@@ -1,0 +1,10 @@
+/node_modules/
+/.vscode/
+-www/js/lib/*.js
+*.DSStore
+*.png
+*.jpg
+*.psd
+*.xcf
+*.js
+*.js.map
