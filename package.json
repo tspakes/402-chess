@@ -2,11 +2,11 @@
   "name": "402chess",
   "version": "0.0.1",
   "description": "Smart chessboard written for ECE402 Senior Design at the University of Tennessee, Knoxville.",
-  "main": "www/js/main.js",
+  "main": "./server/Server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node ./Server.ts",        
-    "start": "nodemon ./Server.js",
+    "dev": "ts-node ./server/Server.ts",
+    "start": "nodemon ./server/Server.js",
     "prod": "npm run build && npm run start"
   },
   "repository": {
@@ -29,6 +29,7 @@
   "homepage": "https://github.com/tspakes/402-chess#readme",
   "dependencies": {
     "@types/express": "^4.16.0",
+    "@types/node": "^10.12.18",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "ts-node": "^7.0.1",
