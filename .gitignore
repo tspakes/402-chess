@@ -8,3 +8,5 @@
 *.xcf
 *.js
 *.js.map
+
+/angular-chess/node_modules
