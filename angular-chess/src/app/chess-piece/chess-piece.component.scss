@@ -1,0 +1,27 @@
+:host {
+
+  --x: 0;
+  --y: 0;
+
+  --x-calc: calc(var(--x) - 50%);
+  --y-calc: calc(var(--y) - 50%);
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(var(--y-calc)) translateX(var(--x-calc));
+  transition: all ease 0.3s;
+  --chess-background: none;
+
+
+}
+
+
+.piece {
+
+  width: 50px;
+  height: 50px;
+  background-image: var(--chess-background);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
