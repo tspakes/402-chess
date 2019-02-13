@@ -10,7 +10,8 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "www/js/**/*.ts"
+    "www/js/**/*.ts",
+    "server/**/*.ts"
   ],
   "exclude": [
       "node_modules"
