@@ -3,11 +3,20 @@ import { Board } from "./Board";
 import { PieceMinimal, Piece } from "./Piece";
 
 export default class BoardAPI {
-	private static _history: Turn[] = []; // Record of all moves made
+	private static _history: Turn[]; // Record of all moves made
 	private static _board: Board; // Virtual state of board at end of turn
 	private static _boardRaw: PieceMinimal[][]; // Physical state of board in real time
 	private static _moveCurrent: Turn; // Probably gonna need a custom class
 	private static _ignoreMoves: boolean;
+
+	public static init(): void {
+		this._board = new Board();
+		this._board.initPieces();
+		this._history = [];
+		this._boardRaw = [];
+		this._moveCurrent = null;
+		this._ignoreMoves = false;
+	}
 
 	public static listen(): void {
 		setTimeout(() => {
@@ -33,7 +42,7 @@ export default class BoardAPI {
 
 	// RESTful Endpoints
   public static getBoard(): string {
-		return JSON.stringify(this._board.serialize());
+		return JSON.stringify(this._board.minimize());
 	}
 
 	public static getHistory(): string {

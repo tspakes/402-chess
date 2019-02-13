@@ -21,10 +21,10 @@ export class Piece {
     return this._team;
   }
   public get x(): number {
-    return this.x;
+    return this._x;
   }
   public get y(): number {
-    return this.y;
+    return this._y;
   }
 
 	public get notation(): 'K'|'Q'|'B'|'N'|'R'|'' {

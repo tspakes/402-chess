@@ -2,7 +2,7 @@ import * as Express from 'express';
 import { Request, Response } from 'express';
 import * as BodyParser from 'body-parser';
 import * as Path from 'path';
-import Board from './BoardAPI';
+import BoardAPI from './BoardAPI';
 
 const PORT = 3000;
 
@@ -16,6 +16,9 @@ class Server {
 		this.app.use(this.router);
 		this.config();
 		this.route();
+
+		BoardAPI.init();
+		BoardAPI.listen();
 
 		this.app.listen(PORT, () => {
 			console.log('Express server listening on port ' + PORT);
@@ -40,10 +43,7 @@ class Server {
 		// Board API
 		this.app.get('/board', (req: Request, res: Response) => {
 			res.status(200);
-			res.json({
-				route: 'BoardAPI',
-				message: 'Success!'
-			});
+			res.send(BoardAPI.getBoard());
 		});
 
 		// Database API

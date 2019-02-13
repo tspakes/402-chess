@@ -87,7 +87,7 @@ export class Board { // Single state of the board
     for (let y = 0; y < 8; y++) {
       ser[y] = [];
       for (let x = 0; x < 8; x++)
-        ser[y].push(this.grid[y][x].serialize());
+        ser[y].push(this.grid[y][x] ? this.grid[y][x].serialize() : null);
     }
     return ser;
   }
@@ -100,7 +100,7 @@ export class Board { // Single state of the board
     for (let y = 0; y < 8; y++) {
       min[y] = [];
       for (let x = 0; x < 8; x++)
-        min[y].push(this.grid[y][x].minimize());
+        min[y].push(this.grid[y][x] ? this.grid[y][x].minimize() : null);
     }
     return min;
   }
