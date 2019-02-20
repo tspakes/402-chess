@@ -72,12 +72,13 @@ export class Board { // Single state of the board
 	/**
 	 * @returns true if valid, false if invalid
 	 */
-	public movePiece(turn: Turn): boolean {
+	public applyTurn(turn: Turn): boolean {
     // Note sure whether to pass two sets of coords or the actual Turn object
     // Check move validity
     // Add turn to history
 		return true;
   }
+  
   
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 

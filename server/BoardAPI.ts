@@ -1,4 +1,4 @@
-import { Turn } from "./Turn";
+import { Turn, TurnType } from "./Turn";
 import { Board } from "./Board";
 import { PieceMinimal, Piece } from "./Piece";
 
@@ -6,36 +6,39 @@ export default class BoardAPI {
 	private static _history: Turn[]; // Record of all moves made
 	private static _board: Board; // Virtual state of board at end of turn
 	private static _boardRaw: PieceMinimal[][]; // Physical state of board in real time
-	private static _moveCurrent: Turn; // Probably gonna need a custom class
+	private static _boardRawChange: { x: number, y: number, up: boolean };
 	private static _ignoreMoves: boolean;
+	private static _possibleTurnTypes: TurnType[];
 
 	public static init(): void {
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
 		this._boardRaw = [];
-		this._moveCurrent = null;
 		this._ignoreMoves = false;
 	}
 
 	public static listen(): void {
-		setTimeout(() => {
+		setInterval(() => {
+			if (this._ignoreMoves) return;
 			// Check for piece movement
-				// Update board_raw
-				// Update GPIO for to read next input after 10ms
+				// For each board change, update possibleTurnChange
+				// Update GPIO to read next input after 10ms
+			
 			// Check for turn end button
 				// Check move validity
 				// Update committed board if move was valid
-				if (this._board.movePiece(this._moveCurrent))
-					this._boardRaw = this._board.minimize();
-				else {
-					console.error('Invalid move detected. Please move pieces to previous positions.');
-					this._ignoreMoves = true;
-					while (this._ignoreMoves) {} // Obviously bad logic, just have this here until I can actually write this
-					// Wait until local website confirms pieces have been moved to previous state
-					// Probably have the _ignoreMoves/wait use this 10ms loop
-					this._boardRaw = this._board.minimize();
-				}
+				
+				// if (this._board.movePiece(this._moveCurrent))
+				// 	this._boardRaw = this._board.minimize();
+				// else {
+				// 	console.error('Invalid move detected. Please move pieces to previous positions.');
+				// 	this._ignoreMoves = true;
+				// 	while (this._ignoreMoves) {} // Obviously bad logic, just have this here until I can actually write this
+				// 	// Wait until local website confirms pieces have been moved to previous state
+				// 	// Probably have the _ignoreMoves/wait use this 10ms loop
+				// 	this._boardRaw = this._board.minimize();
+				// }
 		}, 10);
 		// TODO Keep invalid state boolean somewhere
 	}

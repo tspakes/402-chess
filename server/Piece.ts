@@ -1,3 +1,5 @@
+import { Board } from "./Board";
+
 export type PieceType = 'king'|'queen'|'bishop'|'knight'|'rook'|'pawn';
 export type Team = 'black'|'white';
 
@@ -58,6 +60,16 @@ export class Piece {
     if (this._type !== 'pawn')
       throw 'Only pawns may be promoted.';
     this._type = type;
+  }
+
+  public checkMoveValid(xi: number, yi: number, xf: number, yf: number, board: Board): void {
+    // TODO Make this abstract and have each piece implement this function
+    // For example, rook's would check that either xi==xf or yi==yf, then check that all spaces along that axis of movement are unoccupied
+    // OR, a big, ugly switch statement
+    // Three main checks:
+    // 1. Can the piece ever make that move
+    // 2. Is the movement path unobstructed (except knights)
+    // 3. Is final position occupied by friendly piece
   }
   
   /**
