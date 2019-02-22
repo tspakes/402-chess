@@ -44,7 +44,7 @@ export default class BoardAPI {
 	}
 
 	// RESTful Endpoints
-  public static getBoard(): string {
+  	public static getBoard(): string {
 		return JSON.stringify(this._board.minimize());
 	}
 
