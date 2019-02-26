@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import * as BodyParser from 'body-parser';
 import * as Path from 'path';
 import BoardAPI from './BoardAPI';
+import Chalk from 'chalk';
 
 const PORT = 3000;
 
@@ -34,12 +35,6 @@ class Server {
 	}
 
 	private route(): void {
-		this.router.use((req: Request, res: Response, next: Function) => {
-			// Run this on every incoming request
-			console.log('req_url=' + req.url);
-			next();
-		});
-
 		// Board API
 		this.app.get('/board', (req: Request, res: Response) => {
 			res.status(200);
@@ -55,8 +50,37 @@ class Server {
 			});
 		});
 
+		// Input Spoofing
+		this.app.get('/debug', (req: Request, res: Response) => {
+			if (!BoardAPI.debug) {
+				BoardAPI.debug = true;
+				console.log('BoardAPI set to debug state and will remain in this state until the web server is restarted.');
+			}
+			res.sendFile(Path.join(__dirname, '../debug/inputspoof.html'));
+		});
+		this.app.get('/debug/move', (req: Request, res: Response) => {
+			res.status(200);
+			res.json({
+				message: 'Updated board state.'
+			});
+			console.log(req.params);
+		});
+		this.app.get('/debug/reset', (req: Request, res: Response) => {
+			res.status(200);
+			res.json({
+				message: 'Reset board state.'
+			});
+			console.log('Reset spoofed board state.');
+		});
+
 		// Website file serving
 		this.app.use(Express.static(Path.join(__dirname, '../www')));
+
+		this.router.use((req: Request, res: Response, next: Function) => {
+			// Run this on every incoming request
+			console.log(Chalk.blueBright(req.url));
+			next();
+		});
 	}
 }
 

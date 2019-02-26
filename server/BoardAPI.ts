@@ -3,6 +3,7 @@ import { Board } from "./Board";
 import { PieceMinimal, Piece } from "./Piece";
 
 export default class BoardAPI {
+	public static debug: boolean = false;
 	private static _history: Turn[]; // Record of all moves made
 	private static _board: Board; // Virtual state of board at end of turn
 	private static _boardRaw: PieceMinimal[][]; // Physical state of board in real time
@@ -44,7 +45,7 @@ export default class BoardAPI {
 	}
 
 	// RESTful Endpoints
-  	public static getBoard(): string {
+	public static getBoard(): string {
 		return JSON.stringify(this._board.minimize());
 	}
 

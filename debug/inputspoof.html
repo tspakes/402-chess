@@ -1,0 +1,133 @@
+<html>
+	<head>
+		<title>Input Spoofing | 402Chess</title>
+		<script type="text/javascript">
+			// Generate HTML
+			function init() {
+				let html = '<table>';
+				for (let r = 0; r < 8; r++) {
+					html += '<tr>';
+					for (let c = 0; c < 8; c++) {
+						html += `<td id="cell_${c+1}${8-r}" onclick="toggle(${c+1}, ${8-r})" class="${(r<=1||r>=6?'occupied':'')}">${String.fromCharCode(65+c)}${8-r}</td>`;
+					}
+					html += '</tr>';
+				}
+				html += '</table>';
+				document.getElementById('board').innerHTML = html;
+			}
+
+			// Toggle cell
+			function toggle(x, y) {
+				let td = document.getElementById(`cell_${x}${y}`);
+				let occ = td.className.indexOf('occupied') !== -1;
+				if (occ)
+					td.className = '';
+				else
+					td.className = 'occupied';
+					
+				xhttp = new XMLHttpRequest();
+				xhttp.open('GET', `board/debug/move?x=${x}&y=${y}&b=${occ}`, false); // Async not really nec. for debugging
+				xhttp.send();
+
+				let hist = document.getElementById('history');
+				hist.innerHTML = `<li class="${(occ?'up':'down')}">${(occ?'Picked up':'Put down')} ${td.textContent} ${(occ?'&uarr;':'&darr;')}</li>` + hist.innerHTML;
+			}
+
+			function reset() {
+				xhttp = new XMLHttpRequest();
+				xhttp.open('GET', `board/debug/reset`, false);
+				xhttp.send();
+				init();
+				document.getElementById('history').innerHTML = '';
+			}
+
+			function separate() {
+				let hist = document.getElementById('history');
+				hist.innerHTML = `<li class="separator">-----</li>` + hist.innerHTML;
+			}
+		</script>
+		<style>
+			body {
+				background-color: black;
+				color: #FFF;
+			}
+			div.container {
+				margin-left: auto;
+				margin-right: auto;
+				max-width: 400px;
+				text-align: center;
+			}
+			h1, h2 {
+				margin: 15px 0px 5px;
+			}
+			div#board table {
+				margin: 10px auto;
+				background-color: #CCC;
+			}
+			td {
+				background-color: #999;
+				width: 42px;
+				height: 42px;
+				text-align: center;
+				font-size: 24px;
+				padding: 0px;
+				cursor: pointer;
+				user-select: none;
+			}
+			td:hover {
+				background-color: #777;
+			}
+			td.occupied {
+				background-color: #333;
+			}
+			td.occupied:hover {
+				background-color: #555;
+			}
+			div#control {
+				margin: 0px auto;
+				width: 354px;
+			}
+			div#control > * {
+				display: inline-block;
+			}
+			div#control > button:first-child,
+			div#control > button:last-child {
+				width: 87px;
+			}
+			span.instr {
+				font-size: 12px;
+				font-style: italic;
+				margin: 0px 5px;
+			}
+			ul {
+				list-style: none;
+				padding: 0px;
+				margin: 0px;
+			}
+			li.up {
+				color: #FFF;
+			}
+			li.down {
+				color: #999;
+			}
+			li.separator {
+				color: #333;
+			}
+		</style>
+	</head>
+	<body onload="reset()">
+		<div class="container">
+			<h1>Board Input Spoofing</h1>
+			<div id="board"></div>
+			<div id="control">
+				<button onclick="reset()">Reset</button>
+				<span class="instr">Click cells to toggle inputs.</span>
+				<button onclick="separate()">End Turn</button>
+			</div>
+			<div>
+				<h2>History</h2>
+				<ul id="history"></ul>
+			</div>
+		</div>
+	</body>
+</html>
