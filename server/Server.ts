@@ -4,6 +4,7 @@ import * as BodyParser from 'body-parser';
 import * as Path from 'path';
 import BoardAPI from './BoardAPI';
 import Chalk from 'chalk';
+import BoardDriver from './BoardDriver';
 
 const PORT = 3000;
 
@@ -40,6 +41,33 @@ class Server {
 			res.status(200);
 			res.send(BoardAPI.getBoard());
 		});
+		this.app.post('/board/reset', (req: Request, res: Response) => {
+			res.status(200);
+			res.json({
+				message: 'Not yet implemented.'
+			});
+		});
+		this.app.post('/board/pause', (req: Request, res: Response) => {
+			BoardAPI.postPause();
+			res.status(200);
+			res.json({
+				message: 'Piece detection paused.'
+			});
+		});
+		this.app.post('/board/resume', (req: Request, res: Response) => {
+			BoardAPI.postResume();
+			res.status(200);
+			res.json({
+				message: 'Piece detection resumed.'
+			});
+		});
+		this.app.post('/board/commit', (req: Request, res: Response) => {
+			BoardAPI.postTurn();
+			res.status(200);
+			res.json({
+				message: 'Turn committed.'
+			});
+		});
 
 		// Database API
 		this.app.get('/stats', (req: Request, res: Response) => {
@@ -52,24 +80,29 @@ class Server {
 
 		// Input Spoofing
 		this.app.get('/debug', (req: Request, res: Response) => {
-			if (!BoardAPI.debug) {
-				BoardAPI.debug = true;
-				console.log('BoardAPI set to debug state and will remain in this state until the web server is restarted.');
+			if (!BoardDriver.debug) {
+				BoardDriver.debug = false;
+				BoardDriver.debug = true;
+				BoardAPI.postResume();
+				console.log('BoardDriver set to debug state and will remain in this state until the web server is restarted.');
 			}
 			res.sendFile(Path.join(__dirname, '../debug/inputspoof.html'));
 		});
-		this.app.get('/debug/move', (req: Request, res: Response) => {
+		this.app.post('/debug/set', (req: Request, res: Response) => {
 			res.status(200);
 			res.json({
 				message: 'Updated board state.'
 			});
-			console.log(req.params);
+			BoardDriver.debug_setCell(req.query.x - 1, req.query.y - 1, req.query.lift !== 'true');
+			// TODO Use req.query to modify raw board state
 		});
-		this.app.get('/debug/reset', (req: Request, res: Response) => {
+		this.app.post('/debug/reset', (req: Request, res: Response) => {
 			res.status(200);
 			res.json({
 				message: 'Reset board state.'
 			});
+			BoardDriver.debug = false;
+			BoardDriver.debug = true;
 			console.log('Reset spoofed board state.');
 		});
 

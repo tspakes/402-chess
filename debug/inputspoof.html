@@ -26,7 +26,7 @@
 					td.className = 'occupied';
 					
 				xhttp = new XMLHttpRequest();
-				xhttp.open('GET', `board/debug/move?x=${x}&y=${y}&b=${occ}`, false); // Async not really nec. for debugging
+				xhttp.open('POST', `debug/set?x=${x}&y=${y}&lift=${occ}`, false); // Async not really nec. for debugging
 				xhttp.send();
 
 				let hist = document.getElementById('history');
@@ -35,15 +35,27 @@
 
 			function reset() {
 				xhttp = new XMLHttpRequest();
-				xhttp.open('GET', `board/debug/reset`, false);
+				xhttp.open('POST', `debug/reset`, false);
 				xhttp.send();
 				init();
 				document.getElementById('history').innerHTML = '';
 			}
 
-			function separate() {
+			function endTurn() {
+				xhttp = new XMLHttpRequest();
+				xhttp.open('POST', `board/commit`, false);
+				xhttp.send();
 				let hist = document.getElementById('history');
 				hist.innerHTML = `<li class="separator">-----</li>` + hist.innerHTML;
+			}
+
+			let detectingTurns = true;
+			function toggleDetection(enabled) {
+				xhttp = new XMLHttpRequest();
+				xhttp.open('POST', `board/${detectingTurns?'pause':'resume'}`, false);
+				xhttp.send();
+				detectingTurns = !detectingTurns;
+				document.getElementById('toggleDetectionBtn').innerText = detectingTurns ? 'Pause' : 'Resume';
 			}
 		</script>
 		<style>
@@ -90,9 +102,8 @@
 			div#control > * {
 				display: inline-block;
 			}
-			div#control > button:first-child,
-			div#control > button:last-child {
-				width: 87px;
+			div#control > button {
+				width: 67px;
 			}
 			span.instr {
 				font-size: 12px;
@@ -115,14 +126,15 @@
 			}
 		</style>
 	</head>
-	<body onload="reset()">
+	<body onload="init()">
 		<div class="container">
 			<h1>Board Input Spoofing</h1>
 			<div id="board"></div>
 			<div id="control">
-				<button onclick="reset()">Reset</button>
+				<button id="toggleDetectionBtn" onclick="toggleDetection()" title="Start/stop piece detection">Pause</button>
+				<button onclick="reset()" title="Reset raw board state">Reset</button>
 				<span class="instr">Click cells to toggle inputs.</span>
-				<button onclick="separate()">End Turn</button>
+				<button onclick="endTurn()" title="Commit turn and insert separator to history">Commit</button>
 			</div>
 			<div>
 				<h2>History</h2>
