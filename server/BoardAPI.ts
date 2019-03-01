@@ -32,10 +32,12 @@ export default class BoardAPI {
 			for (let r = 0; r < 8; r++) {
 				if (!col[r] && this._boardRaw[r][BoardDriver.readCol] !== null) {
 					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: true });
+					this._boardRaw[r][BoardDriver.readCol] = null;
 					console.log(Chalk.greenBright(`Picked up ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↑`));
 				}
 				if (col[r] && this._boardRaw[r][BoardDriver.readCol] === null) {
 					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: false });
+					this._boardRaw[r][BoardDriver.readCol] = { type: 'unknown', team: 'unknown' };
 					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`));
 				}
 			}
@@ -57,8 +59,6 @@ export default class BoardAPI {
 				// 	// Probably have the _ignoreMoves/wait use this 10ms loop
 				// 	this._boardRaw = this._board.minimize();
 				// }
-
-			this._boardRaw = this._board.minimize();
 		}, this._pollInterval);
 		// TODO Keep invalid state boolean somewhere
 	}

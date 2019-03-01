@@ -1,7 +1,7 @@
 import { Board } from "./Board";
 
-export type PieceType = 'king'|'queen'|'bishop'|'knight'|'rook'|'pawn';
-export type Team = 'black'|'white';
+export type PieceType = 'king'|'queen'|'bishop'|'knight'|'rook'|'pawn'|'unknown';
+export type Team = 'black'|'white'|'unknown';
 
 export class Piece {
 
