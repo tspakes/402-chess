@@ -33,6 +33,7 @@
     "body-parser": "^1.18.3",
     "chalk": "^2.4.2",
     "express": "^4.16.4",
+    "raspi-gpio": "^6.2.1",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
   }

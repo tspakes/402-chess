@@ -18,6 +18,7 @@ export default class BoardAPI {
 		this._board.initPieces();
 		this._history = [];
 		this._ignoreMoves = true;
+		BoardDriver.init();
 
 		// Initialize raw board
 		this._boardRaw = this._board.minimize();
