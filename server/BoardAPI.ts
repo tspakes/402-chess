@@ -10,45 +10,59 @@ export default class BoardAPI {
 	private static _boardRaw: PieceMinimal[][]; // Physical state of board in real time
 	private static _ignoreMoves: boolean;
 	private static _possibleTurnTypes: TurnType[];
-	private static _rawChangeQueue: { x: number, y: number, lift: boolean }[] = [];
+	private static _rawChangeQueue: { x: number, y: number, lift: boolean, team: Team }[] = [];
 	private static _pollInterval: number = 10; // 200 is pretty good for debugging
+	private static _currentTeam: Team;
 
-	public static init(): void {
+	public static init(): void { // Called every time a new game is started
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
 		this._ignoreMoves = true;
+		this._currentTeam = 'white';
 
 		// Initialize raw board
 		this._boardRaw = this._board.minimize();
 	}
 
-	public static listen(): void {
+	public static listen(): void { // Looping to check columns for changes
 		setInterval(() => {
 		//setTimeout(() => {
 			if (this._ignoreMoves) return;
 
-			let col = BoardDriver.readColumn();
-			for (let r = 0; r < 8; r++) {
-				if (!col[r] && this._boardRaw[r][BoardDriver.readCol] !== null) {
-					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: true });
-					this._boardRaw[r][BoardDriver.readCol] = null;
-					console.log(Chalk.greenBright(`Picked up ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↑`));
+			let col = BoardDriver.readColumn(); // Read the current column
+			for (let r = 0; r < 8; r++) { // Check for lift
+				if (!col[r] && this._boardRaw[r][BoardDriver.readCol] !== null) { // Piece not on physical board, but is on virtual, so piece lifted
+					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: true }); // Record the change
+					this._boardRaw[r][BoardDriver.readCol] = null; // Establish the change in understanding of physical board
+					console.log(Chalk.greenBright(`Picked up ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↑`)); // Output lift
 				}
-				if (col[r] && this._boardRaw[r][BoardDriver.readCol] === null) {
-					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: false });
-					this._boardRaw[r][BoardDriver.readCol] = { type: 'unknown', team: 'unknown' };
-					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`));
+				if (col[r] && this._boardRaw[r][BoardDriver.readCol] === null) { // Check for drop
+					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: false }); // Piece not on virtual, but is on physical, so piece dropped
+					this._boardRaw[r][BoardDriver.readCol] = { type: 'unknown', team: 'unknown' }; // Record the change, uncertain of the piece
+					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`)); // Output drop
 				}
 			}
-			BoardDriver.cycleColumn();
+			BoardDriver.cycleColumn(); // Go to the next column
 
+			for (let change of this._rawChangeQueue) { // Process all queued changes
+				let outcome: string;
+				if (change.lift == true) { // Lift
+					if (change.Team == this.currentTeam) { // Current team lift
+						outcome = 'current lift';
+					} else { // Enemy team lift
+						outcome = 'enemy lift';
+					}
+				} else { // Drop
+					outcome = 'drop'
+				}
+			}
 			// TODO Process raw changes via move state machine
-			
+
 			// Check for turn end button
 				// Check move validity
 				// Update committed board if move was valid
-				
+
 				// if (this._board.movePiece(this._moveCurrent))
 				// 	this._boardRaw = this._board.minimize();
 				// else {
@@ -57,7 +71,7 @@ export default class BoardAPI {
 				// 	while (this._ignoreMoves) {} // Obviously bad logic, just have this here until I can actually write this
 				// 	// Wait until local website confirms pieces have been moved to previous state
 				// 	// Probably have the _ignoreMoves/wait use this 10ms loop
-				// 	this._boardRaw = this._board.minimize();
+				// 	this._boardRaw = this._board.minimize(); // All unknowns are replaced with appropriate values
 				// }
 		}, this._pollInterval);
 		// TODO Keep invalid state boolean somewhere
@@ -81,6 +95,13 @@ export default class BoardAPI {
 
 	public static postTurn(): void {
 		// TODO Add boolean for end turn triggered for next tick
+		if (this._currentTeam == 'white') { // Switch team from white to black
+			this._currentTeam = 'black';
+		} else if (this._currentTeam == 'black') { // Switch team from black to white
+			this._currentTeam = 'white'
+		} else { // Current team is unknown - can this even happen?
+
+		}
 		console.log('Committed turn.');
 	}
 
@@ -92,7 +113,7 @@ export default class BoardAPI {
 	}
 
 	/**
-	 * Call during pawn promotion to select which type of piece was placed on the board. 
+	 * Call during pawn promotion to select which type of piece was placed on the board.
 	 * @param type Piece type to be promoted to
 	 */
 	public static setPromotion(type: string): void {
@@ -101,7 +122,7 @@ export default class BoardAPI {
 	}
 
 	/**
-	 * Call when pieces have been returned to their previous states to resume move detection. 
+	 * Call when pieces have been returned to their previous states to resume move detection.
 	 */
 	public static setUndo(): void {
 		this._ignoreMoves = false;
