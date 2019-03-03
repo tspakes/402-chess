@@ -11,13 +11,13 @@ export default class BoardAPI {
 	private static _ignoreMoves: boolean;
 	private static _possibleTurnTypes: TurnType[];
 	private static _rawChangeQueue: { x: number, y: number, lift: boolean }[] = [];
-	private static _pollInterval: number = 10; // 200 is pretty good for debugging
+	private static _pollInterval: number = 10; // 200 is pretty good for debugging, 10 for production
 
 	public static init(): void {
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
-		this._ignoreMoves = true;
+		this._ignoreMoves = false;//true;
 		BoardDriver.init();
 
 		// Initialize raw board

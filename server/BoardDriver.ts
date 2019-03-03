@@ -40,17 +40,17 @@ export default class BoardDriver {
   public static o_mux2: DigitalOutput;
 
   public static init(): void {
-    this.i_col0 = new DigitalInput({ pin: 'P1-03', pullResistor: PULL_UP });
-    this.i_col1 = new DigitalInput({ pin: 'P1-05', pullResistor: PULL_UP });
-    this.i_col2 = new DigitalInput({ pin: 'P1-07', pullResistor: PULL_UP });
-    this.i_col3 = new DigitalInput({ pin: 'P1-11', pullResistor: PULL_UP });
-    this.i_col4 = new DigitalInput({ pin: 'P1-13', pullResistor: PULL_UP });
-    this.i_col5 = new DigitalInput({ pin: 'P1-15', pullResistor: PULL_UP });
-    this.i_col6 = new DigitalInput({ pin: 'P1-19', pullResistor: PULL_UP });
-    this.i_col7 = new DigitalInput({ pin: 'P1-21', pullResistor: PULL_UP });
-    this.o_mux0 = new DigitalOutput('P1-08');
-    this.o_mux1 = new DigitalOutput('P1-10');
-    this.o_mux2 = new DigitalOutput('P1-12');
+    this.i_col0 = new DigitalInput({ pin: 'GPIO10', pullResistor: PULL_UP });
+    this.i_col1 = new DigitalInput({ pin: 'GPIO9', pullResistor: PULL_UP });
+    this.i_col2 = new DigitalInput({ pin: 'GPIO11', pullResistor: PULL_UP });
+    this.i_col3 = new DigitalInput({ pin: 'GPIO5', pullResistor: PULL_UP });
+    this.i_col4 = new DigitalInput({ pin: 'GPIO6', pullResistor: PULL_UP });
+    this.i_col5 = new DigitalInput({ pin: 'GPIO13', pullResistor: PULL_UP });
+    this.i_col6 = new DigitalInput({ pin: 'GPIO19', pullResistor: PULL_UP });
+    this.i_col7 = new DigitalInput({ pin: 'GPIO26', pullResistor: PULL_UP });
+    this.o_mux0 = new DigitalOutput('GPIO16');
+    this.o_mux1 = new DigitalOutput('GPIO20');
+    this.o_mux2 = new DigitalOutput('GPIO21');
   }
 
   private static _nextCol: number = 0;
@@ -61,12 +61,14 @@ export default class BoardDriver {
   public static setColumn(c: number): void {
     if (c < 0 || c > 7)
       throw `Column must be within the range [0,7]. Actual: ${c}`;
+    //console.log(`Selected col ${c}: ${c%2}${Math.floor(c/2)%2}${Math.floor(c/4)%2}`);
     this.o_mux0.write(c % 2 ? HIGH : LOW);
-    this.o_mux1.write(c / 2 % 2 ? HIGH : LOW);
-    this.o_mux2.write(c / 4 % 2 ? HIGH : LOW);
+    this.o_mux1.write(Math.floor(c / 2) % 2 ? HIGH : LOW);
+    this.o_mux2.write(Math.floor(c / 4) % 2 ? HIGH : LOW);
   }
 
   public static cycleColumn(): number {
+    this.setColumn(this._nextCol);
     if (++this._nextCol > 7)
       this._nextCol = 0;
     return this._nextCol;
