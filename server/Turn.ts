@@ -1,6 +1,6 @@
 import { Piece, PieceType, PieceSerialized } from "./Piece";
 
-export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion';
+export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion'|'invalid';
 
 export class Turn {
 	public type: TurnType;
@@ -21,8 +21,8 @@ export class Turn {
 		// TODO Append '+' for check and '++' for checkmate.
 		// Seems like chess notation is chosen to be as short as possible while still being fully explicit,
 		//  so certain if the only one piece could've taken another, you only designate the attacking piece
-		//  followed by the target's position. 
-		// Really going to need move validity checking before this can be fully fleshed out. 
+		//  followed by the target's position.
+		// Really going to need move validity checking before this can be fully fleshed out.
 		if ('castle')
 			return 'Not yet implemented.'; // Castling kingside is 'O-O' and queenside is 'O-O-O'
 		if ('enpassant')
@@ -33,9 +33,9 @@ export class Turn {
 			return 'Not yet implemented.'; // Include type, x, source, and destination
 		return this.actor.notation + String.fromCharCode(97/*a*/ + this.x2) + (this.y2 + 1);
   }
-  
+
   /**
-   * Remove the turn's functions, getters, and setters in preparation for stringification. 
+   * Remove the turn's functions, getters, and setters in preparation for stringification.
    */
   public serialize(): TurnSerialized {
     return {

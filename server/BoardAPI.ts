@@ -45,17 +45,10 @@ export default class BoardAPI {
 			}
 			BoardDriver.cycleColumn(); // Go to the next column
 
+
+
 			for (let change of this._rawChangeQueue) { // Process all queued changes
-				let outcome: string;
-				if (change.lift == true) { // Lift
-					if (change.Team == this.currentTeam) { // Current team lift
-						outcome = 'current lift';
-					} else { // Enemy team lift
-						outcome = 'enemy lift';
-					}
-				} else { // Drop
-					outcome = 'drop'
-				}
+					state.Process(change, change.team == this._currentTeam)
 			}
 			// TODO Process raw changes via move state machine
 
@@ -99,8 +92,6 @@ export default class BoardAPI {
 			this._currentTeam = 'black';
 		} else if (this._currentTeam == 'black') { // Switch team from black to white
 			this._currentTeam = 'white'
-		} else { // Current team is unknown - can this even happen?
-
 		}
 		console.log('Committed turn.');
 	}
@@ -127,4 +118,11 @@ export default class BoardAPI {
 	public static setUndo(): void {
 		this._ignoreMoves = false;
 	}
+}
+
+export interface RawChange {
+	x: number,
+	y: number,
+	lift: boolean,
+	team: Team
 }
