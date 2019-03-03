@@ -46,6 +46,10 @@ export class Piece {
 		}
   }
 
+  public toString(): string {
+    return `${this.notation}(${String.fromCharCode(66+this.x)}${this.y+1})`;
+  }
+
   /**
    * Utililized by the Board to update the stored position. Does not move the piece on the board. 
    */

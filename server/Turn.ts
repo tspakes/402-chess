@@ -1,18 +1,41 @@
 import { Piece, PieceType, PieceSerialized } from "./Piece";
 
-export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion';
+export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion'|'invalid';
 
 export class Turn {
-	public type: TurnType;
-	public x1: number;
-	public y1: number;
-	public x2: number;
-	public y2: number;
+  public type: TurnType;
+  private _x2: number = -1;
+  private _y2: number = -1;
 	public actor: Piece; // Piece moving
   public target: Piece; // Used in take, enpassant, and pawnpromotion
 	public promotion: PieceType;
 	// TODO Pawn promotion might also be a take, enpassant is always a take
-	// Probably just type enpassant as move and take, only differentiate upon checking validity
+  // Probably just type enpassant as move and take, only differentiate upon checking validity
+  
+  public get x1(): number {
+    if (!this.actor) return -1;
+    return this.actor.x;
+  }
+  public get y1(): number {
+    if (!this.actor) return -1;
+    return this.actor.y;
+  }
+  public get x2(): number {
+    if (this._x2 >= 0) return this._x2;
+    if (!this.target) return -1;
+    return this.target.x;
+  }
+  public set x2(value: number) {
+    this._x2 = value;
+  }
+  public get y2(): number {
+    if (this._x2 >= 0) return this._y2;
+    if (!this.target) return -1;
+    return this.target.y;
+  }
+  public set y2(value: number) {
+    this._y2 = value;
+  }
 
 	/**
 	 * @see http://blog.chesshouse.com/how-to-read-and-write-algebraic-chess-notation/

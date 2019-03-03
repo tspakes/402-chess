@@ -73,9 +73,17 @@ export class Board { // Single state of the board
 	 * @returns true if valid, false if invalid
 	 */
 	public applyTurn(turn: Turn): boolean {
-    // Note sure whether to pass two sets of coords or the actual Turn object
     // Check move validity
-    // Add turn to history
+    if (turn.type === 'invalid') return false;
+    //if (invalid) return false;
+
+    // Update board
+    this.grid[turn.y1][turn.x1] = null;
+    this.grid[turn.y2][turn.x2] = turn.actor;
+
+    // Update piece
+    turn.actor.updatePosition(turn.x2, turn.y2);
+    
 		return true;
   }
   

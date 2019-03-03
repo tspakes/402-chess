@@ -1,6 +1,6 @@
 import { Turn, TurnType } from "./Turn";
 import { Board } from "./Board";
-import { PieceMinimal, Piece } from "./Piece";
+import { PieceMinimal, Piece, Team } from "./Piece";
 import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
 
@@ -8,16 +8,19 @@ export default class BoardAPI {
 	private static _history: Turn[]; // Record of all moves made
 	private static _board: Board; // Virtual state of board at end of turn
 	private static _boardRaw: PieceMinimal[][]; // Physical state of board in real time
+	private static _boardDelta: boolean[][]; // True for cells interacted w/ this turn
 	private static _ignoreMoves: boolean;
-	private static _possibleTurnTypes: TurnType[];
-	private static _rawChangeQueue: { x: number, y: number, lift: boolean }[] = [];
+	private static _rawChangeQueue: { x: number, y: number, lift: boolean, team: Team }[] = [];
 	private static _pollInterval: number = 10; // 200 is pretty good for debugging
+	private static _teamCurrent: Team = 'white';
+	private static _turnCommitQueued: boolean = false;
 
 	public static init(): void {
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
 		this._ignoreMoves = true;
+		this.zeroDelta();
 
 		// Initialize raw board
 		this._boardRaw = this._board.minimize();
@@ -31,36 +34,127 @@ export default class BoardAPI {
 			let col = BoardDriver.readColumn();
 			for (let r = 0; r < 8; r++) {
 				if (!col[r] && this._boardRaw[r][BoardDriver.readCol] !== null) {
-					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: true });
+					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: true, team: this._boardRaw[r][BoardDriver.readCol].team });
 					this._boardRaw[r][BoardDriver.readCol] = null;
+					this._boardDelta[r][BoardDriver.readCol] = true;
 					console.log(Chalk.greenBright(`Picked up ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↑`));
 				}
 				if (col[r] && this._boardRaw[r][BoardDriver.readCol] === null) {
-					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: false });
+					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: false, team: 'unknown' });
 					this._boardRaw[r][BoardDriver.readCol] = { type: 'unknown', team: 'unknown' };
+					this._boardDelta[r][BoardDriver.readCol] = true;
 					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`));
 				}
 			}
 			BoardDriver.cycleColumn();
 
 			// TODO Process raw changes via move state machine
+			//state.process();
 			
 			// Check for turn end button
-				// Check move validity
-				// Update committed board if move was valid
-				
-				// if (this._board.movePiece(this._moveCurrent))
-				// 	this._boardRaw = this._board.minimize();
-				// else {
-				// 	console.error('Invalid move detected. Please move pieces to previous positions.');
-				// 	this._ignoreMoves = true;
-				// 	while (this._ignoreMoves) {} // Obviously bad logic, just have this here until I can actually write this
-				// 	// Wait until local website confirms pieces have been moved to previous state
-				// 	// Probably have the _ignoreMoves/wait use this 10ms loop
-				// 	this._boardRaw = this._board.minimize();
-				// }
+			if (this._turnCommitQueued) {
+				// If no delta and invalid, ignore changes (can't end turn w/o doing anything)
+				let turn = this.postProcess('move');//state.commit());
+				if (this._board.applyTurn(turn)) {
+					console.log('Committed turn.');
+					this._turnCommitQueued = false;
+					this.zeroDelta();
+					this._history.push(turn);
+					// this._boardRaw = this._board.minimize();
+					// TODO Switch current team
+				} else {
+					throw 'Invalid move';
+					this._ignoreMoves = true;
+					// TODO Notify webserver w/ some state information (publish ignore moves && turn committed?)
+					// Wait for undo
+				}
+			}
 		}, this._pollInterval);
 		// TODO Keep invalid state boolean somewhere
+	}
+
+	private static postProcess(type: TurnType): Turn {
+		let boardInit = this._board.grid;
+		let boardFinal = this._boardRaw;
+
+		let turn = new Turn();
+		turn.type = type;
+
+		// Find actor (current team's piece that moved)
+		actorDetection:
+		for (let r = 0; r < 8; r++) {
+			for (let c = 0; c < 8; c++) {
+				if (!this._boardDelta[r][c]) continue; // Skip cells w/o change
+
+				// Add first cell newly vacated by current team (for castling, just picks either king or rook)
+				if (boardInit[r][c] !== null
+						&& boardInit[r][c].team === this._teamCurrent
+						&& boardFinal[r][c] === null) {
+					turn.actor = boardInit[r][c];
+					break actorDetection;
+				}
+			}
+		}
+		console.log(Chalk.greenBright(`actor=${turn.actor.toString()}`));
+
+		// Find final position of moving piece (newly occupied cell)
+		if (type === 'move') {
+			moveDetection:
+			for (let r = 0; r < 8; r++) {
+				for (let c = 0; c < 8; c++) {
+					if (!this._boardDelta[r][c]) continue; // Skip cells w/o change
+
+					// Was unoccupied and is now occupied
+					if (boardInit[r][c] === null
+							&& boardFinal[r][c] !== null) {
+						turn.x2 = c;
+						turn.y2 = r;
+						break moveDetection;
+					}
+				}
+			}
+		}
+		
+		// If take, find target (opposing team that no longer exists on square w/ changes)
+		if (type === 'take') {
+			targetDetection:
+			for (let r = 0; r < 8; r++) {
+				for (let c = 0; c < 8; c++) {
+					if (!this._boardDelta[r][c]) continue; // Skip cells w/o change
+
+					// Add cells still occupied that were changed
+					if (boardFinal[r][c] !== null) {
+						turn.target = boardInit[r][c];
+						break targetDetection;
+					}
+				}
+			}
+			console.log(Chalk.greenBright(`target=${turn.target.toString()}`));
+		}
+
+		switch (type) {
+			case 'move':
+				// Check if pawn and back-row, promote if true
+				break;
+			case 'take':
+				// Check if en-passant (put-down does not match either pick-up)
+				break;
+			case 'castle':
+				// Should be two actors, check both king and rook
+				break;
+		}
+		
+		return turn;
+	}
+
+	private static zeroDelta(): void {
+		this._boardDelta = [];
+		for (let r = 0; r < 8; r++) {
+			this._boardDelta[r] = [];
+			for (let c = 0; c < 8; c++) {
+				this._boardDelta[r][c] = false;
+			}
+		}
 	}
 
 	// RESTful Endpoints
@@ -80,8 +174,8 @@ export default class BoardAPI {
 	}
 
 	public static postTurn(): void {
-		// TODO Add boolean for end turn triggered for next tick
-		console.log('Committed turn.');
+		console.log('Committing turn...');
+		this._turnCommitQueued = true;
 	}
 
 	public static getHistory(): string {
