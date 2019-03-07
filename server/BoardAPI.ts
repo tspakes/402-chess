@@ -3,6 +3,7 @@ import { Board } from "./Board";
 import { PieceMinimal, Piece, Team } from "./Piece";
 import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
+import { State } from "./State";
 
 export default class BoardAPI {
 	private static _history: Turn[]; // Record of all moves made
@@ -10,11 +11,14 @@ export default class BoardAPI {
 	private static _boardRaw: PieceMinimal[][]; // Physical state of board in real time
 	private static _boardDelta: boolean[][]; // True for cells interacted w/ this turn
 	private static _ignoreMoves: boolean;
-	private static _rawChangeQueue: { x: number, y: number, lift: boolean, team: Team }[] = [];
+	private static _rawChangeQueue: RawChange[] = [];
 	private static _pollInterval: number = 10; // 200 is pretty good for debugging
 	private static _teamCurrent: Team = 'white';
 	private static _turnCommitQueued: boolean = false;
 
+	/**
+	 * Initialize board upon the start of a new game. 
+	 */
 	public static init(): void {
 		this._board = new Board();
 		this._board.initPieces();
@@ -26,9 +30,11 @@ export default class BoardAPI {
 		this._boardRaw = this._board.minimize();
 	}
 
+	/**
+	 * Listen for piece movements and turn commits. 
+	 */
 	public static listen(): void {
 		setInterval(() => {
-		//setTimeout(() => {
 			if (this._ignoreMoves) return;
 
 			let col = BoardDriver.readColumn();
@@ -46,10 +52,12 @@ export default class BoardAPI {
 					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`));
 				}
 			}
-			BoardDriver.cycleColumn();
+			BoardDriver.cycleColumn(); // Go to the next column
 
-			// TODO Process raw changes via move state machine
-			//state.process();
+
+			// Process all queued changes
+			for (let change of this._rawChangeQueue)
+				State.process(change, change.team == this._teamCurrent)
 			
 			// Check for turn end button
 			if (this._turnCommitQueued) {
@@ -61,7 +69,11 @@ export default class BoardAPI {
 					this.zeroDelta();
 					this._history.push(turn);
 					// this._boardRaw = this._board.minimize();
-					// TODO Switch current team
+					// Switch current team
+					if (this._teamCurrent === 'white')
+						this._teamCurrent = 'black';
+					else if (this._teamCurrent === 'black')
+						this._teamCurrent = 'white'
 				} else {
 					throw 'Invalid move';
 					this._ignoreMoves = true;
@@ -200,4 +212,11 @@ export default class BoardAPI {
 	public static setUndo(): void {
 		this._ignoreMoves = false;
 	}
+}
+
+export interface RawChange {
+	x: number,
+	y: number,
+	lift: boolean,
+	team: Team
 }
