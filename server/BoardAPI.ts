@@ -117,10 +117,11 @@ export default class BoardAPI {
 			}
 		}
 		if (turn.actor === null) {
+			// The player probably moved the wrong team's piece
 			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected.`));
 			this.printBoardState();
-			// TODO If the player moves the opposing team's piece, we currently throw, but should handle w/ error earlier
-			throw 'Turn actor not detected.';
+			turn.type = 'invalid';
+			return turn;
 		}
 		console.log(Chalk.greenBright(`actor=${turn.actor.toString()}`));
 
