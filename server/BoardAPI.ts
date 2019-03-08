@@ -99,6 +99,7 @@ export default class BoardAPI {
 
 		let turn = new Turn();
 		turn.type = type;
+		if (type === 'invalid') return turn;
 
 		// Find actor (current team's piece that moved)
 		actorDetection:
