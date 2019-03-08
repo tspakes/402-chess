@@ -52,7 +52,7 @@ export default class BoardAPI {
 					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`));
 				}
 			}
-			BoardDriver.cycleColumn(); // Go to the next column
+			BoardDriver.cycleColumn();
 
 
 			// Process all queued changes
@@ -107,6 +107,12 @@ export default class BoardAPI {
 				}
 			}
 		}
+		if (BoardDriver.debug) this.printBoardState();
+		if (turn.actor === null) {
+			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected.`));
+			this.printBoardState();
+			throw 'Turn actor not detected.';
+		}
 		console.log(Chalk.greenBright(`actor=${turn.actor.toString()}`));
 
 		// Find final position of moving piece (newly occupied cell)
@@ -157,6 +163,39 @@ export default class BoardAPI {
 		}
 		
 		return turn;
+	}
+
+	private static printBoardState(): void {
+		// Print header
+		console.log(Chalk.gray('  ==[ ')
+			+ Chalk.white('Initial') + Chalk.gray(' ]========[ ')
+			+ Chalk.white('Delta') + Chalk.gray(' ]========[ ')
+			+ Chalk.white('Current') + Chalk.gray(' ]=='));
+		
+		let lines: string[] = this._board.toString().split('\n');
+		lines[0] += Chalk.gray('   A B C D E F G H   A B C D E F G H');
+		console.log(lines[0]);
+
+		// Append and print the delta and current boards
+		for (let l = 1; l < lines.length; l++) {
+			lines[l] += '   ';
+			// Print delta board
+			for (let x = 0; x < this._boardDelta[l-1].length; x++) {
+				if (this._boardDelta[8-l][x])
+            lines[l] += Chalk.white('1 ');
+          else
+            lines[l] += Chalk.gray('0 ');
+			}
+			lines[l] += '  ';
+			// Print hardware state board
+			for (let x = 0; x < this._boardRaw[l-1].length; x++) {
+				if (this._boardRaw[8-l][x] !== null)
+            lines[l] += Chalk.white('1 ');
+          else
+            lines[l] += Chalk.gray('0 ');
+			}
+			console.log(lines[l]);
+		}
 	}
 
 	private static zeroDelta(): void {
