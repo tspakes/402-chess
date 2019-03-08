@@ -6,8 +6,8 @@ export class Turn {
   public type: TurnType;
   private _x2: number = -1;
   private _y2: number = -1;
-	public actor: Piece; // Piece moving
-  public target: Piece; // Used in take, enpassant, and pawnpromotion
+	public actor: Piece = null; // Piece moving
+  public target: Piece = null; // Used in take, enpassant, and pawnpromotion
 	public promotion: PieceType;
 	// TODO Pawn promotion might also be a take, enpassant is always a take
   // Probably just type enpassant as move and take, only differentiate upon checking validity

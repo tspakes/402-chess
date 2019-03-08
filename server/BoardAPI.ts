@@ -52,23 +52,26 @@ export default class BoardAPI {
 					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`));
 				}
 			}
-			BoardDriver.cycleColumn(); // Go to the next column
+			BoardDriver.cycleColumn();
 
 
 			// Process all queued changes
-			for (let change of this._rawChangeQueue)
-				State.process(change, change.team == this._teamCurrent)
+			for (let change of this._rawChangeQueue) {
+				State.process(change, change.team === this._teamCurrent)
+				if (BoardDriver.debug) console.log(`state=${State.state}`);
+			}
+			this._rawChangeQueue = [];
 			
 			// Check for turn end button
 			if (this._turnCommitQueued) {
 				// If no delta and invalid, ignore changes (can't end turn w/o doing anything)
-				let turn = this.postProcess('move');//state.commit());
+				let turn = this.postProcess(State.commit());
 				if (this._board.applyTurn(turn)) {
 					console.log('Committed turn.');
 					this._turnCommitQueued = false;
 					this.zeroDelta();
 					this._history.push(turn);
-					// this._boardRaw = this._board.minimize();
+					this._boardRaw = this._board.minimize();
 					// Switch current team
 					if (this._teamCurrent === 'white')
 						this._teamCurrent = 'black';
@@ -86,6 +89,11 @@ export default class BoardAPI {
 	}
 
 	private static postProcess(type: TurnType): Turn {
+		if (BoardDriver.debug) {
+			console.log(`turntype=${type}`);
+			this.printBoardState();
+		}
+
 		let boardInit = this._board.grid;
 		let boardFinal = this._boardRaw;
 
@@ -106,6 +114,12 @@ export default class BoardAPI {
 					break actorDetection;
 				}
 			}
+		}
+		if (turn.actor === null) {
+			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected.`));
+			this.printBoardState();
+			// TODO If the player moves the opposing team's piece, we currently throw, but should handle w/ error earlier
+			throw 'Turn actor not detected.';
 		}
 		console.log(Chalk.greenBright(`actor=${turn.actor.toString()}`));
 
@@ -157,6 +171,39 @@ export default class BoardAPI {
 		}
 		
 		return turn;
+	}
+
+	private static printBoardState(): void {
+		// Print header
+		console.log(Chalk.gray('  ==[ ')
+			+ Chalk.white('Initial') + Chalk.gray(' ]========[ ')
+			+ Chalk.white('Delta') + Chalk.gray(' ]========[ ')
+			+ Chalk.white('Current') + Chalk.gray(' ]=='));
+		
+		let lines: string[] = this._board.toString().split('\n');
+		lines[0] += Chalk.gray('   A B C D E F G H   A B C D E F G H');
+		console.log(lines[0]);
+
+		// Append and print the delta and current boards
+		for (let l = 1; l < lines.length; l++) {
+			lines[l] += '   ';
+			// Print delta board
+			for (let x = 0; x < this._boardDelta[l-1].length; x++) {
+				if (this._boardDelta[8-l][x])
+            lines[l] += Chalk.white('1 ');
+          else
+            lines[l] += Chalk.gray('0 ');
+			}
+			lines[l] += '  ';
+			// Print hardware state board
+			for (let x = 0; x < this._boardRaw[l-1].length; x++) {
+				if (this._boardRaw[8-l][x] !== null)
+            lines[l] += Chalk.white('1 ');
+          else
+            lines[l] += Chalk.gray('0 ');
+			}
+			console.log(lines[l]);
+		}
 	}
 
 	private static zeroDelta(): void {

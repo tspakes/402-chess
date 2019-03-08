@@ -25,9 +25,10 @@ export default class BoardDriver {
   }
   // #endregion
 
-  private static _nextCol: number = 0;
+  private static _colSelected: number = 0;
+  private static _colRead: number = 0;
   public static get readCol(): number {
-    return this._nextCol <= 0 ? 7 : this._nextCol - 1;
+    return this._colRead;
   }
   
   public static setColumn(c: number): void {
@@ -37,14 +38,16 @@ export default class BoardDriver {
   }
 
   public static cycleColumn(): number {
-    if (++this._nextCol > 7)
-      this._nextCol = 0;
-    return this._nextCol;
+    this.setColumn(this._colSelected);
+    if (++this._colSelected > 7)
+      this._colSelected = 0;
+    return this._colSelected;
   }
   
   public static readColumn(): boolean[] {
+    this._colRead = this._colSelected;
     if (this._debug)
-      return this._debugBoard[this._nextCol];
+      return this._debugBoard[this._colSelected];
     // TODO Read inputs from GPIO
     return [ false, false, false, false, false, false, false, false ];
   }

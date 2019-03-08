@@ -47,7 +47,7 @@ export class Piece {
   }
 
   public toString(): string {
-    return `${this.notation}(${String.fromCharCode(66+this.x)}${this.y+1})`;
+    return `${this.notation}(${String.fromCharCode(65+this.x)}${this.y+1})`;
   }
 
   /**

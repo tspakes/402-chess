@@ -80,10 +80,10 @@ class Server {
 
 		// Input Spoofing
 		this.app.get('/debug', (req: Request, res: Response) => {
+			BoardAPI.postResume();
 			if (!BoardDriver.debug) {
 				BoardDriver.debug = false;
 				BoardDriver.debug = true;
-				BoardAPI.postResume();
 				console.log('BoardDriver set to debug state and will remain in this state until the web server is restarted.');
 			}
 			res.sendFile(Path.join(__dirname, '../debug/inputspoof.html'));
