@@ -1,10 +1,12 @@
 import { RawChange } from "./BoardAPI";
 import { TurnType } from "./Turn";
 
-export class State {
-	private static _state: string = 'init';
+export type StateEnum = 'init'|'any'|'move'|'enpassant'|'castle'|'take'|'takealt'|'takeconfirm'|'error';
 
-  public static get state(): string {
+export class State {
+	private static _state: StateEnum = 'init';
+
+  public static get state(): StateEnum {
     return this._state;
   }
 
@@ -43,14 +45,14 @@ export class State {
   }
 
   public static commit(): TurnType {
-    if (this._state === 'init') return 'invalid';
-    else if (this._state === 'any') return 'invalid';
-    else if (this._state === 'move') return 'move';
-    else if (this._state === 'enpassant') return 'enpassant';
-    else if (this._state === 'castle') return 'castle';
-    else if (this._state === 'take') return 'invalid';
-    else if (this._state === 'takealt') return 'invalid';
-    else if (this._state === 'takeconfirm') return 'take';
-    else if (this._state === 'error') return 'invalid';
+    let type: TurnType = 'invalid';
+    if (this._state === 'move') type = 'move';
+    else if (this._state === 'enpassant') type = 'enpassant';
+    else if (this._state === 'castle') type = 'castle';
+    else if (this._state === 'take') type = 'invalid';
+    else if (this._state === 'takealt') type = 'invalid';
+    else if (this._state === 'takeconfirm') type = 'take';
+    this._state = 'init';
+    return type;
   }
 }

@@ -56,19 +56,22 @@ export default class BoardAPI {
 
 
 			// Process all queued changes
-			for (let change of this._rawChangeQueue)
-				State.process(change, change.team == this._teamCurrent)
+			for (let change of this._rawChangeQueue) {
+				State.process(change, change.team === this._teamCurrent)
+				if (BoardDriver.debug) console.log(`state=${State.state}`);
+			}
+			this._rawChangeQueue = [];
 			
 			// Check for turn end button
 			if (this._turnCommitQueued) {
 				// If no delta and invalid, ignore changes (can't end turn w/o doing anything)
-				let turn = this.postProcess('move');//state.commit());
+				let turn = this.postProcess(State.commit());
 				if (this._board.applyTurn(turn)) {
 					console.log('Committed turn.');
 					this._turnCommitQueued = false;
 					this.zeroDelta();
 					this._history.push(turn);
-					// this._boardRaw = this._board.minimize();
+					this._boardRaw = this._board.minimize();
 					// Switch current team
 					if (this._teamCurrent === 'white')
 						this._teamCurrent = 'black';
@@ -86,6 +89,11 @@ export default class BoardAPI {
 	}
 
 	private static postProcess(type: TurnType): Turn {
+		if (BoardDriver.debug) {
+			console.log(`turntype=${type}`);
+			this.printBoardState();
+		}
+
 		let boardInit = this._board.grid;
 		let boardFinal = this._boardRaw;
 
@@ -107,10 +115,10 @@ export default class BoardAPI {
 				}
 			}
 		}
-		if (BoardDriver.debug) this.printBoardState();
 		if (turn.actor === null) {
 			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected.`));
 			this.printBoardState();
+			// TODO If the player moves the opposing team's piece, we currently throw, but should handle w/ error earlier
 			throw 'Turn actor not detected.';
 		}
 		console.log(Chalk.greenBright(`actor=${turn.actor.toString()}`));
