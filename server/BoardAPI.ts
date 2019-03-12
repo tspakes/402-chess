@@ -44,13 +44,13 @@ export default class BoardAPI {
 					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: true, team: this._boardRaw[r][BoardDriver.readCol].team });
 					this._boardRaw[r][BoardDriver.readCol] = null;
 					this._boardDelta[r][BoardDriver.readCol] = true;
-					console.log(Chalk.greenBright(`Picked up ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↑`));
+					console.log(Chalk.greenBright(`Picked up ${String.fromCharCode(65+BoardDriver.readCol)}${r+1}. ↑`));
 				}
 				if (col[r] && this._boardRaw[r][BoardDriver.readCol] === null) {
 					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: false, team: 'unknown' });
 					this._boardRaw[r][BoardDriver.readCol] = { type: 'unknown', team: 'unknown' };
 					this._boardDelta[r][BoardDriver.readCol] = true;
-					console.log(Chalk.green(`Put down ${String.fromCharCode(66+BoardDriver.readCol)}${r+1}. ↓`));
+					console.log(Chalk.green(`Put down ${String.fromCharCode(65+BoardDriver.readCol)}${r+1}. ↓`));
 				}
 			}
 			BoardDriver.cycleColumn();
@@ -60,6 +60,10 @@ export default class BoardAPI {
 			for (let change of this._rawChangeQueue) {
 				State.process(change, change.team === this._teamCurrent)
 				if (BoardDriver.debug) console.log(`state=${State.state}`);
+				if (State.state === 'move' && this.sumDelta() === 1) {
+					// Forget change if player moved piece to same cell
+					State.reset();
+				}
 			}
 			this._rawChangeQueue = [];
 			
@@ -83,7 +87,7 @@ export default class BoardAPI {
 						this._teamCurrent = 'white';
 				} else {
 					this._ignoreMoves = true;
-					throw 'Invalid move';
+					throw Chalk.red('Invalid move processed.');
 					// TODO Notify webserver w/ some state information (publish ignore moves && turn committed?)
 					// Wait for undo
 				}
@@ -148,7 +152,7 @@ export default class BoardAPI {
 		}
 		
 		// If take, find target (opposing team that no longer exists on square w/ changes)
-		if (type === 'take') {
+		if (type === 'take' || type === 'enpassant') {
 			targetDetection:
 			for (let r = 0; r < 8; r++) {
 				for (let c = 0; c < 8; c++) {
@@ -272,6 +276,15 @@ export default class BoardAPI {
 				this._boardDelta[r][c] = false;
 			}
 		}
+	}
+
+	private static sumDelta(): number {
+		let sum = 0;
+		for (let r = 0; r < 8; r++)
+			for (let c = 0; c < 8; c++)
+				if (this._boardDelta[r][c])
+					sum++;
+		return sum;
 	}
 
 	// RESTful Endpoints

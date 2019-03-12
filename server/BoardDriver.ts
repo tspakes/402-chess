@@ -1,3 +1,5 @@
+import chalk from "chalk";
+
 // Import GPIO here later
 
 export default class BoardDriver {
@@ -21,6 +23,8 @@ export default class BoardDriver {
     this._debug = value;
   }
   public static debug_setCell(x: number, y: number, occupied: boolean) {
+    if (!this._debug)
+      throw chalk.red('Cannot set spoofed cell when not spoofing.');
     this._debugBoard[x][y] = occupied;
   }
   // #endregion
@@ -33,7 +37,7 @@ export default class BoardDriver {
   
   public static setColumn(c: number): void {
     if (c < 0 || c > 7)
-      throw `Column must be within the range [0,7]. Actual: ${c}`;
+      throw chalk.red(`Column must be within the range [0,7]. Actual: ${c}`);
     // TODO Set multiplexer GPIO
   }
 

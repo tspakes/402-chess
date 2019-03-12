@@ -14,6 +14,8 @@
 				}
 				html += '</table>';
 				document.getElementById('board').innerHTML = html;
+
+				readHistoryFromUrl();
 			}
 
 			// Toggle cell
@@ -56,6 +58,38 @@
 				xhttp.send();
 				detectingTurns = !detectingTurns;
 				document.getElementById('toggleDetectionBtn').innerText = detectingTurns ? 'Pause' : 'Resume';
+			}
+
+			function exportHistory() {
+				let enc = '';
+				let lines = document.getElementById('history').innerText.split('\n').reverse();
+				let line;
+				for (let l = 0; l < lines.length; l++) {
+					line = lines[l];
+					if (line === '-----') line = '';
+					else if (line.startsWith('Picked up')) line = line.substr(10, 2);
+					else if (line.startsWith('Put down')) line = line.substr(9, 2);
+					else continue;
+					enc += ',' + line;
+				}
+				enc = './debug?script=' + enc.substr(1);
+				document.getElementById('histEnc').innerText = enc;
+			}
+
+			function readHistoryFromUrl() {
+				let iQ = window.location.href.indexOf('script=');
+				if (iQ < 0) return;
+				let actions = window.location.href.substr(iQ+7).split(',');
+				let a = 0;
+				let intval = setInterval(() => {
+					if (actions[a] === '')
+						endTurn();
+					else
+						toggle(actions[a].charCodeAt(1)-65+1, parseInt(actions[a].substr(2,1)));
+					a++;
+					if (a >= actions.length)
+						clearInterval(intval);
+				}, 100);
 			}
 		</script>
 		<style>
@@ -124,6 +158,9 @@
 			li.separator {
 				color: #333;
 			}
+			a {
+				color: #999;
+			}
 		</style>
 	</head>
 	<body onload="init()">
@@ -139,6 +176,8 @@
 			<div>
 				<h2>History</h2>
 				<ul id="history"></ul>
+				<button id="exportHistory" onclick="exportHistory()" title="Encode history for url">Export</button>
+				<div id="histEnc"></div>
 			</div>
 		</div>
 	</body>
