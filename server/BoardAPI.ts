@@ -37,6 +37,7 @@ export default class BoardAPI {
 		setInterval(() => {
 			if (this._ignoreMoves) return;
 
+			// Queue changes from physical board
 			let col = BoardDriver.readColumn();
 			for (let r = 0; r < 8; r++) {
 				if (!col[r] && this._boardRaw[r][BoardDriver.readCol] !== null) {
@@ -61,6 +62,7 @@ export default class BoardAPI {
 				if (BoardDriver.debug) console.log(`state=${State.state}`);
 			}
 			this._rawChangeQueue = [];
+			
 			
 			// Check for turn end button
 			if (this._turnCommitQueued) {
@@ -172,9 +174,13 @@ export default class BoardAPI {
 				turn.type = 'invalid';
 		}
 
-		// TODO Check if pawn that reached back row
-		// turn.type = 'pawnpromotion';
-		// this._ignoreMoves = true;
+		// Check for pawn promotion
+		if (turn.actor.type === 'pawn'
+				&& ((turn.actor.team === 'black' && turn.y2 === 7)
+					|| (turn.actor.team === 'white' && turn.y2 === 0)))
+			turn.type = 'pawnpromotion';
+		// TODO The black and white here depend on starting positions here, so make sure the indexing is correct
+		// TODO Flag for further interaction needed from local website
 		
 		return turn;
 	}
