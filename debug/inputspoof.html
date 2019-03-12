@@ -37,7 +37,11 @@
 
 			function reset() {
 				xhttp = new XMLHttpRequest();
+				xhttp.open('POST', `board/reset`, false);
+				xhttp.send();
 				xhttp.open('POST', `debug/reset`, false);
+				xhttp.send();
+				xhttp.open('POST', `board/resume`, false);
 				xhttp.send();
 				init();
 				document.getElementById('history').innerHTML = '';

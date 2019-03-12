@@ -13,30 +13,39 @@ export default class BoardAPI {
 	private static _boardRaw: PieceMinimal[][]; // Physical state of board in real time
 	private static _boardDelta: boolean[][]; // True for cells interacted w/ this turn
 	private static _ignoreMoves: boolean;
-	private static _rawChangeQueue: RawChange[] = [];
+	private static _rawChangeQueue: RawChange[];
 	private static _pollInterval: number = 10; // 200 is pretty good for debugging
-	private static _teamCurrent: Team = 'white';
+	private static _teamCurrent: Team;
 	private static _turnCommitQueued: boolean = false;
+	private static _intervalId: NodeJS.Timeout = null;
 
 	/**
 	 * Initialize board upon the start of a new game. 
 	 */
 	public static init(): void {
+		// Zero everything. 
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
 		this._ignoreMoves = true;
+		this._teamCurrent = 'white';
+		this._rawChangeQueue = [];
 		this.zeroDelta();
-
-		// Initialize raw board
 		this._boardRaw = this._board.minimize();
+		State.reset();
+
+		// Restart listening if already doing so
+		if (this._intervalId !== null) {
+			clearInterval(this._intervalId);
+			this.listen();
+		}
 	}
 
 	/**
 	 * Listen for piece movements and turn commits. 
 	 */
 	public static listen(): void {
-		setInterval(() => {
+		this._intervalId = setInterval(() => {
 			if (this._ignoreMoves) return;
 
 			// Queue changes from physical board
