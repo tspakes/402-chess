@@ -96,6 +96,10 @@ export class Board { // Single state of the board
     // Update board
     this.grid[turn.y1][turn.x1] = null;
     this.grid[turn.y2][turn.x2] = turn.actor;
+    if (turn.type === 'castle') {
+      this.grid[turn.y3][turn.x3] = null;
+      this.grid[turn.y4][turn.x4] = turn.actor2;
+    }
 
     // Update piece
     turn.actor.updatePosition(turn.x2, turn.y2);

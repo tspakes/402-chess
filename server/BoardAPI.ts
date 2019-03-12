@@ -144,7 +144,7 @@ export default class BoardAPI {
 		console.log(Chalk.greenBright(`actor=${turn.actor.toString()}`));
 
 		// Find final position of moving piece (newly occupied cell)
-		if (type === 'move') {
+		if (type === 'move' || type === 'castle') {
 			moveDetection:
 			for (let r = 0; r < 8; r++) {
 				for (let c = 0; c < 8; c++) {
@@ -221,8 +221,8 @@ export default class BoardAPI {
 					// Was unoccupied and is now occupied, but not the same as previously detected
 					if (boardInit[r][c] === null
 							&& boardFinal[r][c] !== null
-							&& c !== turn.x2
-							&& r !== turn.y2) {
+							&& !(c === turn.x2
+								&& r === turn.y2)) {
 						turn.x4 = c;
 						turn.y4 = r;
 						break moveDetection;
@@ -238,7 +238,9 @@ export default class BoardAPI {
 			}
 			
 			// Sub-classify castle turn type depending on king's final location
-			turn.meta.kingside = boardFinal[turn.actor.y][6] !== null;
+			turn.meta.kingside = boardFinal[turn.actor.y][6] !== null
+				&& boardFinal[turn.actor.y][6].type === 'king'
+				&& boardFinal[turn.actor.y][6].team === this._teamCurrent;
 			if (DEBUG) console.log(Chalk.gray(`turn.meta.kingside=${turn.meta.kingside}`));
 		}
 

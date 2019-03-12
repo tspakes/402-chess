@@ -3,6 +3,7 @@
 		<title>Input Spoofing | 402Chess</title>
 		<script type="text/javascript">
 			// Generate HTML
+			let firstinit = true;
 			function init() {
 				let html = '<table>';
 				for (let r = 0; r < 8; r++) {
@@ -15,7 +16,10 @@
 				html += '</table>';
 				document.getElementById('board').innerHTML = html;
 
-				readHistoryFromUrl();
+				if (firstinit) {
+					readHistoryFromUrl();
+					firstinit = false;
+				}
 			}
 
 			// Toggle cell
