@@ -1,4 +1,5 @@
 import { DigitalInput, DigitalOutput, PULL_UP, HIGH, LOW } from 'raspi-gpio';
+import chalk from "chalk";
 
 export default class BoardDriver {
   // #region DEBUG
@@ -21,10 +22,11 @@ export default class BoardDriver {
     this._debug = value;
   }
   public static debug_setCell(x: number, y: number, occupied: boolean) {
+    if (!this._debug)
+      throw chalk.red('Cannot set spoofed cell when not spoofing.');
     this._debugBoard[x][y] = occupied;
   }
   // #endregion
-
 
   
   public static i_col0: DigitalInput;
@@ -53,14 +55,15 @@ export default class BoardDriver {
     this.o_mux2 = new DigitalOutput('GPIO21');
   }
 
-  private static _nextCol: number = 0;
+  private static _colSelected: number = 0;
+  private static _colRead: number = 0;
   public static get readCol(): number {
-    return this._nextCol <= 0 ? 7 : this._nextCol - 1;
+    return this._colRead;
   }
   
   public static setColumn(c: number): void {
     if (c < 0 || c > 7)
-      throw `Column must be within the range [0,7]. Actual: ${c}`;
+      throw chalk.red(`Column must be within the range [0,7]. Actual: ${c}`);
     //console.log(`Selected col ${c}: ${c%2}${Math.floor(c/2)%2}${Math.floor(c/4)%2}`);
     this.o_mux0.write(c % 2 ? HIGH : LOW);
     this.o_mux1.write(Math.floor(c / 2) % 2 ? HIGH : LOW);
@@ -68,15 +71,16 @@ export default class BoardDriver {
   }
 
   public static cycleColumn(): number {
-    this.setColumn(this._nextCol);
-    if (++this._nextCol > 7)
-      this._nextCol = 0;
-    return this._nextCol;
+    this.setColumn(this._colSelected);
+    if (++this._colSelected > 7)
+      this._colSelected = 0;
+    return this._colSelected;
   }
   
   public static readColumn(): boolean[] {
+    this._colRead = this._colSelected;
     if (this._debug)
-      return this._debugBoard[this._nextCol];
+      return this._debugBoard[this._colSelected];
     return [
       this.i_col0.read() === HIGH,
       this.i_col1.read() === HIGH,

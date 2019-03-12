@@ -1,5 +1,6 @@
 import { Piece, PieceSerialized, PieceType, Team, PieceMinimal } from "./Piece";
 import { Turn } from "./Turn";
+import Chalk from 'chalk';
 
 export class Board { // Single state of the board
   public grid: Piece[][]; // Rows denoted by numbers, columns by letters A-H (y, x here)
@@ -67,16 +68,41 @@ export class Board { // Single state of the board
 	public placePiece(type: PieceType, team: Team, x: number, y: number): void {
     let p = new Piece(type, team, x, y);
     this.grid[y][x] = p;
-	}
+  }
+  
+  public toString(): string {
+    let str: string = Chalk.gray('  A B C D E F G H\n');
+    for (let y = 7; y >= 0; y--) {
+      str += Chalk.gray(`${y+1} `); // Row demarkation
+      for (let x = 0; x < 8; x++) {
+        // Piece '-' for empty, 'P' for pawn, notation for others; cyan for white, blue for black
+        if (this.grid[y][x] === null) str += Chalk.gray('-');
+        else {
+          if (this.grid[y][x].team === 'white')
+            str += Chalk.cyanBright(this.grid[y][x].notation === '' ? 'P' : this.grid[y][x].notation);
+          else
+            str += Chalk.blue(this.grid[y][x].notation === '' ? 'P' : this.grid[y][x].notation);
+        }
+        str += ' ';
+      }
+      str = str.slice(0, str.length-1) + '\n';
+    }
+    return str.slice(0, str.length-1);
+  }
 
-	/**
-	 * @returns true if valid, false if invalid
-	 */
-	public applyTurn(turn: Turn): boolean {
-    // Note sure whether to pass two sets of coords or the actual Turn object
-    // Check move validity
-    // Add turn to history
-		return true;
+	public applyTurn(turn: Turn): void {
+    if (turn.type === 'invalid') throw 'Could not apply invalid move to the board.';
+
+    // Update board
+    this.grid[turn.y1][turn.x1] = null;
+    this.grid[turn.y2][turn.x2] = turn.actor;
+    if (turn.type === 'castle') {
+      this.grid[turn.y3][turn.x3] = null;
+      this.grid[turn.y4][turn.x4] = turn.actor2;
+    }
+
+    // Update piece
+    turn.actor.updatePosition(turn.x2, turn.y2);
   }
   
   
