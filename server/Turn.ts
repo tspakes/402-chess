@@ -7,7 +7,10 @@ export class Turn {
   public type: TurnType;
   private _x2: number = -1;
   private _y2: number = -1;
-	public actor: Piece = null; // Piece moving
+  private _x4: number = -1;
+  private _y4: number = -1;
+  public actor: Piece = null; // Piece moving
+  public actor2: Piece = null; // Only used for castling
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
   public promotion: PieceType;
 	// TODO Pawn promotion might also be a take, enpassant is always a take
@@ -37,6 +40,27 @@ export class Turn {
   public set y2(value: number) {
     this._y2 = value;
   }
+  // Castling-only variables
+  public get x3(): number {
+    if (!this.actor2) return -1;
+    return this.actor2.x;
+  }
+  public get y3(): number {
+    if (!this.actor2) return -1;
+    return this.actor2.y;
+  }
+  public get x4(): number {
+    return this._x4;
+  }
+  public set x4(value: number) {
+    this._x4 = value;
+  }
+  public get y4(): number {
+    return this._y4;
+  }
+  public set y4(value: number) {
+    this._y4 = value;
+  }
 
 	/**
 	 * @see http://blog.chesshouse.com/how-to-read-and-write-algebraic-chess-notation/
@@ -59,6 +83,9 @@ export class Turn {
   }
 
 	public isValid(board: Board): boolean {
+    // TODO This should handle castling while Piece.isTurnValid() just checks that each piece moved in a valid way
+    //      For castling, check that both king and rook castled to the same side
+    // TODO Need to check that this.actor2.isTurnValid() as well, but it'll need to use a different x and y, so maybe pass in the x and y instead?
     return this.type !== 'invalid' && this.actor.isTurnValid(this, board);
 	}
   

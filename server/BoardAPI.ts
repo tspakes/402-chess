@@ -167,11 +167,57 @@ export default class BoardAPI {
 		}
 
 		if (type === 'castle') {
-			// Set actor to king
-			// Set target to rook
-			// Set kingside/queenside meta
-			if (turn.type === 'castle')
-				turn.type = 'invalid';
+			// Find the piece that hasn't beed logged yet (king if actor==rook, rook if actor==king)
+			actor2Detection:
+			for (let r = 0; r < 8; r++) {
+				for (let c = 0; c < 8; c++) {
+					if (!this._boardDelta[r][c]) continue; // Skip cells w/o change
+
+					// Add second (and hopefully only other) cell newly vacated by current team
+					if (boardInit[r][c] !== null
+							&& boardInit[r][c].team === this._teamCurrent
+							&& boardFinal[r][c] === null
+							&& boardInit[r][c] !== turn.actor) {
+						turn.actor2 = boardInit[r][c];
+						break actor2Detection;
+					}
+				}
+			}
+
+			// Swap king and rook so that turn.actor = king
+			if (turn.actor.type !== 'king') {
+				let temp = turn.actor;
+				turn.actor = turn.actor2;
+				turn.actor2 = temp;
+			}
+
+			// Detect rook's final position (might actually be king's final position)
+			moveDetection:
+			for (let r = 0; r < 8; r++) {
+				for (let c = 0; c < 8; c++) {
+					if (!this._boardDelta[r][c]) continue; // Skip cells w/o change
+
+					// Was unoccupied and is now occupied, but not the same as previously detected
+					if (boardInit[r][c] === null
+							&& boardFinal[r][c] !== null
+							&& c !== turn.x2
+							&& r !== turn.y2) {
+						turn.x4 = c;
+						turn.y4 = r;
+						break moveDetection;
+					}
+				}
+			}
+			// Attempt to swap rook and king's final positions to make more sense if necessary
+			// y-position should be consistent, so ignore that, but should be checked in the validity checker
+			if (turn.x2 !== 2 && turn.x2 !== 6) { // If king not at one of the possible king spots, swap
+				let tmp = turn.x2;
+				turn.x2 = turn.x4;
+				turn.x4 = tmp;
+			}
+			
+			// Sub-classify castle turn type depending on king's final location
+			turn.type = boardFinal[turn.actor.y][6] !== null ? 'castlekingside' : 'castlequeenside';
 		}
 
 		// Check for pawn promotion

@@ -90,11 +90,8 @@ export class Board { // Single state of the board
     return str.slice(0, str.length-1);
   }
 
-	/**
-	 * @returns true if valid, false if invalid
-	 */
 	public applyTurn(turn: Turn): void {
-    //if (invalid) return false;
+    if (turn.type === 'invalid') throw 'Could not apply invalid move to the board.';
 
     // Update board
     this.grid[turn.y1][turn.x1] = null;
