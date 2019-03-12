@@ -66,7 +66,9 @@ export default class BoardAPI {
 			if (this._turnCommitQueued) {
 				// If no delta and invalid, ignore changes (can't end turn w/o doing anything)
 				let turn = this.postProcess(State.commit());
-				if (this._board.applyTurn(turn)) {
+				if (turn.isValid(this._board)) {
+					this._board.applyTurn(turn);
+					
 					console.log('Committed turn.');
 					this._turnCommitQueued = false;
 					this.zeroDelta();
@@ -76,10 +78,10 @@ export default class BoardAPI {
 					if (this._teamCurrent === 'white')
 						this._teamCurrent = 'black';
 					else if (this._teamCurrent === 'black')
-						this._teamCurrent = 'white'
+						this._teamCurrent = 'white';
 				} else {
-					throw 'Invalid move';
 					this._ignoreMoves = true;
+					throw 'Invalid move';
 					// TODO Notify webserver w/ some state information (publish ignore moves && turn committed?)
 					// Wait for undo
 				}
@@ -158,19 +160,21 @@ export default class BoardAPI {
 				}
 			}
 			console.log(Chalk.greenBright(`target=${turn.target.toString()}`));
+
+			// TODO Check if en-passant (put-down does not match either pick-up) and set turn type
 		}
 
-		switch (type) {
-			case 'move':
-				// Check if pawn and back-row, promote if true
-				break;
-			case 'take':
-				// Check if en-passant (put-down does not match either pick-up)
-				break;
-			case 'castle':
-				// Should be two actors, check both king and rook
-				break;
+		if (type === 'castle') {
+			// Set actor to king
+			// Set target to rook
+			// Set kingside/queenside meta
+			if (turn.type === 'castle')
+				turn.type = 'invalid';
 		}
+
+		// TODO Check if pawn that reached back row
+		// turn.type = 'pawnpromotion';
+		// this._ignoreMoves = true;
 		
 		return turn;
 	}

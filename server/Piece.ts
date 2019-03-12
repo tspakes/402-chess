@@ -1,4 +1,5 @@
 import { Board } from "./Board";
+import { Turn } from "./Turn";
 
 export type PieceType = 'king'|'queen'|'bishop'|'knight'|'rook'|'pawn'|'unknown';
 export type Team = 'black'|'white'|'unknown';
@@ -66,7 +67,7 @@ export class Piece {
     this._type = type;
   }
 
-  public checkMoveValid(xi: number, yi: number, xf: number, yf: number, board: Board): void {
+  public isTurnValid(turn: Turn, board: Board): boolean {
     // TODO Make this abstract and have each piece implement this function
     // For example, rook's would check that either xi==xf or yi==yf, then check that all spaces along that axis of movement are unoccupied
     // OR, a big, ugly switch statement
@@ -74,6 +75,7 @@ export class Piece {
     // 1. Can the piece ever make that move
     // 2. Is the movement path unobstructed (except knights)
     // 3. Is final position occupied by friendly piece
+    return true;
   }
   
   /**
