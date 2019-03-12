@@ -5,6 +5,8 @@ import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
 import { State } from "./State";
 
+const DEBUG = true;
+
 export default class BoardAPI {
 	private static _history: Turn[]; // Record of all moves made
 	private static _board: Board; // Virtual state of board at end of turn
@@ -59,7 +61,7 @@ export default class BoardAPI {
 			// Process all queued changes
 			for (let change of this._rawChangeQueue) {
 				State.process(change, change.team === this._teamCurrent)
-				if (BoardDriver.debug) console.log(`state=${State.state}`);
+				if (DEBUG) console.log(`state=${State.state}`);
 				if (State.state === 'move' && this.sumDelta() === 1) {
 					// Forget change if player moved piece to same cell
 					State.reset();
@@ -93,12 +95,11 @@ export default class BoardAPI {
 				}
 			}
 		}, this._pollInterval);
-		// TODO Keep invalid state boolean somewhere
 	}
 
 	private static postProcess(type: TurnType): Turn {
-		if (BoardDriver.debug) {
-			console.log(`turntype=${type}`);
+		if (DEBUG) {
+			console.log(Chalk.gray(`turntype=${type}`));
 			this.printBoardState();
 		}
 
@@ -148,6 +149,12 @@ export default class BoardAPI {
 						break moveDetection;
 					}
 				}
+			}
+
+			// Maintain whether pawn movement was single or double for enpassant validity checking later
+			if (turn.actor.type === 'pawn') {
+				turn.meta.doublepawn = Math.abs(turn.y1 - turn.y2) > 1;
+				if (DEBUG) console.log(Chalk.gray(`turn.meta.doublepawn=${turn.meta.doublepawn}`));
 			}
 		}
 		
@@ -221,7 +228,8 @@ export default class BoardAPI {
 			}
 			
 			// Sub-classify castle turn type depending on king's final location
-			turn.type = boardFinal[turn.actor.y][6] !== null ? 'castlekingside' : 'castlequeenside';
+			turn.meta.kingside = boardFinal[turn.actor.y][6] !== null;
+			if (DEBUG) console.log(Chalk.gray(`turn.meta.kingside=${turn.meta.kingside}`));
 		}
 
 		// Check for pawn promotion

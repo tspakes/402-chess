@@ -1,7 +1,7 @@
 import { Piece, PieceType, PieceSerialized } from "./Piece";
 import { Board } from "./Board";
 
-export type TurnType = 'move'|'take'|'castle'|'castlekingside'|'castlequeenside'|'enpassant'|'pawnpromotion'|'invalid';
+export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion'|'invalid';
 
 export class Turn {
   public type: TurnType;
@@ -13,6 +13,7 @@ export class Turn {
   public actor2: Piece = null; // Only used for castling
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
   public promotion: PieceType;
+  public meta: any = {}; // Pawn double move, castle side
 	// TODO Pawn promotion might also be a take, enpassant is always a take
   // Probably just type enpassant as move and take, only differentiate upon checking validity
   
@@ -102,7 +103,8 @@ export class Turn {
       actor: this.actor.serialize(),
       target: this.target.serialize(),
       promotion: this.promotion,
-      notation: this.notation
+      notation: this.notation,
+      meta: this.meta
     }
   }
 }
@@ -117,4 +119,5 @@ export interface TurnSerialized {
   target: PieceSerialized;
   promotion: string;
   notation: string;
+  meta: {};
 }
