@@ -79,9 +79,11 @@ export class Piece {
 
 		if (turn.type == 'invalid') return false; // Invalid move, just return false
 
+		if (board.grid[turn.y2][turn.x2] != null && board.grid[turn.y2][turn.x2].team == turn.actor.team) return false; // Friendly piece in the way at destination
+
 		let xdiff = Math.abs(turn.x2 - turn.x1);
 		let ydiff = Math.abs(turn.y2 - turn.y1);
-		switch (turn.type) {
+		switch (turn.actor.type) {
 	/* KING KING KING KING KING KING */
 			case 'king':
 				// Have to consider moves not being able to be made due to check threat
