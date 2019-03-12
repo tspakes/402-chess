@@ -51,13 +51,13 @@ export default class BoardAPI {
 			// Queue changes from physical board
 			let col = BoardDriver.readColumn();
 			for (let r = 0; r < 8; r++) {
-				if (!col[r] && this._boardRaw[r][BoardDriver.readCol] !== null) {
+				if (!col[r] && this._boardRaw[r][BoardDriver.readCol] !== null) { // Lift
 					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: true, team: this._boardRaw[r][BoardDriver.readCol].team });
 					this._boardRaw[r][BoardDriver.readCol] = null;
 					this._boardDelta[r][BoardDriver.readCol] = true;
 					console.log(Chalk.greenBright(`Picked up ${String.fromCharCode(65+BoardDriver.readCol)}${r+1}. ↑`));
 				}
-				if (col[r] && this._boardRaw[r][BoardDriver.readCol] === null) {
+				if (col[r] && this._boardRaw[r][BoardDriver.readCol] === null) { // Drop
 					this._rawChangeQueue.push({ x: BoardDriver.readCol, y: r, lift: false, team: 'unknown' });
 					this._boardRaw[r][BoardDriver.readCol] = { type: 'unknown', team: 'unknown' };
 					this._boardDelta[r][BoardDriver.readCol] = true;
@@ -203,6 +203,7 @@ export default class BoardAPI {
 					}
 				}
 			}
+			console.log(Chalk.greenBright(`actor2=${turn.actor2.toString()}`));
 
 			// Swap king and rook so that turn.actor = king
 			if (turn.actor.type !== 'king') {
@@ -243,11 +244,12 @@ export default class BoardAPI {
 
 		// Check for pawn promotion
 		if (turn.actor.type === 'pawn'
-				&& ((turn.actor.team === 'black' && turn.y2 === 7)
-					|| (turn.actor.team === 'white' && turn.y2 === 0)))
+				&& ((turn.actor.team === 'black' && turn.y2 === 0)
+					|| (turn.actor.team === 'white' && turn.y2 === 7))) {
 			turn.type = 'pawnpromotion';
+			if (DEBUG) console.log(Chalk.gray(`turntype=pawnpromotion`));
+		}
 		// TODO The black and white here depend on starting positions here, so make sure the indexing is correct
-		// TODO Flag for further interaction needed from local website
 		
 		return turn;
 	}

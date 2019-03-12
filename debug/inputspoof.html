@@ -44,6 +44,7 @@
 				xhttp.open('POST', `board/resume`, false);
 				xhttp.send();
 				init();
+				document.getElementById('histEncLabel').innerText = '';
 				document.getElementById('history').innerHTML = '';
 			}
 
@@ -76,8 +77,11 @@
 					else continue;
 					enc += ',' + line;
 				}
-				enc = './debug?script=' + enc.substr(1);
-				document.getElementById('histEnc').innerText = enc;
+				enc = window.location.href.substr(0, window.location.href.lastIndexOf('/')) + '/debug?script=' + enc.substr(1);
+				document.getElementById('histEnc').value = enc;
+				document.getElementById('histEnc').select();
+				document.execCommand('copy');
+				document.getElementById('histEncLabel').innerText = 'Copied to clipboard.';
 			}
 
 			function readHistoryFromUrl() {
@@ -86,10 +90,17 @@
 				let actions = window.location.href.substr(iQ+7).split(',');
 				let a = 0;
 				let intval = setInterval(() => {
-					if (actions[a] === '')
-						endTurn();
-					else
-						toggle(actions[a].charCodeAt(1)-65+1, parseInt(actions[a].substr(2,1)));
+					try {
+						if (actions[a] === '')
+							endTurn();
+						else
+							toggle(actions[a].charCodeAt(0)-65+1, parseInt(actions[a].substr(1,1)));
+					} catch (error) {
+						clearInterval(intval);
+						let hist = document.getElementById('history');
+						hist.innerHTML = `<li style="color:#F00;">${error}</li>` + hist.innerHTML;
+						return;
+					}
 					a++;
 					if (a >= actions.length)
 						clearInterval(intval);
@@ -151,7 +162,7 @@
 			ul {
 				list-style: none;
 				padding: 0px;
-				margin: 0px;
+				margin: 0px 0px 5px;
 			}
 			li.up {
 				color: #FFF;
@@ -164,6 +175,12 @@
 			}
 			a {
 				color: #999;
+			}
+			input#histEnc {
+				display: block;
+				color: black;
+				background-color: black;
+				border: none;
 			}
 		</style>
 	</head>
@@ -180,8 +197,9 @@
 			<div>
 				<h2>History</h2>
 				<ul id="history"></ul>
-				<button id="exportHistory" onclick="exportHistory()" title="Encode history for url">Export</button>
-				<div id="histEnc"></div>
+				<button id="exportHistory" onclick="exportHistory()" title="Encode history as script for reproduction">Export Script</button>
+				<div id="histEncLabel"></div>
+				<input type="text" value="" id="histEnc" />
 			</div>
 		</div>
 	</body>
