@@ -1,6 +1,7 @@
 import { Piece, PieceType, PieceSerialized } from "./Piece";
+import { Board } from "./Board";
 
-export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion'|'invalid';
+export type TurnType = 'move'|'take'|'castle'|'castlekingside'|'castlequeenside'|'enpassant'|'pawnpromotion'|'invalid';
 
 export class Turn {
   public type: TurnType;
@@ -8,7 +9,7 @@ export class Turn {
   private _y2: number = -1;
 	public actor: Piece = null; // Piece moving
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
-	public promotion: PieceType;
+  public promotion: PieceType;
 	// TODO Pawn promotion might also be a take, enpassant is always a take
   // Probably just type enpassant as move and take, only differentiate upon checking validity
   
@@ -56,6 +57,10 @@ export class Turn {
 			return 'Not yet implemented.'; // Include type, x, source, and destination
 		return this.actor.notation + String.fromCharCode(97/*a*/ + this.x2) + (this.y2 + 1);
   }
+
+	public isValid(board: Board): boolean {
+    return this.type !== 'invalid' && this.actor.isTurnValid(this, board);
+	}
   
   /**
    * Remove the turn's functions, getters, and setters in preparation for stringification. 

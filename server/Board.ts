@@ -93,9 +93,7 @@ export class Board { // Single state of the board
 	/**
 	 * @returns true if valid, false if invalid
 	 */
-	public applyTurn(turn: Turn): boolean {
-    // Check move validity
-    if (turn.type === 'invalid') return false;
+	public applyTurn(turn: Turn): void {
     //if (invalid) return false;
 
     // Update board
@@ -104,8 +102,6 @@ export class Board { // Single state of the board
 
     // Update piece
     turn.actor.updatePosition(turn.x2, turn.y2);
-    
-		return true;
   }
   
   

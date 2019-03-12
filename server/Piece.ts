@@ -1,4 +1,5 @@
 import { Board } from "./Board";
+import { Turn } from "./Turn";
 
 export type PieceType = 'king'|'queen'|'bishop'|'knight'|'rook'|'pawn'|'unknown';
 export type Team = 'black'|'white'|'unknown';
@@ -81,8 +82,9 @@ export class Piece {
 
 		let xdiff = Math.abs(turn.x2 - turn.x1);
 		let ydiff = Math.abs(turn.y2 - turn.y1);
-		switch (turn.type) {
-	/* KING KING KING KING KING KING */
+		let a: number, b: number, x: number; // <- Just added temporarily to fix build errors 
+		switch (turn.actor.type) {
+			/* KING KING KING KING KING KING */
 			case 'king':
 				// Have to consider moves not being able to be made due to check threat
 				if (xdiff > 1 || ydiff > 1) { // Might be a castle, but not a normal king move
@@ -98,8 +100,8 @@ export class Piece {
 				} else { // Should be normal move, can't have pieces in the way, as this is a one-square move
 					return true;
 				}
-	/* END KING */
-	/* QUEEN QUEEN QUEEN QUEEN QUEEN QUEEN */
+			/* END KING */
+			/* QUEEN QUEEN QUEEN QUEEN QUEEN QUEEN */
 			case 'queen':
 				if (xdiff == ydiff) { // Diagonal move
 					if (turn.y1 < turn.y2) {
@@ -110,9 +112,9 @@ export class Piece {
 						let b = turn.y1;
 					}
 					if (turn.x1 < turn.x2) {
-						let x = x1 + 1;
+						let x = turn.x1 + 1;
 					} else {
-						let x = x2 + 1;
+						let x = turn.x2 + 1;
 					}
 					while (a < b) { // Check spaces between source and destination
 						if (board.grid[a][x] != null) return false; // Piece in the way
@@ -149,81 +151,81 @@ export class Piece {
 					return false;
 				}
 				return true;
-	/* END QUEEN */
-	/* BISHOP BISHOP BISHOP BISHOP BISHOP BISHOP */
+			/* END QUEEN */
+			/* BISHOP BISHOP BISHOP BISHOP BISHOP BISHOP */
 			case 'bishop':
-			if (xdiff == ydiff) {
-				if (turn.y1 < turn.y2) {
-					let a = turn.y1 + 1;
-					let b = turn.y2;
-				} else {
-					let a = turn.y2 + 1;
-					let b = turn.y1;
+				if (xdiff == ydiff) {
+					if (turn.y1 < turn.y2) {
+						let a = turn.y1 + 1;
+						let b = turn.y2;
+					} else {
+						let a = turn.y2 + 1;
+						let b = turn.y1;
+					}
+					if (turn.x1 < turn.x2) {
+						let x = turn.x1 + 1;
+					} else {
+						let x = turn.x2 + 1;
+					}
+					while (a < b) { // Check spaces between source and destination
+						if (board.grid[a][x] != null) return false; // Piece in the way
+						a++; // Move toward y destination/source
+						x++; // Move toward x destination/source
+					}
+				} else {// Invalid, xdiff and ydiff must be equal
+					return false;
 				}
-				if (turn.x1 < turn.x2) {
-					let x = x1 + 1;
-				} else {
-					let x = x2 + 1;
-				}
-				while (a < b) { // Check spaces between source and destination
-					if (board.grid[a][x] != null) return false; // Piece in the way
-					a++; // Move toward y destination/source
-					x++; // Move toward x destination/source
-				}
-			} else {// Invalid, xdiff and ydiff must be equal
-				return false;
-			}
 				return true;
-	/* END BISHOP */
-	/* KNIGHT KNIGHT KNIGHT KNIGHT KNIGHT KNIGHT */
+			/* END BISHOP */
+			/* KNIGHT KNIGHT KNIGHT KNIGHT KNIGHT KNIGHT */
 			case 'knight':
 				if (xdiff == 2 && ydiff == 1 || xdiff == 1 && ydiff == 2) { // L move
 					return true;
 				} else { // Not an L move
 					return false;
 				}
-	/* END KNIGHT */
-	/* ROOK ROOK ROOK ROOK ROOK ROOK */
+			/* END KNIGHT */
+			/* ROOK ROOK ROOK ROOK ROOK ROOK */
 			case 'rook':
-			if (xdiff == 0) { // y-axis move
-				if (turn.y1 < turn.y2) {
-					let a = turn.y1 + 1;
-					let b = turn.y2;
-				} else {
-					let a = turn.y2 + 1;
-					let b = turn.y1;
+				if (xdiff == 0) { // y-axis move
+					if (turn.y1 < turn.y2) {
+						let a = turn.y1 + 1;
+						let b = turn.y2;
+					} else {
+						let a = turn.y2 + 1;
+						let b = turn.y1;
+					}
+					let x = turn.x1;
+					while (a < b) { // Check spaces between source and destination
+						if (board.grid[a][x] != null) return false; // Piece in the way
+						a++; // Move toward destination/source
+					}
+				} else if (ydiff == 0) { // x-axis move
+					if (turn.x1 < turn.x2) {
+						let a = turn.x1 + 1;
+						let b = turn.x2;
+					} else {
+						let a = turn.x2 + 1;
+						let b = turn.x1;
+					}
+					let y = turn.y1;
+					while (a < b) { // Check spaces between source and destination
+						if (board.grid[y][a] != null) return false; // Piece in the way
+						a++; // Move toward destination/source
+					}
+				} else { // Invalid, either xdiff or ydiff must be 0
+					return false;
 				}
-				let x = turn.x1;
-				while (a < b) { // Check spaces between source and destination
-					if (board.grid[a][x] != null) return false; // Piece in the way
-					a++; // Move toward destination/source
-				}
-			} else if (ydiff == 0) { // x-axis move
-				if (turn.x1 < turn.x2) {
-					let a = turn.x1 + 1;
-					let b = turn.x2;
-				} else {
-					let a = turn.x2 + 1;
-					let b = turn.x1;
-				}
-				let y = turn.y1;
-				while (a < b) { // Check spaces between source and destination
-					if (board.grid[y][a] != null) return false; // Piece in the way
-					a++; // Move toward destination/source
-				}
-			} else { // Invalid, either xdiff or ydiff must be 0
-				return false;
-			}
-			return true;
-	/* END ROOK */
-	/* PAWN PAWN PAWN PAWN PAWN PAWN */
+				return true;
+			/* END ROOK */
+			/* PAWN PAWN PAWN PAWN PAWN PAWN */
 			case 'pawn':
 				return true;
-	/* END PAWN */
-	/* DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT */
+			/* END PAWN */
+			/* DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT */
 			default:
 				return false;
-				// Do something errory
+				// Do something errory <- just returning false is error-y enough [BFSV]
 		}
   }
 
