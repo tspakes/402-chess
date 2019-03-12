@@ -84,14 +84,9 @@ export class Piece {
 
 		let xdiff = Math.abs(turn.x2 - turn.x1);
 		let ydiff = Math.abs(turn.y2 - turn.y1);
-<<<<<<< HEAD
-		let a: number, b: number, x: number; // <- Just added temporarily to fix build errors 
+		let a: number, b: number, x: number; // <- Just added temporarily to fix build errors
 		switch (turn.actor.type) {
 			/* KING KING KING KING KING KING */
-=======
-		switch (turn.actor.type) {
-	/* KING KING KING KING KING KING */
->>>>>>> Tristan
 			case 'king':
 				// Have to consider moves not being able to be made due to check threat
 				if (xdiff > 1 || ydiff > 1) { // Might be a castle, but not a normal king move
