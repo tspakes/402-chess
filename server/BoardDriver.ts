@@ -58,7 +58,7 @@ export default class BoardDriver {
   private static _colSelected: number = 0;
   private static _colRead: number = 0;
   public static get readCol(): number {
-    return this._colRead;
+    return 7 - this._colRead;
   }
   
   public static setColumn(c: number): void {
