@@ -60,7 +60,7 @@ export class Turn {
   }
 
 	public isValid(board: Board): boolean {
-    if (this.type == 'enpassant' && this.target != board.lastTurn.actor && lastTurn.meta.doublepawn != true) return false; // Attempted invalid enpassant 
+    if (this.type == 'enpassant' && this.target != board.lastTurn.actor && board.lastTurn.meta.doublepawn != true) return false; // Attempted invalid enpassant 
     return this.type !== 'invalid' && this.actor.isTurnValid(this, board);
     
 	}
