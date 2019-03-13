@@ -10,6 +10,7 @@ export class Turn {
 	public actor: Piece = null; // Piece moving
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
   public promotion: PieceType;
+  public lastTurn: Turn;
 	// TODO Pawn promotion might also be a take, enpassant is always a take
   // Probably just type enpassant as move and take, only differentiate upon checking validity
   
@@ -59,7 +60,9 @@ export class Turn {
   }
 
 	public isValid(board: Board): boolean {
+    if (this.type == 'enpassant' && this.target != board.lastTurn.actor && lastTurn.meta.doublepawn != true) return false; // Attempted invalid enpassant 
     return this.type !== 'invalid' && this.actor.isTurnValid(this, board);
+    
 	}
   
   /**

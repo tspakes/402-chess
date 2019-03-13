@@ -9,7 +9,9 @@ export class Piece {
 	private _type: PieceType;
 	private _team: Team;
 	private _x: number;
-  private _y: number;
+	private _y: number;
+	public hasMoved: boolean = false;
+
 
 	constructor(type: PieceType, team: Team, x: number = -1, y: number = -1) {
     this._type = type;
@@ -84,13 +86,13 @@ export class Piece {
 
 		let xdiff = Math.abs(turn.x2 - turn.x1);
 		let ydiff = Math.abs(turn.y2 - turn.y1);
-		let a: number, b: number, x: number; // <- Just added temporarily to fix build errors
+		let a: number, b: number, x: number, y: number; // <- Just added temporarily to fix build errors
 		switch (turn.actor.type) {
 			/* KING KING KING KING KING KING */
 			case 'king':
 				// Have to consider moves not being able to be made due to check threat
 				if (xdiff > 1 || ydiff > 1) { // Might be a castle, but not a normal king move
-					if (ydiff != 0 || xdiff != 2) { //Not a castle, so invalid
+					if (ydiff != 0 || xdiff != 2) { // Not a castle, so invalid
 						return false;
 					} else {
 						// Castling cannot occur if:
@@ -98,6 +100,8 @@ export class Piece {
 						//   2. A space the King must cross or will arrive at is threatened
 						//   3. The King or Rook to castle with has moved
 						//   4. A piece, enemy or friendly, is obstructing the castling path
+						
+						return true;
 					}
 				} else { // Should be normal move, can't have pieces in the way, as this is a one-square move
 					return true;
@@ -107,16 +111,16 @@ export class Piece {
 			case 'queen':
 				if (xdiff == ydiff) { // Diagonal move
 					if (turn.y1 < turn.y2) {
-						let a = turn.y1 + 1;
-						let b = turn.y2;
+						a = turn.y1 + 1;
+						b = turn.y2;
 					} else {
-						let a = turn.y2 + 1;
-						let b = turn.y1;
+						a = turn.y2 + 1;
+						b = turn.y1;
 					}
 					if (turn.x1 < turn.x2) {
-						let x = turn.x1 + 1;
+						x = turn.x1 + 1;
 					} else {
-						let x = turn.x2 + 1;
+						x = turn.x2 + 1;
 					}
 					while (a < b) { // Check spaces between source and destination
 						if (board.grid[a][x] != null) return false; // Piece in the way
@@ -125,26 +129,26 @@ export class Piece {
 					}
 				} else if (xdiff == 0) { // y-axis move
 					if (turn.y1 < turn.y2) {
-						let a = turn.y1 + 1;
-						let b = turn.y2;
+						a = turn.y1 + 1;
+						b = turn.y2;
 					} else {
-						let a = turn.y2 + 1;
-						let b = turn.y1;
+						a = turn.y2 + 1;
+						b = turn.y1;
 					}
-					let x = turn.x1;
+					x = turn.x1;
 					while (a < b) { // Check spaces between source and destination
 						if (board.grid[a][x] != null) return false; // Piece in the way
 						a++; // Move toward destination/source
 					}
 				} else if (ydiff == 0) { // x-axis move
 					if (turn.x1 < turn.x2) {
-						let a = turn.x1 + 1;
-						let b = turn.x2;
+						a = turn.x1 + 1;
+						b = turn.x2;
 					} else {
-						let a = turn.x2 + 1;
-						let b = turn.x1;
+						a = turn.x2 + 1;
+						b = turn.x1;
 					}
-					let y = turn.y1;
+					y = turn.y1;
 					while (a < b) { // Check spaces between source and destination
 						if (board.grid[y][a] != null) return false; // Piece in the way
 						a++; // Move toward destination/source
@@ -158,16 +162,16 @@ export class Piece {
 			case 'bishop':
 				if (xdiff == ydiff) {
 					if (turn.y1 < turn.y2) {
-						let a = turn.y1 + 1;
-						let b = turn.y2;
+						a = turn.y1 + 1;
+						b = turn.y2;
 					} else {
-						let a = turn.y2 + 1;
-						let b = turn.y1;
+						a = turn.y2 + 1;
+						b = turn.y1;
 					}
 					if (turn.x1 < turn.x2) {
-						let x = turn.x1 + 1;
+						x = turn.x1 + 1;
 					} else {
-						let x = turn.x2 + 1;
+						x = turn.x2 + 1;
 					}
 					while (a < b) { // Check spaces between source and destination
 						if (board.grid[a][x] != null) return false; // Piece in the way
@@ -191,26 +195,26 @@ export class Piece {
 			case 'rook':
 				if (xdiff == 0) { // y-axis move
 					if (turn.y1 < turn.y2) {
-						let a = turn.y1 + 1;
-						let b = turn.y2;
+						a = turn.y1 + 1;
+						b = turn.y2;
 					} else {
-						let a = turn.y2 + 1;
-						let b = turn.y1;
+						a = turn.y2 + 1;
+						b = turn.y1;
 					}
-					let x = turn.x1;
+					x = turn.x1;
 					while (a < b) { // Check spaces between source and destination
 						if (board.grid[a][x] != null) return false; // Piece in the way
 						a++; // Move toward destination/source
 					}
 				} else if (ydiff == 0) { // x-axis move
 					if (turn.x1 < turn.x2) {
-						let a = turn.x1 + 1;
-						let b = turn.x2;
+						a = turn.x1 + 1;
+						b = turn.x2;
 					} else {
-						let a = turn.x2 + 1;
-						let b = turn.x1;
+						a = turn.x2 + 1;
+						b = turn.x1;
 					}
-					let y = turn.y1;
+					y = turn.y1;
 					while (a < b) { // Check spaces between source and destination
 						if (board.grid[y][a] != null) return false; // Piece in the way
 						a++; // Move toward destination/source
@@ -222,12 +226,46 @@ export class Piece {
 			/* END ROOK */
 			/* PAWN PAWN PAWN PAWN PAWN PAWN */
 			case 'pawn':
-				return true;
+				let pawnMovement = turn.y2 - turn.y1;
+				if (xdiff == 1 && ydiff == 1) { // Pawn diagonal attack
+					let dest = board.grid[turn.y2][turn.x2];
+					let offset: number;
+					if (turn.actor.team == 'white') offset = -1; // Behind white pawn
+					else offset = 1; // Behind black pawn
+					let behindPawn = board.grid[turn.y2 + offset][turn.x2]
+					if (dest == null && behindPawn == null) {
+						return false; // Not an enpassant and no enemy piece to take at pawn destination
+					} else { // Piece present at pawn attack destination or behind that destination
+						if (dest != null) { // Normal pawn attack
+							return true; // Enemy piece at destination
+						} else { // A piece is behind the pawn attack destination
+							if (behindPawn.type != 'pawn' || behindPawn.team == turn.actor.team) return false;
+							else return true; // Valid enpassant							
+						}
+					}
+				} else if (ydiff == 1 && xdiff == 0) { // Pawn single move
+					if (turn.actor.team == 'white' && (pawnMovement <  1) || turn.actor.team == 'black' && (pawnMovement > -1)) {
+						return false; // Pawn moving backwards
+					} else if (board.grid[turn.y2][turn.x2] != null) {
+						return false; // Piece in the way at pawn destination
+					} else return true; // Valid single move
+				} else if (ydiff == 2 && xdiff == 0 && this.hasMoved == false) { // Pawn double move allowed if it hasn't moved
+					if (board.grid[turn.y2][turn.x2] != null) return false; // Piece in the way at pawn destination
+					if (turn.actor.team == 'white') {
+						y = turn.y1 + 1; // White team pawn double move transition space
+					} else if (turn.actor.team == 'black') {
+						y = turn.y1 - 1; // Black team pawn double move transition space
+					}
+					if (board.grid[y][turn.x2] != null) return false; // Obstruction check for pawn double move transition space
+					else return true; // Valid double move
+				} else {
+					return false;
+				}
+				
 			/* END PAWN */
 			/* DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT */
 			default:
 				return false;
-				// Do something errory <- just returning false is error-y enough [BFSV]
 		}
   }
 
