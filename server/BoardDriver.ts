@@ -71,9 +71,9 @@ export default class BoardDriver {
   }
 
   public static cycleColumn(): number {
-    this.setColumn(this._colSelected);
     if (++this._colSelected > 7)
       this._colSelected = 0;
+    this.setColumn(this._colSelected);
     return this._colSelected;
   }
   
@@ -82,14 +82,14 @@ export default class BoardDriver {
     if (this._debug)
       return this._debugBoard[this._colSelected];
     return [
-      this.i_col0.read() === HIGH,
-      this.i_col1.read() === HIGH,
-      this.i_col2.read() === HIGH,
-      this.i_col3.read() === HIGH,
-      this.i_col4.read() === HIGH,
-      this.i_col5.read() === HIGH,
-      this.i_col6.read() === HIGH,
-      this.i_col7.read() === HIGH,
+      this.i_col0.read() === LOW,
+      this.i_col1.read() === LOW,
+      this.i_col2.read() === LOW,
+      this.i_col3.read() === LOW,
+      this.i_col4.read() === LOW,
+      this.i_col5.read() === LOW,
+      this.i_col6.read() === LOW,
+      this.i_col7.read() === LOW,
     ];
   }
 }
