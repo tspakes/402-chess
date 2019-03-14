@@ -55,4 +55,8 @@ export class State {
     this._state = 'init';
     return type;
   }
+
+  public static reset(): void {
+    this._state = 'init';
+  }
 }

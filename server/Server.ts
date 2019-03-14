@@ -49,12 +49,19 @@ class Server {
 			res.status(200);
 			res.send(BoardAPI.getBoard());
 		});
+		/** 
+		 * Resets board to initial state. Pauses move detection until /board/resume is called.
+		 */
 		this.app.post('/board/reset', (req: Request, res: Response) => {
+			BoardAPI.init();
 			res.status(200);
 			res.json({
-				message: 'Not yet implemented.'
+				message: 'Board reset to initial state.'
 			});
 		});
+		/**
+		 * Pause piece detection. 
+		 */
 		this.app.post('/board/pause', (req: Request, res: Response) => {
 			BoardAPI.postPause();
 			res.status(200);
@@ -62,6 +69,9 @@ class Server {
 				message: 'Piece detection paused.'
 			});
 		});
+		/**
+		 * Resume piece detection. 
+		 */
 		this.app.post('/board/resume', (req: Request, res: Response) => {
 			BoardAPI.postResume();
 			res.status(200);
@@ -69,6 +79,9 @@ class Server {
 				message: 'Piece detection resumed.'
 			});
 		});
+		/**
+		 * Commit currently pending turn. 
+		 */
 		this.app.post('/board/commit', (req: Request, res: Response) => {
 			BoardAPI.postTurn();
 			res.status(200);
@@ -87,6 +100,9 @@ class Server {
 		});
 
 		// Input Spoofing
+		/**
+		 * Enable hardware spoofing, enable piece detection, and return the control panel. 
+		 */
 		this.app.get('/debug', (req: Request, res: Response) => {
 			BoardAPI.postResume();
 			if (!BoardDriver.debug) {
@@ -102,8 +118,10 @@ class Server {
 				message: 'Updated board state.'
 			});
 			BoardDriver.debug_setCell(req.query.x - 1, req.query.y - 1, req.query.lift !== 'true');
-			// TODO Use req.query to modify raw board state
 		});
+		/**
+		 * Reset the spoofed hardware state. 
+		 */
 		this.app.post('/debug/reset', (req: Request, res: Response) => {
 			res.status(200);
 			res.json({
