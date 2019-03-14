@@ -4,7 +4,9 @@ import {NgModule} from '@angular/core';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {ChessBoardComponent} from './chess-board/chess-board.component';
-import { ChessPieceComponent } from './chess-piece/chess-piece.component';
+import {ChessPieceComponent} from './chess-piece/chess-piece.component';
+import {HttpClientModule} from '@angular/common/http';
+import {BoardApi} from './api/board.api';
 
 @NgModule({
     declarations: [
@@ -14,9 +16,12 @@ import { ChessPieceComponent } from './chess-piece/chess-piece.component';
     ],
     imports: [
         BrowserModule,
-        AppRoutingModule
+        AppRoutingModule,
+        HttpClientModule
     ],
-    providers: [],
+    providers: [
+        BoardApi
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

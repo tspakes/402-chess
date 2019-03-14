@@ -16,7 +16,7 @@ export class ChessPieceComponent implements OnInit {
     /**
      * Which color the piece should be
      */
-    @Input() color: 'dark' | 'light';
+    @Input() color: 'black' | 'white';
 
 
     @Input() x: number;

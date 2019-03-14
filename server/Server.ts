@@ -29,6 +29,14 @@ class Server {
 	}
 
 	private config(): void{
+		
+		// Enable cross origin requests
+		this.app.use(function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+			next();
+		});
+		
 		// Support application/json type post data
 		this.app.use(BodyParser.json());
 		// Support application/x-www-form-urlencoded post data
