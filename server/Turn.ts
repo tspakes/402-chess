@@ -13,11 +13,8 @@ export class Turn {
   public actor2: Piece = null; // Only used for castling
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
   public promotion: PieceType;
-<<<<<<< HEAD
   public lastTurn: Turn;
-=======
   public meta: any = {}; // Pawn double move, castle side
->>>>>>> 76a16ecfe54ca4d7bced105d3bb7023e83b68984
 	// TODO Pawn promotion might also be a take, enpassant is always a take
   // Probably just type enpassant as move and take, only differentiate upon checking validity
   
@@ -88,13 +85,10 @@ export class Turn {
   }
 
 	public isValid(board: Board): boolean {
-<<<<<<< HEAD
     if (this.type == 'enpassant' && this.target != board.lastTurn.actor && board.lastTurn.meta.doublepawn != true) return false; // Attempted invalid enpassant 
-=======
     // TODO This should handle castling while Piece.isTurnValid() just checks that each piece moved in a valid way
     //      For castling, check that both king and rook castled to the same side
     // TODO Need to check that this.actor2.isTurnValid() as well, but it'll need to use a different x and y, so maybe pass in the x and y instead?
->>>>>>> 76a16ecfe54ca4d7bced105d3bb7023e83b68984
     return this.type !== 'invalid' && this.actor.isTurnValid(this, board);
     
 	}
