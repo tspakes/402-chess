@@ -1,16 +1,23 @@
 import { Piece, PieceType, PieceSerialized } from "./Piece";
 import { Board } from "./Board";
 
-export type TurnType = 'move'|'take'|'castle'|'castlekingside'|'castlequeenside'|'enpassant'|'pawnpromotion'|'invalid';
+export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion'|'invalid';
 
 export class Turn {
   public type: TurnType;
   private _x2: number = -1;
   private _y2: number = -1;
-	public actor: Piece = null; // Piece moving
+  private _x4: number = -1;
+  private _y4: number = -1;
+  public actor: Piece = null; // Piece moving
+  public actor2: Piece = null; // Only used for castling
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
   public promotion: PieceType;
+<<<<<<< HEAD
   public lastTurn: Turn;
+=======
+  public meta: any = {}; // Pawn double move, castle side
+>>>>>>> 76a16ecfe54ca4d7bced105d3bb7023e83b68984
 	// TODO Pawn promotion might also be a take, enpassant is always a take
   // Probably just type enpassant as move and take, only differentiate upon checking validity
   
@@ -38,6 +45,27 @@ export class Turn {
   public set y2(value: number) {
     this._y2 = value;
   }
+  // Castling-only variables
+  public get x3(): number {
+    if (!this.actor2) return -1;
+    return this.actor2.x;
+  }
+  public get y3(): number {
+    if (!this.actor2) return -1;
+    return this.actor2.y;
+  }
+  public get x4(): number {
+    return this._x4;
+  }
+  public set x4(value: number) {
+    this._x4 = value;
+  }
+  public get y4(): number {
+    return this._y4;
+  }
+  public set y4(value: number) {
+    this._y4 = value;
+  }
 
 	/**
 	 * @see http://blog.chesshouse.com/how-to-read-and-write-algebraic-chess-notation/
@@ -60,7 +88,13 @@ export class Turn {
   }
 
 	public isValid(board: Board): boolean {
+<<<<<<< HEAD
     if (this.type == 'enpassant' && this.target != board.lastTurn.actor && board.lastTurn.meta.doublepawn != true) return false; // Attempted invalid enpassant 
+=======
+    // TODO This should handle castling while Piece.isTurnValid() just checks that each piece moved in a valid way
+    //      For castling, check that both king and rook castled to the same side
+    // TODO Need to check that this.actor2.isTurnValid() as well, but it'll need to use a different x and y, so maybe pass in the x and y instead?
+>>>>>>> 76a16ecfe54ca4d7bced105d3bb7023e83b68984
     return this.type !== 'invalid' && this.actor.isTurnValid(this, board);
     
 	}
@@ -78,7 +112,8 @@ export class Turn {
       actor: this.actor.serialize(),
       target: this.target.serialize(),
       promotion: this.promotion,
-      notation: this.notation
+      notation: this.notation,
+      meta: this.meta
     }
   }
 }
@@ -93,4 +128,5 @@ export interface TurnSerialized {
   target: PieceSerialized;
   promotion: string;
   notation: string;
+  meta: {};
 }

@@ -3,6 +3,7 @@
 		<title>Input Spoofing | 402Chess</title>
 		<script type="text/javascript">
 			// Generate HTML
+			let firstinit = true;
 			function init() {
 				let html = '<table>';
 				for (let r = 0; r < 8; r++) {
@@ -14,6 +15,11 @@
 				}
 				html += '</table>';
 				document.getElementById('board').innerHTML = html;
+
+				if (firstinit) {
+					readHistoryFromUrl();
+					firstinit = false;
+				}
 			}
 
 			// Toggle cell
@@ -35,9 +41,14 @@
 
 			function reset() {
 				xhttp = new XMLHttpRequest();
+				xhttp.open('POST', `board/reset`, false);
+				xhttp.send();
 				xhttp.open('POST', `debug/reset`, false);
 				xhttp.send();
+				xhttp.open('POST', `board/resume`, false);
+				xhttp.send();
 				init();
+				document.getElementById('histEncLabel').innerText = '';
 				document.getElementById('history').innerHTML = '';
 			}
 
@@ -56,6 +67,48 @@
 				xhttp.send();
 				detectingTurns = !detectingTurns;
 				document.getElementById('toggleDetectionBtn').innerText = detectingTurns ? 'Pause' : 'Resume';
+			}
+
+			function exportHistory() {
+				let enc = '';
+				let lines = document.getElementById('history').innerText.split('\n').reverse();
+				let line;
+				for (let l = 0; l < lines.length; l++) {
+					line = lines[l];
+					if (line === '-----') line = '';
+					else if (line.startsWith('Picked up')) line = line.substr(10, 2);
+					else if (line.startsWith('Put down')) line = line.substr(9, 2);
+					else continue;
+					enc += ',' + line;
+				}
+				enc = window.location.href.substr(0, window.location.href.lastIndexOf('/')) + '/debug?script=' + enc.substr(1);
+				document.getElementById('histEnc').value = enc;
+				document.getElementById('histEnc').select();
+				document.execCommand('copy');
+				document.getElementById('histEncLabel').innerText = 'Copied to clipboard.';
+			}
+
+			function readHistoryFromUrl() {
+				let iQ = window.location.href.indexOf('script=');
+				if (iQ < 0) return;
+				let actions = window.location.href.substr(iQ+7).split(',');
+				let a = 0;
+				let intval = setInterval(() => {
+					try {
+						if (actions[a] === '')
+							endTurn();
+						else
+							toggle(actions[a].charCodeAt(0)-65+1, parseInt(actions[a].substr(1,1)));
+					} catch (error) {
+						clearInterval(intval);
+						let hist = document.getElementById('history');
+						hist.innerHTML = `<li style="color:#F00;">${error}</li>` + hist.innerHTML;
+						return;
+					}
+					a++;
+					if (a >= actions.length)
+						clearInterval(intval);
+				}, 100);
 			}
 		</script>
 		<style>
@@ -113,7 +166,7 @@
 			ul {
 				list-style: none;
 				padding: 0px;
-				margin: 0px;
+				margin: 0px 0px 5px;
 			}
 			li.up {
 				color: #FFF;
@@ -123,6 +176,15 @@
 			}
 			li.separator {
 				color: #333;
+			}
+			a {
+				color: #999;
+			}
+			input#histEnc {
+				display: block;
+				color: black;
+				background-color: black;
+				border: none;
 			}
 		</style>
 	</head>
@@ -139,6 +201,9 @@
 			<div>
 				<h2>History</h2>
 				<ul id="history"></ul>
+				<button id="exportHistory" onclick="exportHistory()" title="Encode history as script for reproduction">Export Script</button>
+				<div id="histEncLabel"></div>
+				<input type="text" value="" id="histEnc" />
 			</div>
 		</div>
 	</body>
