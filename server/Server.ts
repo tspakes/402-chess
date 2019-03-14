@@ -81,6 +81,17 @@ class Server {
 				message: 'Turn committed.'
 			});
 		});
+		/**
+		 * Cancel currently pending turn. Pauses piece detection until /board/resume is called,
+		 * so display a button to call that. 
+		 */
+		this.app.post('/board/cancel', (req: Request, res: Response) => {
+			BoardAPI.postCancel();
+			res.status(200);
+			res.json({
+				message: 'Turn pending cancel. Call /board/resume when the pieces have been moved to their locations at the start of the turn.'
+			});
+		});
 
 		// Database API
 		this.app.get('/stats', (req: Request, res: Response) => {

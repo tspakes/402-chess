@@ -5,6 +5,8 @@ import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
 import { State } from "./State";
 
+export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'';
+
 const DEBUG = true;
 
 export default class BoardAPI {
@@ -18,6 +20,19 @@ export default class BoardAPI {
 	private static _teamCurrent: Team;
 	private static _turnCommitQueued: boolean = false;
 	private static _intervalId: NodeJS.Timeout = null;
+	private static _error: Error = '';
+	private static _errorDesc: string = '';
+
+	public static get error(): Error {
+		return this._error;
+	}
+	public static set error(err: Error) {
+		if (err !== '') this._ignoreMoves = true;
+		this._error = err;
+	}
+	public static get errorDesc(): string {
+		return this._errorDesc;
+	}
 
 	/**
 	 * Initialize board upon the start of a new game. 
@@ -30,6 +45,8 @@ export default class BoardAPI {
 		this._ignoreMoves = true;
 		this._teamCurrent = 'white';
 		this._rawChangeQueue = [];
+		this.error = '';
+		this._errorDesc = '';
 		this.zeroDelta();
 		this._boardRaw = this._board.minimize();
 		State.reset();
@@ -98,9 +115,8 @@ export default class BoardAPI {
 						this._teamCurrent = 'white';
 				} else {
 					this._ignoreMoves = true;
-					throw Chalk.red('Invalid move processed.');
-					// TODO Notify webserver w/ some state information (publish ignore moves && turn committed?)
-					// Wait for undo
+					this.error = 'INVALID_TURN';
+					console.log(Chalk.red('Invalid move processed. Waiting for /board/resume request.'));
 				}
 			}
 		}, this._pollInterval);
@@ -311,7 +327,11 @@ export default class BoardAPI {
 	// RESTful Endpoints
 	// Named as <method><Action>()
 	public static getBoard(): string {
-		return JSON.stringify(this._board.minimize());
+		return JSON.stringify({
+			message: this.error,
+			description: this.errorDesc,
+			pieces: this._board.minimize()
+		});
 	}
 
 	public static postPause(): void {
@@ -320,6 +340,8 @@ export default class BoardAPI {
 	}
 
 	public static postResume(): void {
+		this._error = '';
+		this._errorDesc = '';
 		this._ignoreMoves = false;
 		console.log('Piece detection enabled.');
 	}
@@ -327,6 +349,11 @@ export default class BoardAPI {
 	public static postTurn(): void {
 		console.log('Committing turn...');
 		this._turnCommitQueued = true;
+	}
+
+	public static postCancel(): void {
+		console.log('Cancelling turn...');
+		throw 'Not yet implemented.';
 	}
 
 	public static getHistory(): string {
