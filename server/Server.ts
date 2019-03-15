@@ -32,8 +32,8 @@ class Server {
 		
 		// Enable cross origin requests
 		this.app.use(function(req, res, next) {
-			res.header("Access-Control-Allow-Origin", "*");
-			res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+			res.header('Access-Control-Allow-Origin', '*');
+			res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 			next();
 		});
 		
@@ -87,6 +87,17 @@ class Server {
 			res.status(200);
 			res.json({
 				message: 'Turn committed.'
+			});
+		});
+		/**
+		 * Cancel currently pending turn. Pauses piece detection until /board/resume is called,
+		 * so display a button to call that. 
+		 */
+		this.app.post('/board/cancel', (req: Request, res: Response) => {
+			BoardAPI.postCancel();
+			res.status(200);
+			res.json({
+				message: 'Turn pending cancel. Call /board/resume when the pieces have been moved to their locations at the start of the turn.'
 			});
 		});
 
