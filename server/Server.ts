@@ -5,8 +5,9 @@ import * as Path from 'path';
 import BoardAPI from './BoardAPI';
 import Chalk from 'chalk';
 import BoardDriver from './BoardDriver';
+import { PieceType } from './Piece';
 
-const PORT = 3000;
+const PORT = 80;
 
 class Server {
 	public app: Express.Application;
@@ -99,6 +100,24 @@ class Server {
 			res.json({
 				message: 'Turn pending cancel. Call /board/resume when the pieces have been moved to their locations at the start of the turn.'
 			});
+		});
+		/**
+		 * Choose type of piece for pawn promotion. 
+		 */
+		this.app.post('/board/promote/:type', (req: Request, res: Response) => {
+			try {
+				BoardAPI.postPromote(req.params.type);
+				res.status(200);
+				res.json({
+					message: `Promoted piece to ${req.params.type}.`
+				});
+			} catch (ex) {
+				console.log(ex);
+				res.status(400);
+				res.json({
+					message: ex
+				});
+			}
 		});
 
 		// Database API

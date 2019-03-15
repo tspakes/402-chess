@@ -1,11 +1,11 @@
 import { Turn, TurnType } from "./Turn";
 import { Board } from "./Board";
-import { PieceMinimal, Piece, Team } from "./Piece";
+import { PieceMinimal, Piece, Team, PieceType } from "./Piece";
 import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
 import { State } from "./State";
 
-export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'';
+export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'PAWN_PROMOTION'|'';
 
 const DEBUG = true;
 
@@ -22,12 +22,18 @@ export default class BoardAPI {
 	private static _intervalId: NodeJS.Timeout = null;
 	private static _error: Error = '';
 	private static _errorDesc: string = '';
+	private static _pendingTurn: Turn = null;
 
 	public static get error(): Error {
 		return this._error;
 	}
 	public static set error(err: Error) {
-		if (err !== '') this._ignoreMoves = true;
+		if (err === '') {
+			this._ignoreMoves = false;
+			this._errorDesc = '';
+		} else {
+			this._ignoreMoves = true;
+		}
 		this._error = err;
 	}
 	public static get errorDesc(): string {
@@ -42,11 +48,11 @@ export default class BoardAPI {
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
-		this._ignoreMoves = true;
 		this._teamCurrent = 'white';
 		this._rawChangeQueue = [];
 		this.error = '';
 		this._errorDesc = '';
+		this._ignoreMoves = true;
 		this.zeroDelta();
 		this._boardRaw = this._board.minimize();
 		State.reset();
@@ -99,22 +105,26 @@ export default class BoardAPI {
 			// Check for turn end button
 			if (this._turnCommitQueued) {
 				// If no delta and invalid, ignore changes (can't end turn w/o doing anything)
-				let turn = this.postProcess(State.commit());
-				if (turn.isValid(this._board)) {
-					this._board.applyTurn(turn);
+				this._pendingTurn = this.postProcess(State.commit());
+				if (this._pendingTurn.type === 'pawnpromotion') {
+					this.error = 'PAWN_PROMOTION';
+					return;
+				}
+				if (this._pendingTurn.isValid(this._board)) {
+					this._board.applyTurn(this._pendingTurn);
 					
 					console.log('Committed turn.');
 					this._turnCommitQueued = false;
 					this.zeroDelta();
-					this._history.push(turn);
+					this._history.push(this._pendingTurn);
 					this._boardRaw = this._board.minimize();
+					this._pendingTurn = null;
 					// Switch current team
 					if (this._teamCurrent === 'white')
 						this._teamCurrent = 'black';
 					else if (this._teamCurrent === 'black')
 						this._teamCurrent = 'white';
 				} else {
-					this._ignoreMoves = true;
 					this.error = 'INVALID_TURN';
 					console.log(Chalk.red('Invalid move processed. Waiting for /board/resume request.'));
 				}
@@ -330,7 +340,7 @@ export default class BoardAPI {
 		return JSON.stringify({
 			message: this.error,
 			description: this.errorDesc,
-			pieces: this._board.minimize()
+			pieces: this._board.serialize()
 		});
 	}
 
@@ -340,10 +350,8 @@ export default class BoardAPI {
 	}
 
 	public static postResume(): void {
-		this._error = '';
-		this._errorDesc = '';
-		this._ignoreMoves = false;
-		console.log('Piece detection enabled.');
+		this.error = '';
+		console.log('Errors cleared and piece detection enabled.');
 	}
 
 	public static postTurn(): void {
@@ -354,6 +362,13 @@ export default class BoardAPI {
 	public static postCancel(): void {
 		console.log('Cancelling turn...');
 		throw 'Not yet implemented.';
+	}
+
+	public static postPromote(type: PieceType): void {
+		if (this.error !== 'PAWN_PROMOTION')
+			throw 'No pawns are being promoted.';
+		console.log(`Promoting ${this._pendingTurn.actor.toString()} to type ${type}.`);
+		this._pendingTurn.actor.promote(type);
 	}
 
 	public static getHistory(): string {

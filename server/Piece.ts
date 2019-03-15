@@ -10,12 +10,15 @@ export class Piece {
 	private _team: Team;
 	private _x: number;
 	private _y: number;
+	private _id: number;
+	private static _nextId: number = 0;
 	public hasMoved: boolean = false;
 
 
 	constructor(type: PieceType, team: Team, x: number = -1, y: number = -1) {
     this._type = type;
-    this._team = team;
+		this._team = team;
+		this._id = Piece._nextId++;
     this.updatePosition(x, y);
 	}
 
@@ -30,7 +33,10 @@ export class Piece {
   }
   public get y(): number {
     return this._y;
-  }
+	}
+	public get id(): number {
+		return this._id;
+	}
 
 	public get notation(): 'K'|'Q'|'B'|'N'|'R'|'' {
 		switch (this.type) {
@@ -65,7 +71,10 @@ export class Piece {
 
   public promote(type: PieceType): void {
     if (this._type !== 'pawn')
-      throw 'Only pawns may be promoted.';
+			throw 'Only pawns may be promoted.';
+		if (type !== 'queen' && type !== 'bishop' && type !== 'knight'
+				&& type !== 'rook' && type !== 'pawn')
+			throw `Invalid promotion type.`;
     this._type = type;
   }
 
@@ -277,7 +286,8 @@ export class Piece {
       type: this.type,
       team: this.team,
       x: this.x,
-      y: this.y
+			y: this.y,
+			id: this.id
     };
 	}
 
