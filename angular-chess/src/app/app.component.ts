@@ -1,6 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {BoardApi} from './api/board.api';
-import {PieceModel} from './models/piece.model';
+import {IPieceModel} from './models/IPieceModel';
+import {Store} from '@ngrx/store';
+import {IBoardState} from './reducers/board-reducer.reducer';
+import {Observable} from 'rxjs';
+import {LoadGetBoards} from './actions/get-board.actions';
+import {IBoardModel} from './models/IBoardModel';
 
 @Component({
     selector: 'app-root',
@@ -11,52 +15,27 @@ export class AppComponent implements OnInit {
 
     title = 'angular-chess';
 
-    public board = [];
+    public board = null;
 
-    public pieces: PieceModel[] = [];
+    public pieces: IPieceModel[] = [];
 
-    constructor(private boardApi: BoardApi) {
+    board$: Observable<IBoardModel> = this.store.select(state => state.board);
+
+
+    constructor(public store: Store<IBoardState>) {
     }
 
     async ngOnInit() {
 
+        this.board$.subscribe((board: IBoardModel) => {
+            this.board = board.board;
 
-        this.board = await this.boardApi.getBoard();
-        this.drawBoard();
-
-        setInterval(async () => {
-
-            this.board = await this.boardApi.getBoard();
-            this.drawBoard();
-
-        }, 2000);
-    }
-
-    private drawBoard() {
-
-        this.pieces  = [];
-
-        let row_index = 1;
-        let column_index = 1;
-
-        this.board.forEach((row: Array<any>) => {
-
-            row.forEach((piece: PieceModel) => {
-
-                if (piece !== null) {
-                    piece.column = column_index;
-                    piece.row = row_index;
-                    this.pieces.push(piece);
-                }
-
-                column_index++;
-
-            });
-
-            // Reset the column index every time we enter into a new row
-            column_index = 1;
-            row_index++;
-
+            console.log(board);
         });
+
+        this.store.dispatch(new LoadGetBoards());
+
+        setInterval(() => this.store.dispatch(new LoadGetBoards()), 2000);
     }
+
 }

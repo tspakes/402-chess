@@ -135,5 +135,8 @@
       }
     }
   },
-  "defaultProject": "angular-chess"
+  "defaultProject": "angular-chess",
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
+  }
 }

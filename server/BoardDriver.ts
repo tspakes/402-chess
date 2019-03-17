@@ -1,4 +1,6 @@
 import chalk from "chalk";
+import {IPieceModel} from "../angular-chess/src/app/models/IPieceModel";
+import {Piece} from "./Piece";
 
 // Import GPIO here later
 
@@ -20,7 +22,9 @@ export default class BoardDriver {
         }
       }
     }
+
     this._debug = value;
+
   }
   public static debug_setCell(x: number, y: number, occupied: boolean) {
     if (!this._debug)

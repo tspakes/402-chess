@@ -1,20 +1,20 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ChessBoardComponent} from './chess-board.component';
+import {ChessErrorComponent} from './chess-error.component';
 
-describe('ChessBoardComponent', () => {
-    let component: ChessBoardComponent;
-    let fixture: ComponentFixture<ChessBoardComponent>;
+describe('ChessErrorComponent', () => {
+    let component: ChessErrorComponent;
+    let fixture: ComponentFixture<ChessErrorComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [ChessBoardComponent]
+            declarations: [ChessErrorComponent]
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ChessBoardComponent);
+        fixture = TestBed.createComponent(ChessErrorComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
