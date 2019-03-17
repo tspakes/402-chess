@@ -1,0 +1,24 @@
+
+.error {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  background: white;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+
+.error > span {
+  color: red;
+}
+
+.resume-game {
+  border: none;
+  color: white;
+  background: forestgreen;
+  padding: 10px;
+  border-radius: 3px;
+}

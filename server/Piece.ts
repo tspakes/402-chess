@@ -16,28 +16,27 @@ export class Piece {
 
 
 	constructor(type: PieceType, team: Team, x: number = -1, y: number = -1) {
-    this._type = type;
+		this._type = type;
 		this._team = team;
 		this._id = Piece._nextId++;
-    this.updatePosition(x, y);
+		this.updatePosition(x, y);
 	}
 
-  public get type(): PieceType {
-    return this._type;
-  }
-  public get team(): Team {
-    return this._team;
-  }
-  public get x(): number {
-    return this._x;
-  }
-  public get y(): number {
-    return this._y;
+	public get type(): PieceType {
+		return this._type;
+	}
+	public get team(): Team {
+		return this._team;
+	}
+	public get x(): number {
+		return this._x;
+	}
+	public get y(): number {
+		return this._y;
 	}
 	public get id(): number {
 		return this._id;
 	}
-
 	public get notation(): 'K'|'Q'|'B'|'N'|'R'|'' {
 		switch (this.type) {
 			case 'king':
@@ -53,41 +52,41 @@ export class Piece {
 			default:
 				return '';
 		}
-  }
+	}
 
-  public toString(): string {
-    return `${this.notation}(${String.fromCharCode(65+this.x)}${this.y+1})`;
-  }
+	public toString(): string {
+		return `${this.notation}(${String.fromCharCode(65+this.x)}${this.y+1})`;
+	}
 
-  /**
-   * Utililized by the Board to update the stored position. Does not move the piece on the board.
-   */
-  public updatePosition(x: number, y: number): void {
-    if (x < -1 || x > 7 || y < -1 || y > 7)
-      throw 'Piece position must be either on the board or (-1,-1) for off-board.';
-    this._x = x;
-    this._y = y;
-  }
+	/**
+	 * Utililized by the Board to update the stored position. Does not move the piece on the board.
+	 */
+	public updatePosition(x: number, y: number): void {
+		if (x < -1 || x > 7 || y < -1 || y > 7)
+			throw 'Piece position must be either on the board or (-1,-1) for off-board.';
+		this._x = x;
+		this._y = y;
+	}
 
-  public promote(type: PieceType): void {
-    if (this._type !== 'pawn')
+	public promote(type: PieceType): void {
+		if (this._type !== 'pawn')
 			throw 'Only pawns may be promoted.';
 		if (type !== 'queen' && type !== 'bishop' && type !== 'knight'
-				&& type !== 'rook' && type !== 'pawn')
+			&& type !== 'rook' && type !== 'pawn')
 			throw `Invalid promotion type.`;
-    this._type = type;
-  }
+		this._type = type;
+	}
 
-  public isTurnValid(turn: Turn, board: Board): boolean {
+	public isTurnValid(turn: Turn, board: Board): boolean {
 		// Pawns are the x-axis
 
-    // TODO Make this abstract and have each piece implement this function
-    // For example, rook's would check that either xi==xf or yi==yf, then check that all spaces along that axis of movement are unoccupied
-    // OR, a big, ugly switch statement
-    // Three main checks:
-    // 1. Can the piece ever make that move
-    // 2. Is the movement path unobstructed (except knights)
-    // 3. Is final position occupied by friendly piece
+		// TODO Make this abstract and have each piece implement this function
+		// For example, rook's would check that either xi==xf or yi==yf, then check that all spaces along that axis of movement are unoccupied
+		// OR, a big, ugly switch statement
+		// Three main checks:
+		// 1. Can the piece ever make that move
+		// 2. Is the movement path unobstructed (except knights)
+		// 3. Is final position occupied by friendly piece
 
 		if (turn.type == 'invalid') return false; // Invalid move, just return false
 
@@ -109,7 +108,7 @@ export class Piece {
 						//   2. A space the King must cross or will arrive at is threatened
 						//   3. The King or Rook to castle with has moved
 						//   4. A piece, enemy or friendly, is obstructing the castling path
-						
+
 						return true;
 					}
 				} else { // Should be normal move, can't have pieces in the way, as this is a one-square move
@@ -249,11 +248,11 @@ export class Piece {
 							return true; // Enemy piece at destination
 						} else { // A piece is behind the pawn attack destination
 							if (behindPawn.type != 'pawn' || behindPawn.team == turn.actor.team) return false;
-							else return true; // Valid enpassant							
+							else return true; // Valid enpassant
 						}
 					}
 				} else if (ydiff == 1 && xdiff == 0) { // Pawn single move
-					if (turn.actor.team == 'white' && (pawnMovement <  1) || turn.actor.team == 'black' && (pawnMovement > -1)) {
+					if (turn.actor.team == 'white' && (pawnMovement < 1) || turn.actor.team == 'black' && (pawnMovement > -1)) {
 						return false; // Pawn moving backwards
 					} else if (board.grid[turn.y2][turn.x2] != null) {
 						return false; // Piece in the way at pawn destination
@@ -270,47 +269,47 @@ export class Piece {
 				} else {
 					return false;
 				}
-				
+
 			/* END PAWN */
 			/* DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT */
 			default:
 				return false;
 		}
-  }
-
-  /**
-   * Remove the piece's functions, getters, and setters in preparation for stringification.
-   */
-	public serialize(): PieceSerialized {
-		return {
-      type: this.type,
-      team: this.team,
-      x: this.x,
-			y: this.y,
-			id: this.id
-    };
 	}
 
-  /**
-   * Keep only needed information for detecting moves at runtime.
-   */
+	/**
+	 * Remove the piece's functions, getters, and setters in preparation for stringification.
+	 */
+	public serialize(): PieceSerialized {
+		return {
+			type: this.type,
+			team: this.team,
+			x: this.x,
+			y: this.y,
+			id: this.id
+		};
+	}
+
+	/**
+	 * Keep only needed information for detecting moves at runtime.
+	 */
 	public minimize(): PieceMinimal {
 		return {
-      type: this.type,
-      team: this.team
-    };
+			type: this.type,
+			team: this.team
+		};
 	}
 }
 
 export interface PieceSerialized {
-	type: string,
-	team: string,
-	x: number,
-	y: number,
-	id: number
+  type: string,
+  team: string,
+  x: number,
+  y: number,
+  id: number
 }
 
 export interface PieceMinimal {
-  type: PieceType,
-  team: Team
+	type: PieceType,
+	team: Team
 }

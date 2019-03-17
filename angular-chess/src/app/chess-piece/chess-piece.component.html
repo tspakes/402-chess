@@ -1,3 +1,4 @@
-<div class="piece" draggable="true" [id]="chessId" (dragstart)="dragStart($event)" (dragover)="$event.preventDefault()">
+<div (dragover)="$event.preventDefault()" (dragstart)="dragStart($event)" [id]="this.piece.id" class="piece"
+     draggable="true">
 
 </div>

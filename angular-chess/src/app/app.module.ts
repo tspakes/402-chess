@@ -7,17 +7,27 @@ import {ChessBoardComponent} from './chess-board/chess-board.component';
 import {ChessPieceComponent} from './chess-piece/chess-piece.component';
 import {HttpClientModule} from '@angular/common/http';
 import {BoardApi} from './api/board.api';
+import {ChessErrorComponent} from './chess-error/chess-error.component';
+import {RemoveEmptyPipe} from './pipes/remove-empty.pipe';
+import {StoreModule} from '@ngrx/store';
+import {metaReducers, reducers} from './reducers';
+import {EffectsModule} from '@ngrx/effects';
+import {BoardEffects} from './effects/BoardEffects';
 
 @NgModule({
     declarations: [
         AppComponent,
         ChessBoardComponent,
-        ChessPieceComponent
+        ChessPieceComponent,
+        ChessErrorComponent,
+        RemoveEmptyPipe
     ],
     imports: [
         BrowserModule,
         AppRoutingModule,
-        HttpClientModule
+        HttpClientModule,
+        StoreModule.forRoot(reducers, {metaReducers}),
+        EffectsModule.forRoot([BoardEffects])
     ],
     providers: [
         BoardApi
