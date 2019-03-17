@@ -84,11 +84,19 @@ class Server {
 		 * Commit currently pending turn. 
 		 */
 		this.app.post('/board/commit', (req: Request, res: Response) => {
-			BoardAPI.postTurn();
-			res.status(200);
-			res.json({
-				message: 'Turn committed.'
-			});
+			try {
+				BoardAPI.postTurn();
+				res.status(200);
+				res.json({
+					message: 'Turn committed.'
+				});
+			} catch (ex) {
+				console.log(Chalk.red(ex));
+				res.status(400);
+				res.json({
+					message: ex
+				});
+			}
 		});
 		/**
 		 * Cancel currently pending turn. Pauses piece detection until /board/resume is called,
@@ -112,7 +120,7 @@ class Server {
 					message: `Promoted piece to ${req.params.type}.`
 				});
 			} catch (ex) {
-				console.log(ex);
+				console.log(Chalk.red(ex));
 				res.status(400);
 				res.json({
 					message: ex

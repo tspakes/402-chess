@@ -5,7 +5,7 @@ import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
 import { State } from "./State";
 
-export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'PAWN_PROMOTION'|'';
+export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'PAWN_PROMOTION'|'CANCEL_TURN'|'';
 
 const DEBUG = true;
 
@@ -29,10 +29,20 @@ export default class BoardAPI {
 	}
 	public static set error(err: Error) {
 		if (err === '') {
-			this._ignoreMoves = false;
 			this._errorDesc = '';
+			this._rawChangeQueue = [];
+			this.zeroDelta();
+			State.reset();
+			this._boardRaw = this._board.minimize();
+			if (this._error !== 'PAWN_PROMOTION') { // Turn should not be canceled for promotion
+				this._turnCommitQueued = false;
+				this._pendingTurn = null;
+			}
+			this._ignoreMoves = false;
+			console.log(Chalk.gray('Errors cleared and piece detection enabled.'));
 		} else {
 			this._ignoreMoves = true;
+			console.log(Chalk.gray('Piece detection disabled.'));
 		}
 		this._error = err;
 	}
@@ -49,12 +59,8 @@ export default class BoardAPI {
 		this._board.initPieces();
 		this._history = [];
 		this._teamCurrent = 'white';
-		this._rawChangeQueue = [];
 		this.error = '';
-		this._errorDesc = '';
 		this._ignoreMoves = true;
-		this.zeroDelta();
-		this._boardRaw = this._board.minimize();
 		State.reset();
 
 		// Restart listening if already doing so
@@ -102,33 +108,52 @@ export default class BoardAPI {
 			}
 			this._rawChangeQueue = [];
 			
-			
 			// Check for turn end button
 			if (this._turnCommitQueued) {
-				// If no delta and invalid, ignore changes (can't end turn w/o doing anything)
-				this._pendingTurn = this.postProcess(State.commit());
-				if (this._pendingTurn.type === 'pawnpromotion') {
-					this.error = 'PAWN_PROMOTION';
+				if (this._pendingTurn === null) {
+					let turntype = State.commit();
+					if (turntype === 'invalid') {
+						this.error = 'INVALID_TURN';
+						this._errorDesc = 'Invalid state.';
+						console.log(Chalk.redBright('Invalid state detected. Waiting for /board/resume request.'));
+						return;
+					}
+					this._pendingTurn = this.postProcess(turntype);
+					if (this._pendingTurn.type === 'invalid') {
+						this.error = 'INVALID_TURN';
+						this._errorDesc = 'Post processing failed.';
+						console.log(Chalk.redBright('Invalid move processed. Waiting for /board/resume request.'));
+						return;
+					}
+
+					if (this._pendingTurn.type === 'pawnpromotion') {
+						this.error = 'PAWN_PROMOTION';
+						this._errorDesc = `Promoting ${this._pendingTurn.actor.toString()}.`;
+						console.log('Pawn promotion detected. Waiting for /board/promote/{type} request.');
+						return;
+					}
+				}
+				if (!this._pendingTurn.isValid(this._board)) {
+					this.error = 'INVALID_TURN';
+					this._errorDesc = 'Turn was detected correctly, but was against the rules.';
+					console.log(Chalk.redBright('Illegal move processed. Waiting for /board/resume request.'));
 					return;
 				}
-				if (this._pendingTurn.isValid(this._board)) {
-					this._board.applyTurn(this._pendingTurn);
-					
-					console.log('Committed turn.');
-					this._turnCommitQueued = false;
-					this.zeroDelta();
-					this._history.push(this._pendingTurn);
-					this._boardRaw = this._board.minimize();
-					this._pendingTurn = null;
-					// Switch current team
-					if (this._teamCurrent === 'white')
-						this._teamCurrent = 'black';
-					else if (this._teamCurrent === 'black')
-						this._teamCurrent = 'white';
-				} else {
-					this.error = 'INVALID_TURN';
-					console.log(Chalk.red('Invalid move processed. Waiting for /board/resume request.'));
-				}
+
+				this._board.applyTurn(this._pendingTurn);
+				
+				console.log('Committed turn.');
+				this._turnCommitQueued = false;
+				this.zeroDelta();
+				this._history.push(this._pendingTurn);
+				this._boardRaw = this._board.minimize();
+				this._pendingTurn = null;
+				// Switch current team
+				if (this._teamCurrent === 'white')
+					this._teamCurrent = 'black';
+				else if (this._teamCurrent === 'black')
+					this._teamCurrent = 'white';
+				console.log(`Now ${this._teamCurrent}'s turn.`);
 			}
 		}, this._pollInterval);
 	}
@@ -163,8 +188,8 @@ export default class BoardAPI {
 		}
 		if (turn.actor === null) {
 			// The player probably moved the wrong team's piece
-			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected.`));
-			this.printBoardState();
+			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected. It is likely the wrong player moved. The current player is ${this._teamCurrent}.`));
+			if (!DEBUG) this.printBoardState();
 			turn.type = 'invalid';
 			return turn;
 		}
@@ -352,24 +377,25 @@ export default class BoardAPI {
 
 	public static postResume(): void {
 		this.error = '';
-		console.log('Errors cleared and piece detection enabled.');
 	}
 
 	public static postTurn(): void {
+		if (this.error)
+			throw 'Cannot commit turn while error is pending.';
 		console.log('Committing turn...');
 		this._turnCommitQueued = true;
 	}
-
+	
 	public static postCancel(): void {
-		console.log('Cancelling turn...');
-		throw 'Not yet implemented.';
+		console.log(`Cancelling turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
+		this.error = 'CANCEL_TURN';
 	}
 
 	public static postPromote(type: PieceType): void {
 		if (this.error !== 'PAWN_PROMOTION')
 			throw 'No pawns are being promoted.';
-		console.log(`Promoting ${this._pendingTurn.actor.toString()} to type ${type}.`);
 		this._pendingTurn.actor.promote(type);
+		console.log(`Promoted ${this._pendingTurn.actor.toString()} to type ${type}. Waiting for /board/resume request.`);
 	}
 
 	public static getHistory(): string {
@@ -386,13 +412,6 @@ export default class BoardAPI {
 	public static setPromotion(type: string): void {
 		// Check that type is a valid type
 		//piece.promote(type);
-	}
-
-	/**
-	 * Call when pieces have been returned to their previous states to resume move detection. 
-	 */
-	public static setUndo(): void {
-		this._ignoreMoves = false;
 	}
 }
 

@@ -306,7 +306,8 @@ export interface PieceSerialized {
 	type: string,
 	team: string,
 	x: number,
-	y: number
+	y: number,
+	id: number
 }
 
 export interface PieceMinimal {
