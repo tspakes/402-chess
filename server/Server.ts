@@ -147,7 +147,7 @@ class Server {
 			res.json({
 				message: 'Updated board state.'
 			});
-			BoardDriver.debug_setCell(req.query.x - 1, req.query.y - 1, req.query.lift !== 'true');
+			BoardDriver.debug_setCell(8 - req.query.x, req.query.y - 1, req.query.lift !== 'true');
 		});
 		/**
 		 * Reset the spoofed hardware state. 

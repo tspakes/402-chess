@@ -93,11 +93,12 @@ export default class BoardAPI {
 			// Process all queued changes
 			for (let change of this._rawChangeQueue) {
 				State.process(change, change.team === this._teamCurrent)
-				if (DEBUG) console.log(`state=${State.state}`);
-				if (State.state === 'move' && this.sumDelta() === 1) {
-					// Forget change if player moved piece to same cell
+				if ((State.state === 'move' || State.state === 'error') && this.sumDelta() === 1 && !change.lift) {
+					// Forget change if player put down a piece in the same cell it started in
 					State.reset();
+					this.zeroDelta();
 				}
+				if (DEBUG) console.log(`state=${State.state}`);
 			}
 			this._rawChangeQueue = [];
 			
