@@ -37,8 +37,12 @@ export class Piece {
 	public get id(): number {
 		return this._id;
 	}
+
 	public get notation(): 'K'|'Q'|'B'|'N'|'R'|'' {
-		switch (this.type) {
+		return Piece.notationFromType(this.type);
+	}
+	public static notationFromType(type: PieceType): 'K'|'Q'|'B'|'N'|'R'|'' {
+		switch (type) {
 			case 'king':
 				return 'K';
 			case 'queen':

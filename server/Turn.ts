@@ -72,16 +72,21 @@ export class Turn {
 		// Seems like chess notation is chosen to be as short as possible while still being fully explicit,
 		//  so certain if the only one piece could've taken another, you only designate the attacking piece
 		//  followed by the target's position. 
-		// Really going to need move validity checking before this can be fully fleshed out. 
-		if ('castle')
-			return 'Not yet implemented.'; // Castling kingside is 'O-O' and queenside is 'O-O-O'
-		if ('enpassant')
-			return 'Not yet implemented.'; // Include extra '(ep)' at end but I'm assuming before '+' for check if applicable
-		if ('pawnpromotion')
-			return 'Not yet implemented.'; // Include '=' followed by notation for piece promoted to, e.g. '=Q'
-		if ('take')
-			return 'Not yet implemented.'; // Include type, x, source, and destination
-		return this.actor.notation + String.fromCharCode(97/*a*/ + this.x2) + (this.y2 + 1);
+    // Really going to need move validity checking before this can be fully fleshed out. 
+    let baseNot: string = this.actor.notation + String.fromCharCode(97/*a*/ + this.x2) + (this.y2 + 1);
+    switch (this.type) {
+      case 'castle':
+        return this.meta.kingside ? 'O-O' : 'O-O-O';
+      case 'enpassant': // Include extra '(ep)' at end but I'm assuming before '+' for check if applicable
+        return 'Not yet implemented.';
+      case 'pawnpromotion':
+        baseNot += '=' + Piece.notationFromType(this.promotion);
+        return 'Not yet implemented.';
+      case 'take': // Include type, x, source, and destination
+        return 'Not yet implemented.';
+      default:
+        return baseNot;
+    }
   }
 
 	public isValid(board: Board): boolean {
