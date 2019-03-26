@@ -110,7 +110,6 @@ export class Board { // Single state of the board
     this.lastTurn = turn; 
   }
   
-  
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
    */
