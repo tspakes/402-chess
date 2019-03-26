@@ -13,6 +13,7 @@ export class Turn {
   public actor2: Piece = null; // Only used for castling
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
   public promotion: PieceType;
+  public check: ''|'check'|'checkmate' = '';
   public lastTurn: Turn;
   public meta: any = {}; // Pawn double move, castle side
 	// TODO Pawn promotion might also be a take, enpassant is always a take
@@ -66,27 +67,39 @@ export class Turn {
 
 	/**
 	 * @see http://blog.chesshouse.com/how-to-read-and-write-algebraic-chess-notation/
+   * @see FIDE standard on https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
 	 */
 	public get notation(): string {
-		// TODO Append '+' for check and '++' for checkmate.
-		// Seems like chess notation is chosen to be as short as possible while still being fully explicit,
-		//  so certain if the only one piece could've taken another, you only designate the attacking piece
-		//  followed by the target's position. 
-    // Really going to need move validity checking before this can be fully fleshed out. 
-    let baseNot: string = this.actor.notation + String.fromCharCode(97/*a*/ + this.x2) + (this.y2 + 1);
+    let not: string;
+
+    // Base notation
     switch (this.type) {
       case 'castle':
-        return this.meta.kingside ? 'O-O' : 'O-O-O';
-      case 'enpassant': // Include extra '(ep)' at end but I'm assuming before '+' for check if applicable
-        return 'Not yet implemented.';
+        not = this.meta.kingside ? 'O-O' : 'O-O-O';
+        break;
+      case 'take': // Include type, source, x, and destination
+        not = 'x' + Piece.colToLetter(this.x2) + (this.y2 + 1);
+      case 'enpassant': // Include file of departure
+        not = Piece.colToLetter(this.x1) + not;
+        break;
       case 'pawnpromotion':
-        baseNot += '=' + Piece.notationFromType(this.promotion);
-        return 'Not yet implemented.';
-      case 'take': // Include type, x, source, and destination
-        return 'Not yet implemented.';
+        not += Piece.colToLetter(this.x2) + (this.y2 + 1) + '=' + Piece.notationFromType(this.promotion);
+        break;
       default:
-        return baseNot;
+        not = Piece.colToLetter(this.x2) + (this.y2 + 1);
     }
+
+    // TODO Actor disambaguation
+
+    // Prefixes
+    if (this.type === 'take' || this.type === 'enpassant') not = this.actor.notation + not;
+
+    // Suffixes
+    if (this.type === 'enpassant') not += '(ep)';
+    if (this.check === 'check') not += '+';
+    if (this.check === 'checkmate') not += '++';
+
+    return not;
   }
 
 	public isValid(board: Board): boolean {
