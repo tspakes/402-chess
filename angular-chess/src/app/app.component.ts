@@ -56,7 +56,9 @@ export class AppComponent implements OnInit, OnDestroy {
         if (this.board !== null) {
             if (this.board.message === 'PAWN_PROMOTION' && this.modalRef === null) {
                 this.modalRef = this.modalService.show(PromotionModalComponent);
-
+            } else if (this.modalRef !== null) {
+                this.modalRef.hide();
+                this.modalRef = null;
             }
         }
     }

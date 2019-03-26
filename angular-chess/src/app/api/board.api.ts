@@ -26,6 +26,18 @@ export class BoardApi {
         return this.httpClient.post(`${this.endpoint}/board/resume`, {}).toPromise();
     }
 
+    public commit(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/commit`, {});
+
+    }
+
+    public reset(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/reset`, {});
+
+    }
+
     public promote(type: PieceType): Observable<IBoardModel> {
 
         return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/promote/${type}`, {});

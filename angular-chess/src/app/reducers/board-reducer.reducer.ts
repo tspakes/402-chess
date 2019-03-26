@@ -28,6 +28,19 @@ export function boardReducer(state = initialState, action: GetBoardActions): IBo
                 ...state,
             };
 
+        case GetBoardActionTypes.ResetBoardSuccess:
+
+            return {
+                ...state,
+            };
+
+        case GetBoardActionTypes.CommitBoardSuccess:
+
+            return {
+                ...state,
+            };
+
+
         default:
             return state;
     }

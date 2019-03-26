@@ -4,6 +4,7 @@ import {IPieceModel} from '../../models/IPieceModel';
 import {Store} from '@ngrx/store';
 import {IAppState} from '../../reducers';
 import {PromotePiece} from '../../actions/get-board.actions';
+import {BoardApi} from '../../api/board.api';
 
 @Component({
     selector: 'app-promotion-modal',
@@ -14,6 +15,8 @@ export class PromotionModalComponent {
     choosePromotion(piece: IPieceModel) {
 
         this.store.dispatch(new PromotePiece(piece.type));
+
+        this.boardApi.resume();
 
         this.bsModalRef.hide();
     }
@@ -45,7 +48,7 @@ export class PromotionModalComponent {
         ];
     }
 
-    constructor(public bsModalRef: BsModalRef, public store: Store<IAppState>) {
+    constructor(public bsModalRef: BsModalRef, public store: Store<IAppState>, private boardApi: BoardApi) {
     }
 
 }
