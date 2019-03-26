@@ -77,13 +77,14 @@ export class ChessBoardComponent {
 
     }
 
-    promote(piece) {
+    promote(piece: IPieceModel) {
 
-        this.modalRef = this.modalService.show(PromotionModalComponent, {
-            initialState: {
-                initialPiece: piece
-            }
-        });
-
+        if (piece.type === 'pawn') {
+            this.modalRef = this.modalService.show(PromotionModalComponent, {
+                initialState: {
+                    initialPiece: piece
+                }
+            });
+        }
     }
 }
