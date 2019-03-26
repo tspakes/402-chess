@@ -13,6 +13,9 @@ import {StoreModule} from '@ngrx/store';
 import {metaReducers, reducers} from './reducers';
 import {EffectsModule} from '@ngrx/effects';
 import {BoardEffects} from './effects/BoardEffects';
+import {BsDropdownModule, ModalModule} from 'ngx-bootstrap';
+import {PromotionModalComponent} from './modals/promotion/promotion.modal';
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
     declarations: [
@@ -20,17 +23,26 @@ import {BoardEffects} from './effects/BoardEffects';
         ChessBoardComponent,
         ChessPieceComponent,
         ChessErrorComponent,
-        RemoveEmptyPipe
+        RemoveEmptyPipe,
+        PromotionModalComponent
+
     ],
     imports: [
         BrowserModule,
+        FormsModule,
+        ReactiveFormsModule,
         AppRoutingModule,
         HttpClientModule,
         StoreModule.forRoot(reducers, {metaReducers}),
-        EffectsModule.forRoot([BoardEffects])
+        EffectsModule.forRoot([BoardEffects]),
+        ModalModule.forRoot(),
+        BsDropdownModule.forRoot()
     ],
     providers: [
         BoardApi
+    ],
+    entryComponents: [
+        PromotionModalComponent
     ],
     bootstrap: [AppComponent]
 })

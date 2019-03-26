@@ -3,7 +3,12 @@ import {Actions, Effect, ofType} from '@ngrx/effects';
 import {EMPTY} from 'rxjs';
 import {catchError, map, mergeMap} from 'rxjs/operators';
 import {BoardApi} from '../api/board.api';
-import {GetBoardActionTypes, LoadGetBoardsSuccess} from '../actions/get-board.actions';
+import {
+    GetBoardActionTypes,
+    LoadGetBoardsSuccess,
+    PromotePiece,
+    PromotePieceSuccess
+} from '../actions/get-board.actions';
 import {IBoardModel} from '../models/IBoardModel';
 
 @Injectable()
@@ -20,10 +25,17 @@ export class BoardEffects {
                 ))
         );
 
+    @Effect()
+    promotePiece$ = this.actions$
+        .pipe(
+            ofType(GetBoardActionTypes.PromotePiece),
+            mergeMap((action: PromotePiece) => this.boardService.promote(action.payload)
+                .pipe(
+                    map((board: IBoardModel) => new PromotePieceSuccess()),
+                    catchError(() => EMPTY)
+                ))
+        );
 
-    constructor(
-        private actions$: Actions,
-        private boardService: BoardApi
-    ) {
+    constructor(private actions$: Actions, private boardService: BoardApi) {
     }
 }

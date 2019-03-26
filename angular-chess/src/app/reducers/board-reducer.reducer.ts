@@ -22,6 +22,12 @@ export function boardReducer(state = initialState, action: GetBoardActions): IBo
                 board: action.payload
             };
 
+        case GetBoardActionTypes.PromotePieceSuccess:
+
+            return {
+                ...state,
+            };
+
         default:
             return state;
     }
