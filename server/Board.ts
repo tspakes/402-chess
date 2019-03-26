@@ -108,6 +108,38 @@ export class Board { // Single state of the board
     this.lastTurn = turn; 
   }
   
+  // Check which board spaces are threatened - this is for castling and king movement/check checking
+  public getThreatenedSpaces(curTeam: Team, turnToApply: Turn = null): boolean[][] {
+    if (turnToApply == null) { // Pre-state
+      for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+          let piece = this.grid[y][x];
+          if (piece != null && piece.team == curTeam) { // Piece found
+            if (piece.type == 'king') {
+              
+
+            } else if (piece.type == 'queen') {
+
+            } else if (piece.type == 'bishop') {
+
+            } else if (piece.type == 'knight') {
+
+            } else if (piece.type == 'rook') {
+
+            } else if (piece.type == 'pawn') {
+
+            } else { // Leftover piece type - shouldn't be reached
+
+            }
+          } else { // No piece of desired team or no piece
+            
+          }
+        }
+      }
+    } else { // Post-state
+
+    }
+  }
   
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
