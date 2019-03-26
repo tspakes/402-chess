@@ -1,7 +1,7 @@
 import {Component, ElementRef, Input} from '@angular/core';
 import {IPieceModel} from '../models/IPieceModel';
-import {PromotionModalComponent} from "../modals/promotion/promotion.modal";
-import {BsModalRef, BsModalService} from "ngx-bootstrap";
+import {PromotionModalComponent} from '../modals/promotion/promotion.modal';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 
 @Component({
     selector: 'app-chess-board',
