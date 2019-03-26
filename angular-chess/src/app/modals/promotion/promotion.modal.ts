@@ -11,8 +11,6 @@ import {PromotePiece} from '../../actions/get-board.actions';
 })
 export class PromotionModalComponent {
 
-    public initialPiece: IPieceModel = {};
-
     choosePromotion(piece: IPieceModel) {
 
         this.store.dispatch(new PromotePiece(piece.type));
@@ -22,7 +20,7 @@ export class PromotionModalComponent {
 
     get getTeam() {
 
-        return this.initialPiece.team;
+        return 'black';
     }
 
     get pieceTypes() {
@@ -35,10 +33,6 @@ export class PromotionModalComponent {
             {
                 team: this.getTeam,
                 type: 'queen'
-            },
-            {
-                team: this.getTeam,
-                type: 'rook'
             },
             {
                 team: this.getTeam,

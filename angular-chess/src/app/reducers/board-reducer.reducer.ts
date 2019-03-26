@@ -1,5 +1,5 @@
 import {IBoardModel} from '../models/IBoardModel';
-import {GetBoardActions, GetBoardActionTypes} from "../actions/get-board.actions";
+import {GetBoardActions, GetBoardActionTypes} from '../actions/get-board.actions';
 
 
 export interface IBoardState {
