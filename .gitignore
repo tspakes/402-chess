@@ -1,6 +1,5 @@
 /node_modules/
 /.vscode/
--www/js/lib/*.js
 *.DSStore
 *.png
 *.jpg
@@ -8,5 +7,6 @@
 *.xcf
 *.js
 *.js.map
+!/www/**/*.js
 
 /angular-chess/node_modules

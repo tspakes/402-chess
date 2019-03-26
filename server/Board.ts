@@ -3,6 +3,7 @@ import { Turn } from "./Turn";
 import Chalk from 'chalk';
 
 export class Board { // Single state of the board
+  public lastTurn: Turn;
   public grid: Piece[][]; // Rows denoted by numbers, columns by letters A-H (y, x here)
   /* Notation: display/internal, ███'s are black squares
    *     A/0 B/1 C/2 D/3 E/4 F/5 G/6 H/7
@@ -95,6 +96,8 @@ export class Board { // Single state of the board
 
     // Update board
     this.grid[turn.y1][turn.x1] = null;
+    if (turn.type === 'enpassant')
+      this.grid[turn.target.y][turn.target.x] = null;
     this.grid[turn.y2][turn.x2] = turn.actor;
     if (turn.type === 'castle') {
       this.grid[turn.y3][turn.x3] = null;
@@ -103,8 +106,9 @@ export class Board { // Single state of the board
 
     // Update piece
     turn.actor.updatePosition(turn.x2, turn.y2);
+    turn.actor.hasMoved = true;
+    this.lastTurn = turn; 
   }
-  
   
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 

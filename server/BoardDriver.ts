@@ -19,7 +19,9 @@ export default class BoardDriver {
         }
       }
     }
+
     this._debug = value;
+
   }
   public static debug_setCell(x: number, y: number, occupied: boolean) {
     if (!this._debug)

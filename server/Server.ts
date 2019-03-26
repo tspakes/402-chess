@@ -5,8 +5,9 @@ import * as Path from 'path';
 import BoardAPI from './BoardAPI';
 import Chalk from 'chalk';
 import BoardDriver from './BoardDriver';
+import { PieceType } from './Piece';
 
-const PORT = 3000;
+const PORT = 80;
 
 class Server {
 	public app: Express.Application;
@@ -29,6 +30,14 @@ class Server {
 	}
 
 	private config(): void{
+		
+		// Enable cross origin requests
+		this.app.use(function(req, res, next) {
+			res.header('Access-Control-Allow-Origin', '*');
+			res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+			next();
+		});
+		
 		// Support application/json type post data
 		this.app.use(BodyParser.json());
 		// Support application/x-www-form-urlencoded post data
@@ -75,11 +84,48 @@ class Server {
 		 * Commit currently pending turn. 
 		 */
 		this.app.post('/board/commit', (req: Request, res: Response) => {
-			BoardAPI.postTurn();
+			try {
+				BoardAPI.postTurn();
+				res.status(200);
+				res.json({
+					message: 'Turn committed.'
+				});
+			} catch (ex) {
+				console.log(Chalk.red(ex));
+				res.status(400);
+				res.json({
+					message: ex
+				});
+			}
+		});
+		/**
+		 * Cancel currently pending turn. Pauses piece detection until /board/resume is called,
+		 * so display a button to call that. 
+		 */
+		this.app.post('/board/cancel', (req: Request, res: Response) => {
+			BoardAPI.postCancel();
 			res.status(200);
 			res.json({
-				message: 'Turn committed.'
+				message: 'Turn pending cancel. Call /board/resume when the pieces have been moved to their locations at the start of the turn.'
 			});
+		});
+		/**
+		 * Choose type of piece for pawn promotion. 
+		 */
+		this.app.post('/board/promote/:type', (req: Request, res: Response) => {
+			try {
+				BoardAPI.postPromote(req.params.type);
+				res.status(200);
+				res.json({
+					message: `Promoted piece to ${req.params.type}.`
+				});
+			} catch (ex) {
+				console.log(Chalk.red(ex));
+				res.status(400);
+				res.json({
+					message: ex
+				});
+			}
 		});
 
 		// Database API
@@ -109,7 +155,7 @@ class Server {
 			res.json({
 				message: 'Updated board state.'
 			});
-			BoardDriver.debug_setCell(req.query.x - 1, req.query.y - 1, req.query.lift !== 'true');
+			BoardDriver.debug_setCell(8 - req.query.x, req.query.y - 1, req.query.lift !== 'true');
 		});
 		/**
 		 * Reset the spoofed hardware state. 

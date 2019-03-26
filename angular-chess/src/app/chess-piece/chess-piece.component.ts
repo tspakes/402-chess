@@ -1,37 +1,40 @@
-import {Component, ElementRef, Input, OnInit} from '@angular/core';
+import {Component, DoCheck, ElementRef, Input, OnInit} from '@angular/core';
+import {IPieceModel} from '../models/IPieceModel';
 
 @Component({
     selector: 'app-chess-piece',
     templateUrl: './chess-piece.component.html',
     styleUrls: ['./chess-piece.component.scss']
 })
-export class ChessPieceComponent implements OnInit {
+export class ChessPieceComponent implements OnInit, DoCheck {
 
 
-    /**
-     * The type of piece this
-     */
-    @Input() type: 'rook' | 'queen' | 'king' | 'pawn' | 'knight' | 'bishop' | 'knight';
+    @Input() piece: IPieceModel;
 
-    /**
-     * Which color the piece should be
-     */
-    @Input() color: 'dark' | 'light';
-
-
-    @Input() x: number;
-
-    @Input() y: number;
-
-    @Input() chessId: string;
 
     constructor(public elementRef: ElementRef) {
     }
 
+
     ngOnInit() {
+        this.draw();
+    }
 
+    dragStart(event) {
 
-        this.elementRef.nativeElement.style.setProperty('--chess-background', 'url(\'/assets/pieces/' + this.type + '_' + this.color + '.png\')');
+        event.dataTransfer.setData('Text', this.piece.id.toString());
+
+    }
+
+    // Draw on every check
+    ngDoCheck() {
+        this.draw();
+    }
+
+    private draw() {
+
+        const background_property = 'url(\'/assets/pieces/' + this.piece.type + '_' + this.piece.team + '.png\')';
+        this.elementRef.nativeElement.style.setProperty('--chess-background', background_property);
 
         this.setCoordinates();
 
@@ -39,16 +42,12 @@ export class ChessPieceComponent implements OnInit {
 
     private setCoordinates() {
 
-        this.elementRef.nativeElement.style.setProperty('--x', ((this.x * 60) - 30) + 'px');
-        this.elementRef.nativeElement.style.setProperty('--y', ((this.y * 60) - 30) + 'px');
+        this.elementRef.nativeElement.style.setProperty('--x', ((this.piece.column * 60) - 30) + 'px');
+        this.elementRef.nativeElement.style.setProperty('--y', ((this.piece.row * 60) - 30) + 'px');
     }
 
-
-    dragStart(event) {
-        console.log(this.chessId);
-        event.dataTransfer.setData('Text', this.chessId);
-
-    }
 
 }
+
+
 

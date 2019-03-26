@@ -1,6 +1,13 @@
 <div>
-    <table cellpadding="0" cellspacing="0" border="0" (drop)="onDrop($event)" (dragover)="dragOver($event)">
-        <ng-content></ng-content>
+
+
+    <app-chess-error [board]="board"></app-chess-error>
+
+    <table (dragover)="dragOver($event)" (drop)="onDrop($event)" border="0" cellpadding="0" cellspacing="0">
+        <app-chess-piece *ngFor="let piece of getGrid | removeEmpty; trackBy: trackElement"
+                         [piece]="piece" (dblclick)="promote(piece)">
+
+        </app-chess-piece>
         <tr>
             <td x="1" y="1"></td>
             <td x="2" y="1"></td>
