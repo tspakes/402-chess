@@ -16,7 +16,7 @@ export default class BoardAPI {
 	private static _boardDelta: boolean[][]; // True for cells interacted w/ this turn
 	private static _ignoreMoves: boolean;
 	private static _rawChangeQueue: RawChange[];
-	private static _pollInterval: number = 10; // 200 is pretty good for debugging
+	private static _pollInterval: number = 10; // 200 is pretty good for debugging, 10 for production
 	private static _teamCurrent: Team;
 	private static _turnCommitQueued: boolean = false;
 	private static _intervalId: NodeJS.Timeout = null;
@@ -58,6 +58,7 @@ export default class BoardAPI {
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
+		BoardDriver.init();
 		this._teamCurrent = 'white';
 		this.error = '';
 		this._ignoreMoves = true;

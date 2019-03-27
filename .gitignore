@@ -1,13 +1,10 @@
 /node_modules/
 /.vscode/
 *.DSStore
-*.png
-*.jpg
 *.psd
 *.xcf
 *.js
 *.js.map
+!/www/**/*.js
 
 /angular-chess/node_modules
-
-.idea

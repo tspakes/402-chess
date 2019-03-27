@@ -4,10 +4,11 @@ import {EMPTY} from 'rxjs';
 import {catchError, map, mergeMap} from 'rxjs/operators';
 import {BoardApi} from '../api/board.api';
 import {
+    CommitTurnSuccess,
     GetBoardActionTypes,
     LoadGetBoardsSuccess,
     PromotePiece,
-    PromotePieceSuccess
+    PromotePieceSuccess, ResetBoardSuccess
 } from '../actions/get-board.actions';
 import {IBoardModel} from '../models/IBoardModel';
 
@@ -32,6 +33,28 @@ export class BoardEffects {
             mergeMap((action: PromotePiece) => this.boardService.promote(action.payload)
                 .pipe(
                     map((board: IBoardModel) => new PromotePieceSuccess()),
+                    catchError(() => EMPTY)
+                ))
+        );
+
+    @Effect()
+    commitPiece$ = this.actions$
+        .pipe(
+            ofType(GetBoardActionTypes.CommitBoard),
+            mergeMap(() => this.boardService.commit()
+                .pipe(
+                    map(() =>  new CommitTurnSuccess()),
+                    catchError(() => EMPTY)
+                ))
+        );
+
+    @Effect()
+    resetBoard$ = this.actions$
+        .pipe(
+            ofType(GetBoardActionTypes.ResetBoard),
+            mergeMap(() => this.boardService.reset()
+                .pipe(
+                    map(() =>  new ResetBoardSuccess()),
                     catchError(() => EMPTY)
                 ))
         );

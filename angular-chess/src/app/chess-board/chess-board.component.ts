@@ -2,6 +2,9 @@ import {Component, ElementRef, Input} from '@angular/core';
 import {IPieceModel} from '../models/IPieceModel';
 import {PromotionModalComponent} from '../modals/promotion/promotion.modal';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
+import {Store} from "@ngrx/store";
+import {IAppState} from "../reducers";
+import {CommitTurn, ResetBoard} from "../actions/get-board.actions";
 
 @Component({
     selector: 'app-chess-board',
@@ -16,7 +19,9 @@ export class ChessBoardComponent {
 
     modalRef: BsModalRef;
 
-    constructor(public elementRef: ElementRef, private modalService: BsModalService) {
+    constructor(public elementRef: ElementRef,
+                private modalService: BsModalService,
+                public store: Store<IAppState>) {
     }
 
     onDrop(event) {
@@ -48,7 +53,7 @@ export class ChessBoardComponent {
 
             this.grid = this.board.pieces;
 
-            let row_index = 1;
+            let row_index = 8;
             let column_index = 1;
 
             this.grid.forEach((row: Array<any>) => {
@@ -68,7 +73,7 @@ export class ChessBoardComponent {
 
                 // Reset the column index every time we enter into a new row
                 column_index = 1;
-                row_index++;
+                row_index--;
 
             });
         }
@@ -86,5 +91,14 @@ export class ChessBoardComponent {
                 }
             });
         }
+    }
+
+    commit() {
+
+        this.store.dispatch(new CommitTurn());
+    }
+
+    reset() {
+        this.store.dispatch(new ResetBoard());
     }
 }
