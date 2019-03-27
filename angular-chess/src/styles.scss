@@ -1,12 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
 @import "styles/reset.css";
+@import "styles/animate.css";
+
 
 
 * {
   box-sizing: initial !important;
+  font-family: 'Nunito', sans-serif;
+
 }
 
 .small-piece {
   width: 20px !important;
   height: 20px !important;
+}
+
+
+.h-500 {
+  height: 500px !important;
 }

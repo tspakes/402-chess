@@ -39,10 +39,17 @@ export class Piece {
 	private static _nextId: number = 0;
 	public hasMoved: boolean = false;
 
+	public static resetId() {
+		this._nextId = 0;
+	}
+
 	constructor(type: PieceType, team: Team, x: number = -1, y: number = -1) {
 		this._type = type;
 		this._team = team;
 		this._id = Piece._nextId++;
+
+		console.log(this._id);
+
 		this.updatePosition(x, y);
 	}
 

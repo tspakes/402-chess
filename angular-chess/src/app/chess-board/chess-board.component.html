@@ -30,22 +30,28 @@
 
                     <button type="button" class="commit-button shadow-sm"
                             [ngClass]="{'commit-disabled': board.currentTeam != 'black'}"
-                            (click)="commit('black')"></button>
+                            (click)="commit('black')">
+                        <span *ngIf="board.currentTeam === 'black'">Confirm<br><i class="fas fa-arrow-down"></i></span>
+                        <span *ngIf="board.currentTeam !== 'black'"></span>
+                    </button>
 
                     <i class="fas fa-undo" (click)="undo()"></i>
 
                     <button type="button" class="commit-button  shadow-sm"
                             [ngClass]="{'commit-disabled': board.currentTeam != 'white'}"
-                            (click)="commit('white')"></button>
+                            (click)="commit('white')">
+                        <span *ngIf="board.currentTeam === 'white'"><i class="fas fa-arrow-up"></i><br>Confirm</span>
+                        <span *ngIf="board.currentTeam !== 'white'"></span>
+                    </button>
 
 
                 </div>
             </div>
         </div>
-        <div class="col-auto">
+        <div class="col-auto d-flex align-items-center">
             <table (dragover)="dragOver($event)" (drop)="onDrop($event)" border="0" cellpadding="0" cellspacing="0">
                 <app-chess-piece *ngFor="let piece of getGrid | removeEmpty; trackBy: trackElement" [piece]="piece"
-                                 (dblclick)="promote(piece)"></app-chess-piece>
+                                 (dblclick)="promote(piece)" styleClass="animated fadeIn"></app-chess-piece>
                 <tr>
                     <td x="1" y="1"></td>
                     <td x="2" y="1"></td>
@@ -130,20 +136,24 @@
         </div>
         <div class="col-auto">
 
-            <div class="card shadow-sm h-100">
-                <div class="card-header">
-                    <h4>Move History</h4>
+            <div class="card shadow-sm h-500">
+                <div class="card-header text-center">
+                    <h5>Move History</h5>
+                    <strong>({{board.history.length}})</strong>
+
                 </div>
                 <div class="card-body history-body" #history>
                     <div class="chess-move d-flex flex-row w-100"
                          *ngFor="let move of board.history.reverse(); trackBy: historyFunction">
-                        <div class="d-flex flex-row justify-content-between  w-100 " *ngIf="move.type === 'move'">
+                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                             *ngIf="move.type === 'move'">
                             <app-chess-piece styleClass="small-piece" [piece]="move.actor"
                                              style="position: relative; display: inline;"></app-chess-piece>
                             <p>moves to</p>
                             <strong>{{move.notation | uppercase}}</strong>
                         </div>
-                        <div class="d-flex flex-row justify-content-between w-100" *ngIf="move.type === 'take'">
+                        <div class="d-flex flex-row justify-content-between w-100 animated fadeIn"
+                             *ngIf="move.type === 'take'">
                             <app-chess-piece styleClass="small-piece" [piece]="move.actor"
                                              style="position: relative; display: inline;"></app-chess-piece>
                             <p>takes </p>
@@ -151,7 +161,15 @@
                                              [piece]="move.target"></app-chess-piece>
                         </div>
                     </div>
+
+                    <div *ngIf="board.history.length === 0"
+                         class="d-flex flex-column justify-content-center align-items-center h-100 animated fadeIn">
+                        <i class="fas fa-2x fa-history mb-2"></i>
+
+                        <p>No move history.</p>
+                    </div>
                 </div>
+
             </div>
         </div>
 

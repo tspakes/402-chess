@@ -38,8 +38,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
             this.board = board.board;
 
-            console.log(this.board);
-
             this.checkMessages();
         });
 
