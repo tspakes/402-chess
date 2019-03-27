@@ -44,10 +44,8 @@
         </div>
         <div class="col-auto">
             <table (dragover)="dragOver($event)" (drop)="onDrop($event)" border="0" cellpadding="0" cellspacing="0">
-                <app-chess-piece *ngFor="let piece of getGrid | removeEmpty; trackBy: trackElement"
-                                 [piece]="piece" (dblclick)="promote(piece)">
-
-                </app-chess-piece>
+                <app-chess-piece *ngFor="let piece of getGrid | removeEmpty; trackBy: trackElement" [piece]="piece"
+                                 (dblclick)="promote(piece)"></app-chess-piece>
                 <tr>
                     <td x="1" y="1"></td>
                     <td x="2" y="1"></td>
@@ -138,7 +136,7 @@
                 </div>
                 <div class="card-body history-body" #history>
                     <div class="chess-move d-flex flex-row w-100"
-                         *ngFor="let move of board.history; trackBy: historyFunction">
+                         *ngFor="let move of board.history.reverse(); trackBy: historyFunction">
                         <div class="d-flex flex-row justify-content-between  w-100 " *ngIf="move.type === 'move'">
                             <app-chess-piece styleClass="small-piece" [piece]="move.actor"
                                              style="position: relative; display: inline;"></app-chess-piece>
