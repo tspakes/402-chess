@@ -430,6 +430,7 @@ export default class BoardAPI {
 	public static postCancel(): void {
 		console.log(`Cancelling turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
 		this.error = 'CANCEL_TURN';
+		this._errorDesc = 'Move pieces back to their locations at the start of the current turn.';
 	}
 	
 	public static postUndo(): any {
@@ -443,6 +444,7 @@ export default class BoardAPI {
 		this.switchTeam();
 		console.log(`Undoing last turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
 		this.error = 'UNDO_TURN';
+		this._errorDesc = 'Move pieces to their locations at the start of the previous turn.';
 	}
 
 	public static postPromote(type: PieceType): void {
