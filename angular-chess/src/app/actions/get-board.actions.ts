@@ -12,6 +12,9 @@ export enum GetBoardActionTypes {
     CommitBoard = '[Board] CommitBoard',
     CommitBoardSuccess = '[Board] CommitBoard Success',
 
+    ResumeBoard = '[Board] ResumeBoard',
+    ResumeBoardSuccess = '[Board] ResumeBoard Success',
+
 }
 
 export class LoadGetBoards implements Action {
@@ -93,6 +96,27 @@ export class CommitTurnSuccess implements Action {
 
 }
 
+export class ResumeBoard implements Action {
+
+    readonly type = GetBoardActionTypes.ResumeBoard;
+
+    constructor() {
+
+    }
+
+}
+
+export class ResumeBoardSuccess implements Action {
+
+    readonly type = GetBoardActionTypes.ResumeBoardSuccess;
+
+    constructor() {
+
+    }
+
+}
+
+
 export type GetBoardActions =
     LoadGetBoards
     | LoadGetBoardsSuccess
@@ -101,4 +125,6 @@ export type GetBoardActions =
     | ResetBoard
     | ResetBoardSuccess
     | CommitTurn
-    | CommitTurnSuccess;
+    | CommitTurnSuccess
+    | ResumeBoard
+    | ResumeBoardSuccess;

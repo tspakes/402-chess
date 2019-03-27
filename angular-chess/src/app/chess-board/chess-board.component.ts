@@ -94,7 +94,6 @@ export class ChessBoardComponent {
     }
 
     commit() {
-
         this.store.dispatch(new CommitTurn());
     }
 

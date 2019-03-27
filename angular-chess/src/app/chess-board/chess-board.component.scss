@@ -19,6 +19,7 @@ td {
 tr {
   padding: 0;
   margin: 0;
+
 }
 
 tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
@@ -42,4 +43,22 @@ tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd) {
   height: 100vh;
   width: 100vw;
   background: #e9d6aa;
+}
+
+
+.commit-button {
+
+  background: #a90329; /* Old browsers */
+  background: -moz-linear-gradient(top, #a90329 0%, #8f0222 44%, #6d0019 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #a90329 0%,#8f0222 44%,#6d0019 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #a90329 0%,#8f0222 44%,#6d0019 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#6d0019',GradientType=0 ); /* IE6-9 */
+  border-radius: 50%;
+  height: 100px;
+  width: 100px;
+  padding: 0px;
+  color: white;
+  border: solid 10px dimgrey;
+  outline: none;
+
 }

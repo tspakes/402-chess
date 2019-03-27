@@ -3,8 +3,7 @@ import {BsModalRef} from 'ngx-bootstrap';
 import {IPieceModel} from '../../models/IPieceModel';
 import {Store} from '@ngrx/store';
 import {IAppState} from '../../reducers';
-import {PromotePiece} from '../../actions/get-board.actions';
-import {BoardApi} from '../../api/board.api';
+import {PromotePiece, ResumeBoard} from '../../actions/get-board.actions';
 
 @Component({
     selector: 'app-promotion-modal',
@@ -16,7 +15,7 @@ export class PromotionModalComponent {
 
         this.store.dispatch(new PromotePiece(piece.type));
 
-        this.boardApi.resume();
+        this.store.dispatch(new ResumeBoard());
 
         this.bsModalRef.hide();
     }
@@ -48,7 +47,7 @@ export class PromotionModalComponent {
         ];
     }
 
-    constructor(public bsModalRef: BsModalRef, public store: Store<IAppState>, private boardApi: BoardApi) {
+    constructor(public bsModalRef: BsModalRef, public store: Store<IAppState>) {
     }
 
 }

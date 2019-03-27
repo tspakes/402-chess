@@ -8,7 +8,9 @@ import {
     GetBoardActionTypes,
     LoadGetBoardsSuccess,
     PromotePiece,
-    PromotePieceSuccess, ResetBoardSuccess
+    PromotePieceSuccess,
+    ResetBoardSuccess,
+    ResumeBoardSuccess
 } from '../actions/get-board.actions';
 import {IBoardModel} from '../models/IBoardModel';
 
@@ -43,7 +45,7 @@ export class BoardEffects {
             ofType(GetBoardActionTypes.CommitBoard),
             mergeMap(() => this.boardService.commit()
                 .pipe(
-                    map(() =>  new CommitTurnSuccess()),
+                    map(() => new CommitTurnSuccess()),
                     catchError(() => EMPTY)
                 ))
         );
@@ -54,7 +56,19 @@ export class BoardEffects {
             ofType(GetBoardActionTypes.ResetBoard),
             mergeMap(() => this.boardService.reset()
                 .pipe(
-                    map(() =>  new ResetBoardSuccess()),
+                    map(() => new ResetBoardSuccess()),
+                    catchError(() => EMPTY)
+                ))
+        );
+
+
+    @Effect()
+    resumeBoard = this.actions$
+        .pipe(
+            ofType(GetBoardActionTypes.ResumeBoard),
+            mergeMap(() => this.boardService.resume()
+                .pipe(
+                    map(() => new ResumeBoardSuccess()),
                     catchError(() => EMPTY)
                 ))
         );
