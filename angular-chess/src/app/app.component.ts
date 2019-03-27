@@ -9,7 +9,7 @@ import {PromotionModalComponent} from './modals/promotion/promotion.modal';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 
 @Component({
-    selector: 'app-root',
+    selector: 'app-main-board',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
