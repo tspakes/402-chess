@@ -110,7 +110,6 @@ export class Board { // Single state of the board
     this.lastTurn = turn; 
   }
   
-<<<<<<< HEAD
   // Check which board spaces are threatened - this is for castling and king movement/check checking
   public getThreatenedSpaces(curTeam: Team, turnToApply: Turn = null): boolean[][] {
     if (turnToApply == null) { // Pre-state
@@ -144,8 +143,6 @@ export class Board { // Single state of the board
     }
   }
   
-=======
->>>>>>> master
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
    */
