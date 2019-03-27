@@ -127,7 +127,9 @@ export default class BoardAPI {
 					this._pendingTurn = this.postProcess(turntype);
 					if (this._pendingTurn.type === 'invalid') {
 						this.error = 'INVALID_TURN';
-						this._errorDesc = 'Post processing failed.';
+						if (this._errorDesc === '')
+							this._errorDesc = 'Post processing failed.';
+						console.log(Chalk.redBright(this._errorDesc));
 						console.log(Chalk.redBright('Invalid move processed. Waiting for /board/resume request.'));
 						return;
 					}
@@ -196,7 +198,7 @@ export default class BoardAPI {
 		}
 		if (turn.actor === null) {
 			// The player probably moved the wrong team's piece
-			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected. It is likely the wrong player moved. The current player is ${this._teamCurrent}.`));
+			this._errorDesc = `Actor for turn of type ${type} not detected. It is likely the wrong player moved. The current player is ${this._teamCurrent}.`;
 			if (!DEBUG) this.printBoardState();
 			turn.type = 'invalid';
 			return turn;
@@ -272,6 +274,13 @@ export default class BoardAPI {
 						break actor2Detection;
 					}
 				}
+			}
+			if (turn.actor2 === null) {
+				// The player probably moved the wrong team's piece
+				this._errorDesc = `Rook not detected. It is likely ${this._teamCurrent} tried to take their own piece.`;
+				if (!DEBUG) this.printBoardState();
+				turn.type = 'invalid';
+				return turn;
 			}
 			console.log(Chalk.greenBright(`actor2=${turn.actor2.toString()}`));
 
