@@ -392,6 +392,7 @@ export default class BoardAPI {
 		return JSON.stringify({
 			message: this.error,
 			description: this.errorDesc,
+			currentTeam: this._teamCurrent,
 			pieces: this._board.serialize(),
 			history: this.serializeHistory()
 		});
