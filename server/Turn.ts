@@ -5,83 +5,94 @@ export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion'|'inval
 
 export class Turn {
   public type: TurnType;
-  private _x2: number = -1;
-  private _y2: number = -1;
-  private _x4: number = -1;
-  private _y4: number = -1;
-  public actor: Piece = null; // Piece moving
-  public actor2: Piece = null; // Only used for castling
-  public target: Piece = null; // Used in take, enpassant, and pawnpromotion
+
+  public x1: number = -1; // Actor initial
+  public y1: number = -1;
+  public x2: number = -1; // Actor final
+  public y2: number = -1;
+  public x3: number = -1; // Actor2 initial
+  public y3: number = -1;
+  public x4: number = -1; // Actor2 final
+  public y4: number = -1;
+  private _xtarget: number = -1; // Target initial
+  private _ytarget: number = -1;
+
+  private _actor: Piece = null; // Piece moving
+  private _actor2: Piece = null; // Only used for castling
+  private _target: Piece = null; // Used in take, enpassant, and pawnpromotion
+
   public promotion: PieceType;
+  public check: ''|'check'|'checkmate' = '';
   public lastTurn: Turn;
   public meta: any = {}; // Pawn double move, castle side
-	// TODO Pawn promotion might also be a take, enpassant is always a take
-  // Probably just type enpassant as move and take, only differentiate upon checking validity
-  
-  public get x1(): number {
-    if (!this.actor) return -1;
-    return this.actor.x;
+
+  // All of this is to maintain the positions apart from the references as the pieces will change over time
+  public get actor(): Piece {
+    return this._actor;
   }
-  public get y1(): number {
-    if (!this.actor) return -1;
-    return this.actor.y;
+  public get actor2(): Piece {
+    return this._actor2;
   }
-  public get x2(): number {
-    if (this._x2 >= 0) return this._x2;
-    if (!this.target) return -1;
-    return this.target.x;
+  public get target(): Piece {
+    return this._target;
   }
-  public set x2(value: number) {
-    this._x2 = value;
+  public get xtarget(): number {
+    return this._xtarget;
   }
-  public get y2(): number {
-    if (this._x2 >= 0) return this._y2;
-    if (!this.target) return -1;
-    return this.target.y;
+  public get ytarget(): number {
+    return this._ytarget;
   }
-  public set y2(value: number) {
-    this._y2 = value;
+  public set actor(p: Piece) {
+    this._actor = p;
+    this.x1 = p.x;
+    this.y1 = p.y;
   }
-  // Castling-only variables
-  public get x3(): number {
-    if (!this.actor2) return -1;
-    return this.actor2.x;
+  public set actor2(p: Piece) {
+    this._actor2 = p;
+    this.x3 = p.x;
+    this.y3 = p.y;
   }
-  public get y3(): number {
-    if (!this.actor2) return -1;
-    return this.actor2.y;
-  }
-  public get x4(): number {
-    return this._x4;
-  }
-  public set x4(value: number) {
-    this._x4 = value;
-  }
-  public get y4(): number {
-    return this._y4;
-  }
-  public set y4(value: number) {
-    this._y4 = value;
+  public set target(p: Piece) {
+    this._target = p;
+    this._xtarget = p.x;
+    this._ytarget = p.y;
   }
 
 	/**
 	 * @see http://blog.chesshouse.com/how-to-read-and-write-algebraic-chess-notation/
+   * @see https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
 	 */
 	public get notation(): string {
-		// TODO Append '+' for check and '++' for checkmate.
-		// Seems like chess notation is chosen to be as short as possible while still being fully explicit,
-		//  so certain if the only one piece could've taken another, you only designate the attacking piece
-		//  followed by the target's position. 
-		// Really going to need move validity checking before this can be fully fleshed out. 
-		if ('castle')
-			return 'Not yet implemented.'; // Castling kingside is 'O-O' and queenside is 'O-O-O'
-		if ('enpassant')
-			return 'Not yet implemented.'; // Include extra '(ep)' at end but I'm assuming before '+' for check if applicable
-		if ('pawnpromotion')
-			return 'Not yet implemented.'; // Include '=' followed by notation for piece promoted to, e.g. '=Q'
-		if ('take')
-			return 'Not yet implemented.'; // Include type, x, source, and destination
-		return this.actor.notation + String.fromCharCode(97/*a*/ + this.x2) + (this.y2 + 1);
+    let not: string;
+
+    // Base notation
+    switch (this.type) {
+      case 'castle':
+        not = this.meta.kingside ? 'O-O' : 'O-O-O';
+        break;
+      case 'take': // Include type, source, x, and destination
+        not = 'x' + Piece.colToLetter(this.x2) + (this.y2 + 1);
+      case 'enpassant': // Include file of departure
+        not = Piece.colToLetter(this.x1) + not;
+        break;
+      case 'pawnpromotion':
+        not += Piece.colToLetter(this.x2) + (this.y2 + 1) + '=' + Piece.notationFromType(this.promotion);
+        break;
+      default:
+        not = Piece.colToLetter(this.x2) + (this.y2 + 1);
+    }
+
+    // TODO Actor disambiguation
+
+    // Prefixes
+    if (this.type === 'take' || this.type === 'enpassant') not = this.actor.notation + not;
+
+    // Suffixes
+    if (this.type === 'enpassant') not += '(ep)';
+    if (this.check === 'check') not += '+';
+    if (this.check === 'checkmate') not += '++';
+
+    return not;
   }
 
 	public isValid(board: Board): boolean {

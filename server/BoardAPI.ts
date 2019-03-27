@@ -322,7 +322,6 @@ export default class BoardAPI {
 			turn.type = 'pawnpromotion';
 			if (DEBUG) console.log(Chalk.gray(`turntype=pawnpromotion`));
 		}
-		// TODO The black and white here depend on starting positions here, so make sure the indexing is correct
 		
 		return turn;
 	}

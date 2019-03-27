@@ -6,6 +6,31 @@ export type Team = 'black'|'white'|'unknown';
 
 export class Piece {
 
+	public static notationFromType(type: PieceType): 'K'|'Q'|'B'|'N'|'R'|'' {
+		switch (type) {
+			case 'king':
+				return 'K';
+			case 'queen':
+				return 'Q';
+			case 'bishop':
+				return 'B';
+			case 'knight':
+				return 'N';
+			case 'rook':
+				return 'R';
+			default:
+				return '';
+		}
+	}
+	/**
+	 * Convert the column index to the corresponding letter for display.
+	 * @param col Zero-indexed column on the chessboard
+	 * @param capital Omit for lowercase, true for uppercase
+	 */
+	public static colToLetter(col: number, capital: boolean = false): string {
+		return String.fromCharCode((capital?65:97/*a:A*/) + col);
+	}
+
 	private _type: PieceType;
 	private _team: Team;
 	private _x: number;
@@ -13,7 +38,6 @@ export class Piece {
 	private _id: number;
 	private static _nextId: number = 0;
 	public hasMoved: boolean = false;
-
 
 	constructor(type: PieceType, team: Team, x: number = -1, y: number = -1) {
 		this._type = type;
@@ -31,31 +55,22 @@ export class Piece {
 	public get x(): number {
 		return this._x;
 	}
+	public get xletter(): string {
+		return Piece.colToLetter(this._x);
+	}
 	public get y(): number {
 		return this._y;
 	}
 	public get id(): number {
 		return this._id;
 	}
+
 	public get notation(): 'K'|'Q'|'B'|'N'|'R'|'' {
-		switch (this.type) {
-			case 'king':
-				return 'K';
-			case 'queen':
-				return 'Q';
-			case 'bishop':
-				return 'B';
-			case 'knight':
-				return 'N';
-			case 'rook':
-				return 'R';
-			default:
-				return '';
-		}
+		return Piece.notationFromType(this.type);
 	}
 
 	public toString(): string {
-		return `${this.notation}(${String.fromCharCode(65+this.x)}${this.y+1})`;
+		return `${this.notation}(${Piece.colToLetter(this.x, true)}${this.y+1})`;
 	}
 
 	/**
