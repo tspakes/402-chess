@@ -1,11 +1,11 @@
-import { Turn, TurnType } from "./Turn";
+import { Turn, TurnType, TurnSerialized } from "./Turn";
 import { Board } from "./Board";
 import { PieceMinimal, Piece, Team, PieceType } from "./Piece";
 import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
 import { State } from "./State";
 
-export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'PAWN_PROMOTION'|'CANCEL_TURN'|'';
+export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'PAWN_PROMOTION'|'CANCEL_TURN'|'UNDO_TURN'|'';
 
 const DEBUG = true;
 
@@ -16,13 +16,14 @@ export default class BoardAPI {
 	private static _boardDelta: boolean[][]; // True for cells interacted w/ this turn
 	private static _ignoreMoves: boolean;
 	private static _rawChangeQueue: RawChange[];
-	private static _pollInterval: number = 10; // 200 is pretty good for debugging
+	private static _pollInterval: number = 10; // 200 is pretty good for debugging, 10 for production
 	private static _teamCurrent: Team;
 	private static _turnCommitQueued: boolean = false;
 	private static _intervalId: NodeJS.Timeout = null;
 	private static _error: Error = '';
 	private static _errorDesc: string = '';
 	private static _pendingTurn: Turn = null;
+	public static validityChecking: boolean = true;
 
 	public static get error(): Error {
 		return this._error;
@@ -58,6 +59,7 @@ export default class BoardAPI {
 		this._board = new Board();
 		this._board.initPieces();
 		this._history = [];
+		BoardDriver.init();
 		this._teamCurrent = 'white';
 		this.error = '';
 		this._ignoreMoves = true;
@@ -133,7 +135,7 @@ export default class BoardAPI {
 						return;
 					}
 				}
-				if (!this._pendingTurn.isValid(this._board)) {
+				if (!this._pendingTurn.isValid(this._board) && this.validityChecking) {
 					this.error = 'INVALID_TURN';
 					this._errorDesc = 'Turn was detected correctly, but was against the rules.';
 					console.log(Chalk.redBright('Illegal move processed. Waiting for /board/resume request.'));
@@ -148,14 +150,16 @@ export default class BoardAPI {
 				this._history.push(this._pendingTurn);
 				this._boardRaw = this._board.minimize();
 				this._pendingTurn = null;
-				// Switch current team
-				if (this._teamCurrent === 'white')
-					this._teamCurrent = 'black';
-				else if (this._teamCurrent === 'black')
-					this._teamCurrent = 'white';
-				console.log(`Now ${this._teamCurrent}'s turn.`);
+				this.switchTeam();
 			}
 		}, this._pollInterval);
+	}
+
+	public static serializeHistory(): TurnSerialized[] {
+		let ser: TurnSerialized[] = [];
+		for (let t of this._history)
+			ser.push(t.serialize());
+		return ser;
 	}
 
 	private static postProcess(type: TurnType): Turn {
@@ -313,7 +317,10 @@ export default class BoardAPI {
 			turn.type = 'pawnpromotion';
 			if (DEBUG) console.log(Chalk.gray(`turntype=pawnpromotion`));
 		}
-		// TODO The black and white here depend on starting positions here, so make sure the indexing is correct
+
+		// Check for first movement for actor (needed for en passant after undo)
+		if (!turn.actor.hasMoved)
+			turn.meta.firstMove = true;
 		
 		return turn;
 	}
@@ -351,6 +358,15 @@ export default class BoardAPI {
 		}
 	}
 
+	private static switchTeam(): void {
+		// Switch current team
+		if (this._teamCurrent === 'white')
+			this._teamCurrent = 'black';
+		else if (this._teamCurrent === 'black')
+			this._teamCurrent = 'white';
+		console.log(`Now ${this._teamCurrent}'s turn.`);
+	}
+
 	private static zeroDelta(): void {
 		this._boardDelta = [];
 		for (let r = 0; r < 8; r++) {
@@ -376,7 +392,8 @@ export default class BoardAPI {
 		return JSON.stringify({
 			message: this.error,
 			description: this.errorDesc,
-			pieces: this._board.serialize()
+			pieces: this._board.serialize(),
+			history: this.serializeHistory()
 		});
 	}
 
@@ -399,6 +416,17 @@ export default class BoardAPI {
 	public static postCancel(): void {
 		console.log(`Cancelling turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
 		this.error = 'CANCEL_TURN';
+	}
+	
+	public static postUndo(): any {
+		if (this.sumDelta() > 0)
+			throw 'A turn is currently pending. Cancel the current turn before undoing the last turn.';
+		this._board.undoTurn(this._history[this._history.length - 1]);
+		this._history.pop();
+		this._board.lastTurn = this._history[this._history.length - 1];
+		this.switchTeam();
+		console.log(`Undoing last turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
+		this.error = 'UNDO_TURN';
 	}
 
 	public static postPromote(type: PieceType): void {

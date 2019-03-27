@@ -15,7 +15,9 @@ import {EffectsModule} from '@ngrx/effects';
 import {BoardEffects} from './effects/BoardEffects';
 import {BsDropdownModule, ModalModule} from 'ngx-bootstrap';
 import {PromotionModalComponent} from './modals/promotion/promotion.modal';
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { InteractComponent } from './interact/interact.component';
+import { MainComponent } from './main/main.component';
 
 @NgModule({
     declarations: [
@@ -24,7 +26,9 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
         ChessPieceComponent,
         ChessErrorComponent,
         RemoveEmptyPipe,
-        PromotionModalComponent
+        PromotionModalComponent,
+        InteractComponent,
+        MainComponent
 
     ],
     imports: [
@@ -44,7 +48,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     entryComponents: [
         PromotionModalComponent
     ],
-    bootstrap: [AppComponent]
+    bootstrap: [MainComponent]
 })
 export class AppModule {
 }

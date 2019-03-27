@@ -107,7 +107,34 @@ export class Board { // Single state of the board
     // Update piece
     turn.actor.updatePosition(turn.x2, turn.y2);
     turn.actor.hasMoved = true;
+    if (turn.type === 'castle')
+      turn.actor2.updatePosition(turn.x4, turn.y4);
+    // Don't need to handle turn.actor2.hasMoved because it will never be involved w/ en passant
     this.lastTurn = turn; 
+  }
+
+  public undoTurn(turn: Turn): void {
+    if (turn.type === 'invalid') throw 'Could not apply invalid move to the board.';
+
+    // Update board
+    this.grid[turn.y2][turn.x2] = null;
+    this.grid[turn.y1][turn.x1] = turn.actor;
+    // Assuming that the target cannot be modified after being removed, place it in its
+    //  previous position which may or may not be turn.x2,y2
+    if (turn.target)
+      this.grid[turn.target.y][turn.target.x] = turn.target;
+    if (turn.type === 'castle') {
+      this.grid[turn.y4][turn.x4] = null;
+      this.grid[turn.y3][turn.x3] = turn.actor2;
+    }
+
+    // Update piece
+    turn.actor.updatePosition(turn.x1, turn.y1);
+    if (turn.meta.firstMove)
+      turn.actor.hasMoved = false;
+    if (turn.type === 'castle')
+      turn.actor2.updatePosition(turn.x3, turn.y3);
+    // Note that this.lastTurn is updated in BoardAPI.postUndo()
   }
   
   // Check which board spaces are threatened - this is for castling and king movement/check checking

@@ -10,7 +10,7 @@ import {PieceType} from "../models/IPieceModel";
 export class BoardApi {
 
 
-    private endpoint = 'http://localhost';
+    private endpoint = window.location.href.substr(0, window.location.href.lastIndexOf('/'));
 
     constructor(private httpClient: HttpClient) {
 
@@ -24,6 +24,18 @@ export class BoardApi {
     public resume(): Promise<any> {
 
         return this.httpClient.post(`${this.endpoint}/board/resume`, {}).toPromise();
+    }
+
+    public commit(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/commit`, {});
+
+    }
+
+    public reset(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/reset`, {});
+
     }
 
     public promote(type: PieceType): Observable<IBoardModel> {

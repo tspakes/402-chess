@@ -1,5 +1,5 @@
 import {IBoardModel} from '../models/IBoardModel';
-import {GetBoardActions, GetBoardActionTypes} from "../actions/get-board.actions";
+import {GetBoardActions, GetBoardActionTypes} from '../actions/get-board.actions';
 
 
 export interface IBoardState {
@@ -27,6 +27,19 @@ export function boardReducer(state = initialState, action: GetBoardActions): IBo
             return {
                 ...state,
             };
+
+        case GetBoardActionTypes.ResetBoardSuccess:
+
+            return {
+                ...state,
+            };
+
+        case GetBoardActionTypes.CommitBoardSuccess:
+
+            return {
+                ...state,
+            };
+
 
         default:
             return state;

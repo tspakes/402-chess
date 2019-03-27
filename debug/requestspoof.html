@@ -1,0 +1,61 @@
+<html>
+	<head>
+		<title>Request Spoofing | 402Chess</title>
+		<script type="text/javascript">
+			function sendReq(method, url) {
+				document.getElementById('response').innerHTML = '<i>' + method + ': ' + url + '</i>';
+				xhttp = new XMLHttpRequest();
+				xhttp.open(method, url, false);
+				xhttp.send();
+				let resp = JSON.parse(xhttp.responseText);
+				console.log(resp);
+				if (url === '/board') resp = resp.history;
+				else resp = resp.message;
+				document.getElementById('response').innerText = JSON.stringify(resp);
+			}
+		</script>
+		<style>
+			body {
+				background-color: black;
+				color: #FFF;
+			}
+			div.container {
+				margin-left: auto;
+				margin-right: auto;
+				max-width: 500px;
+				text-align: center;
+			}
+			h1, h2 {
+				margin: 15px 0px 5px;
+			}
+			div#control {
+				margin: 15px auto 15px;
+				width: 100%;
+			}
+			div#control > * {
+				display: inline-block;
+			}
+			div#control > button {
+				margin: 5px;
+				width: 67px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Request Spoofing</h1>
+			<div id="control">
+				<button onclick="sendReq('GET', '/board')" title="">History</button>
+				<button onclick="sendReq('POST', '/board/reset')" title="">Reset</button>
+				<button onclick="sendReq('POST', '/board/resume')" title="">Resume</button>
+				<button onclick="sendReq('POST', '/board/commit')" title="">Commit</button>
+				<button onclick="sendReq('POST', '/board/cancel')" title="">Cancel</button>
+				<button onclick="sendReq('POST', '/board/undo')" title="">Undo</button>
+				<button onclick="sendReq('POST', '/board/promote/queen')" title="">Promote Queen</button>
+			</div>
+			<div id="response">
+				Click a button to send the corresponding request. 
+			</div>
+		</div>
+	</body>
+</html>

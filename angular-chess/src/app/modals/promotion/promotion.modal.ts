@@ -4,6 +4,7 @@ import {IPieceModel} from '../../models/IPieceModel';
 import {Store} from '@ngrx/store';
 import {IAppState} from '../../reducers';
 import {PromotePiece} from '../../actions/get-board.actions';
+import {BoardApi} from '../../api/board.api';
 
 @Component({
     selector: 'app-promotion-modal',
@@ -11,18 +12,18 @@ import {PromotePiece} from '../../actions/get-board.actions';
 })
 export class PromotionModalComponent {
 
-    public initialPiece: IPieceModel = {};
-
     choosePromotion(piece: IPieceModel) {
 
         this.store.dispatch(new PromotePiece(piece.type));
+
+        this.boardApi.resume();
 
         this.bsModalRef.hide();
     }
 
     get getTeam() {
 
-        return this.initialPiece.team;
+        return 'black';
     }
 
     get pieceTypes() {
@@ -42,16 +43,12 @@ export class PromotionModalComponent {
             },
             {
                 team: this.getTeam,
-                type: 'rook'
-            },
-            {
-                team: this.getTeam,
                 type: 'knight'
             }
         ];
     }
 
-    constructor(public bsModalRef: BsModalRef, public store: Store<IAppState>) {
+    constructor(public bsModalRef: BsModalRef, public store: Store<IAppState>, private boardApi: BoardApi) {
     }
 
 }

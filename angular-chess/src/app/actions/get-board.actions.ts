@@ -7,6 +7,10 @@ export enum GetBoardActionTypes {
     LoadGetBoardsSuccess = '[GetBoard] Load GetBoards Success',
     PromotePiece = '[PromotePiece] PromotePiece',
     PromotePieceSuccess = '[PromotePiece] PromotePiece Success',
+    ResetBoard = '[Board] Board Reset',
+    ResetBoardSuccess = '[Board] Board Reset Success',
+    CommitBoard = '[Board] CommitBoard',
+    CommitBoardSuccess = '[Board] CommitBoard Success',
 
 }
 
@@ -48,4 +52,53 @@ export class PromotePieceSuccess implements Action {
 
 }
 
-export type GetBoardActions = LoadGetBoards | LoadGetBoardsSuccess | PromotePiece | PromotePieceSuccess;
+
+export class ResetBoard implements Action {
+
+    readonly type = GetBoardActionTypes.ResetBoard;
+
+    constructor() {
+
+    }
+
+}
+
+export class ResetBoardSuccess implements Action {
+
+    readonly type = GetBoardActionTypes.ResetBoardSuccess;
+
+    constructor() {
+
+    }
+
+}
+
+export class CommitTurn implements Action {
+
+    readonly type = GetBoardActionTypes.CommitBoard;
+
+    constructor() {
+
+    }
+
+}
+
+export class CommitTurnSuccess implements Action {
+
+    readonly type = GetBoardActionTypes.CommitBoardSuccess;
+
+    constructor() {
+
+    }
+
+}
+
+export type GetBoardActions =
+    LoadGetBoards
+    | LoadGetBoardsSuccess
+    | PromotePiece
+    | PromotePieceSuccess
+    | ResetBoard
+    | ResetBoardSuccess
+    | CommitTurn
+    | CommitTurnSuccess;

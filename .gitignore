@@ -1,8 +1,6 @@
 /node_modules/
 /.vscode/
 *.DSStore
-*.png
-*.jpg
 *.psd
 *.xcf
 *.js

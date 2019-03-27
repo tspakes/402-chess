@@ -110,6 +110,27 @@ class Server {
 			});
 		});
 		/**
+		 * Undo the last committed turn. (no turn may be currently pending)
+		 */
+		this.app.post('/board/undo', (req: Request, res: Response) => {
+			try {
+				BoardAPI.postUndo();
+				res.status(200);
+				res.json({
+					message: 'Last turn undone. Call /board/resume when the pieces have been moved to their locations at the start of the last turn.'
+				});
+			} catch (ex) {
+				console.log(Chalk.red(ex));
+				res.status(400);
+				res.json({
+					message: ex
+				});
+				if (typeof ex !== 'string') {
+					throw ex;
+				}
+			}
+		});
+		/**
 		 * Choose type of piece for pawn promotion. 
 		 */
 		this.app.post('/board/promote/:type', (req: Request, res: Response) => {
@@ -149,6 +170,22 @@ class Server {
 				console.log('BoardDriver set to debug state and will remain in this state until the web server is restarted.');
 			}
 			res.sendFile(Path.join(__dirname, '../debug/inputspoof.html'));
+		});
+		/**
+		 * Return request spoofing panel. Does not enable debug mode. 
+		 */
+		this.app.get('/debug/requests', (req: Request, res: Response) => {
+			res.sendFile(Path.join(__dirname, '../debug/requestspoof.html'));
+		});
+		/**
+		 * Toggle turn validity / rule checker. 
+		 */
+		this.app.get('debug/validitychecker', (req: Request, res: Response) => {
+			BoardAPI.validityChecking = !BoardAPI.validityChecking;
+			res.status(200);
+			res.json({
+				message: `Validity checking ${ BoardAPI.validityChecking ? 'enabled' : 'diabled' }.`
+			});
 		});
 		this.app.post('/debug/set', (req: Request, res: Response) => {
 			res.status(200);
