@@ -104,7 +104,7 @@ export class Turn {
       x2: this.x2,
       y2: this.y2,
       actor: this.actor.serialize(),
-      target: this.target.serialize(),
+      target: this.target ? this.target.serialize() : null,
       promotion: this.promotion,
       notation: this.notation,
       meta: this.meta

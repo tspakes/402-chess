@@ -10,7 +10,7 @@ import {PieceType} from "../models/IPieceModel";
 export class BoardApi {
 
 
-    private endpoint = 'http://chesspi.nomads.utk.edu';
+    private endpoint = window.location.href.substr(0, window.location.href.lastIndexOf('/'));
 
     constructor(private httpClient: HttpClient) {
 

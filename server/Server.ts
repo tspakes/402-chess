@@ -150,6 +150,16 @@ class Server {
 			}
 			res.sendFile(Path.join(__dirname, '../debug/inputspoof.html'));
 		});
+		/**
+		 * Toggle turn validity / rule checker. 
+		 */
+		this.app.get('debug/validitychecker', (req: Request, res: Response) => {
+			BoardAPI.validityChecking = !BoardAPI.validityChecking;
+			res.status(200);
+			res.json({
+				message: `Validity checking ${ BoardAPI.validityChecking ? 'enabled' : 'diabled' }.`
+			});
+		});
 		this.app.post('/debug/set', (req: Request, res: Response) => {
 			res.status(200);
 			res.json({

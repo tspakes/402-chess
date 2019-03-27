@@ -1,4 +1,4 @@
-import { Turn, TurnType } from "./Turn";
+import { Turn, TurnType, TurnSerialized } from "./Turn";
 import { Board } from "./Board";
 import { PieceMinimal, Piece, Team, PieceType } from "./Piece";
 import BoardDriver from "./BoardDriver";
@@ -23,6 +23,7 @@ export default class BoardAPI {
 	private static _error: Error = '';
 	private static _errorDesc: string = '';
 	private static _pendingTurn: Turn = null;
+	public static validityChecking: boolean = true;
 
 	public static get error(): Error {
 		return this._error;
@@ -134,7 +135,7 @@ export default class BoardAPI {
 						return;
 					}
 				}
-				if (!this._pendingTurn.isValid(this._board)) {
+				if (!this._pendingTurn.isValid(this._board) && this.validityChecking) {
 					this.error = 'INVALID_TURN';
 					this._errorDesc = 'Turn was detected correctly, but was against the rules.';
 					console.log(Chalk.redBright('Illegal move processed. Waiting for /board/resume request.'));
@@ -157,6 +158,13 @@ export default class BoardAPI {
 				console.log(`Now ${this._teamCurrent}'s turn.`);
 			}
 		}, this._pollInterval);
+	}
+
+	public static serializeHistory(): TurnSerialized[] {
+		let ser: TurnSerialized[] = [];
+		for (let t of this._history)
+			ser.push(t.serialize());
+		return ser;
 	}
 
 	private static postProcess(type: TurnType): Turn {
@@ -377,7 +385,8 @@ export default class BoardAPI {
 		return JSON.stringify({
 			message: this.error,
 			description: this.errorDesc,
-			pieces: this._board.serialize()
+			pieces: this._board.serialize(),
+			history: this.serializeHistory()
 		});
 	}
 

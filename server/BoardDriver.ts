@@ -3,9 +3,9 @@ import chalk from "chalk";
 
 // Remove these within the GPIO branch, uncomment the import, and run "npm install raspi-gpio --save" for ^6.2.1
 // #region GPIO Stubs
-declare var PULL_UP;
-declare var HIGH;
-declare var LOW;
+const PULL_UP: any = 0;
+const HIGH: any = 0;
+const LOW: any = 0;
 class DigitalInput {
   constructor(arg: any) {}
   public read(): any { return HIGH; }
