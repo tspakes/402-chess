@@ -67,7 +67,7 @@ export class Turn {
 
 	/**
 	 * @see http://blog.chesshouse.com/how-to-read-and-write-algebraic-chess-notation/
-   * @see FIDE standard on https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
+   * @see https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
 	 */
 	public get notation(): string {
     let not: string;
@@ -89,7 +89,7 @@ export class Turn {
         not = Piece.colToLetter(this.x2) + (this.y2 + 1);
     }
 
-    // TODO Actor disambaguation
+    // TODO Actor disambiguation
 
     // Prefixes
     if (this.type === 'take' || this.type === 'enpassant') not = this.actor.notation + not;
