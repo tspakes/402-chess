@@ -226,16 +226,26 @@ export default class BoardAPI {
 				for (let c = 0; c < 8; c++) {
 					if (!this._boardDelta[r][c]) continue; // Skip cells w/o change
 
-					// Add cells still occupied that were changed
-					if (boardFinal[r][c] !== null) {
+					// Target set to changed cell that was an enemy
+					if (boardInit[r][c] !== null
+							&& boardInit[r][c].team !== this._teamCurrent)
 						turn.target = boardInit[r][c];
-						break targetDetection;
+
+					// Locate actor's final position
+					if (boardFinal[r][c] !== null) {
+						turn.x2 = c;
+						turn.y2 = r;
 					}
 				}
 			}
 			console.log(Chalk.greenBright(`target=${turn.target.toString()}`));
 
-			// TODO Check if en-passant (put-down does not match either pick-up) and set turn type
+			// Check if en-passant (put-down does not match either pick-up)
+			if (type !== 'enpassant' && turn.actor.type === 'pawn'
+					&& (turn.x2 !== turn.target.x || turn.y2 !== turn.target.y)) {
+				turn.type = 'enpassant';
+				if (DEBUG) console.log(Chalk.gray(`turn.type=${turn.type}`));
+			}
 		}
 
 		if (type === 'castle') {

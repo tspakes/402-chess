@@ -96,6 +96,8 @@ export class Board { // Single state of the board
 
     // Update board
     this.grid[turn.y1][turn.x1] = null;
+    if (turn.type === 'enpassant')
+      this.grid[turn.target.y][turn.target.x] = null;
     this.grid[turn.y2][turn.x2] = turn.actor;
     if (turn.type === 'castle') {
       this.grid[turn.y3][turn.x3] = null;
@@ -108,6 +110,7 @@ export class Board { // Single state of the board
     this.lastTurn = turn; 
   }
   
+<<<<<<< HEAD
   // Check which board spaces are threatened - this is for castling and king movement/check checking
   public getThreatenedSpaces(curTeam: Team, turnToApply: Turn = null): boolean[][] {
     if (turnToApply == null) { // Pre-state
@@ -141,6 +144,8 @@ export class Board { // Single state of the board
     }
   }
   
+=======
+>>>>>>> master
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
    */

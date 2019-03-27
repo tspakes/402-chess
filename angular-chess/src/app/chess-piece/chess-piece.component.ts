@@ -15,6 +15,7 @@ export class ChessPieceComponent implements OnInit, DoCheck {
     constructor(public elementRef: ElementRef) {
     }
 
+
     ngOnInit() {
         this.draw();
     }
@@ -44,6 +45,7 @@ export class ChessPieceComponent implements OnInit, DoCheck {
         this.elementRef.nativeElement.style.setProperty('--x', ((this.piece.column * 60) - 30) + 'px');
         this.elementRef.nativeElement.style.setProperty('--y', ((this.piece.row * 60) - 30) + 'px');
     }
+
 
 }
 
