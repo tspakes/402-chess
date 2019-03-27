@@ -14,16 +14,13 @@ export class Turn {
   public y3: number = -1;
   public x4: number = -1; // Actor2 final
   public y4: number = -1;
-  private _xtarget: number = -1; // Target initial
-  private _ytarget: number = -1;
 
   private _actor: Piece = null; // Piece moving
   private _actor2: Piece = null; // Only used for castling
-  private _target: Piece = null; // Used in take, enpassant, and pawnpromotion
+  public target: Piece = null; // Used in take, enpassant, and pawnpromotion
 
   public promotion: PieceType;
   public check: ''|'check'|'checkmate' = '';
-  public lastTurn: Turn;
   public meta: any = {}; // Pawn double move, castle side
 
   // All of this is to maintain the positions apart from the references as the pieces will change over time
@@ -32,15 +29,6 @@ export class Turn {
   }
   public get actor2(): Piece {
     return this._actor2;
-  }
-  public get target(): Piece {
-    return this._target;
-  }
-  public get xtarget(): number {
-    return this._xtarget;
-  }
-  public get ytarget(): number {
-    return this._ytarget;
   }
   public set actor(p: Piece) {
     this._actor = p;
@@ -52,18 +40,13 @@ export class Turn {
     this.x3 = p.x;
     this.y3 = p.y;
   }
-  public set target(p: Piece) {
-    this._target = p;
-    this._xtarget = p.x;
-    this._ytarget = p.y;
-  }
 
 	/**
 	 * @see http://blog.chesshouse.com/how-to-read-and-write-algebraic-chess-notation/
    * @see https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
 	 */
 	public get notation(): string {
-    let not: string;
+    let not: string = '';
 
     // Base notation
     switch (this.type) {

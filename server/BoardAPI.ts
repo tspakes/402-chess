@@ -5,7 +5,7 @@ import BoardDriver from "./BoardDriver";
 import Chalk from 'chalk';
 import { State } from "./State";
 
-export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'PAWN_PROMOTION'|'CANCEL_TURN'|'';
+export type Error = 'INVALID_TURN'|'GENERIC_ERROR'|'PAWN_PROMOTION'|'CANCEL_TURN'|'UNDO_TURN'|'';
 
 const DEBUG = true;
 
@@ -150,12 +150,7 @@ export default class BoardAPI {
 				this._history.push(this._pendingTurn);
 				this._boardRaw = this._board.minimize();
 				this._pendingTurn = null;
-				// Switch current team
-				if (this._teamCurrent === 'white')
-					this._teamCurrent = 'black';
-				else if (this._teamCurrent === 'black')
-					this._teamCurrent = 'white';
-				console.log(`Now ${this._teamCurrent}'s turn.`);
+				this.switchTeam();
 			}
 		}, this._pollInterval);
 	}
@@ -322,6 +317,10 @@ export default class BoardAPI {
 			turn.type = 'pawnpromotion';
 			if (DEBUG) console.log(Chalk.gray(`turntype=pawnpromotion`));
 		}
+
+		// Check for first movement for actor (needed for en passant after undo)
+		if (!turn.actor.hasMoved)
+			turn.meta.firstMove = true;
 		
 		return turn;
 	}
@@ -357,6 +356,15 @@ export default class BoardAPI {
 			}
 			console.log(lines[l]);
 		}
+	}
+
+	private static switchTeam(): void {
+		// Switch current team
+		if (this._teamCurrent === 'white')
+			this._teamCurrent = 'black';
+		else if (this._teamCurrent === 'black')
+			this._teamCurrent = 'white';
+		console.log(`Now ${this._teamCurrent}'s turn.`);
 	}
 
 	private static zeroDelta(): void {
@@ -408,6 +416,17 @@ export default class BoardAPI {
 	public static postCancel(): void {
 		console.log(`Cancelling turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
 		this.error = 'CANCEL_TURN';
+	}
+	
+	public static postUndo(): any {
+		if (this.sumDelta() > 0)
+			throw 'A turn is currently pending. Cancel the current turn before undoing the last turn.';
+		this._board.undoTurn(this._history[this._history.length - 1]);
+		this._history.pop();
+		this._board.lastTurn = this._history[this._history.length - 1];
+		this.switchTeam();
+		console.log(`Undoing last turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
+		this.error = 'UNDO_TURN';
 	}
 
 	public static postPromote(type: PieceType): void {
