@@ -48,8 +48,6 @@ export class Piece {
 		this._team = team;
 		this._id = Piece._nextId++;
 
-		console.log(this._id);
-
 		this.updatePosition(x, y);
 	}
 
