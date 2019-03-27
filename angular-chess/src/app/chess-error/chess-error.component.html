@@ -1,5 +1,20 @@
-<div *ngIf="board?.message.length > 0" class="error">
-    <span>{{board?.description}}</span>
+<div class="row justify-content-center mb-5" *ngIf="board?.message.length > 0">
+    <div class="col-auto flex-fill">
+        <div class="card shadow-sm">
+            <div class="card-body">
 
-    <button (click)="resume()" class="resume-game">Resume Game</button>
+                <div class="row justify-content-between align-items-center">
+
+                    <div class="col-auto">
+
+                        <span class="text-danger">{{board?.description}}</span>
+
+                    </div>
+                    <div class="col-auto">
+                        <button (click)="resume()" class="btn btn-success">Resume Game</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

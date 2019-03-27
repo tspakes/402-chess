@@ -10,7 +10,8 @@ import {
     PromotePiece,
     PromotePieceSuccess,
     ResetBoardSuccess,
-    ResumeBoardSuccess
+    ResumeBoardSuccess,
+    UndoBoardSuccess
 } from '../actions/get-board.actions';
 import {IBoardModel} from '../models/IBoardModel';
 
@@ -73,6 +74,18 @@ export class BoardEffects {
                 ))
         );
 
+    @Effect()
+    undoBoard = this.actions$
+        .pipe(
+            ofType(GetBoardActionTypes.UndoBoard),
+            mergeMap(() => this.boardService.undo()
+                .pipe(
+                    map(() => new UndoBoardSuccess()),
+                    catchError(() => EMPTY)
+                ))
+        );
+
     constructor(private actions$: Actions, private boardService: BoardApi) {
     }
 }
+

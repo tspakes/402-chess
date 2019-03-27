@@ -47,6 +47,12 @@ export function boardReducer(state = initialState, action: GetBoardActions): IBo
                 ...state,
             };
 
+        case GetBoardActionTypes.UndoBoardSuccess:
+
+            return {
+                ...state,
+            };
+
         default:
             return state;
     }

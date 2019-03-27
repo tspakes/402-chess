@@ -4,7 +4,7 @@ import {PromotionModalComponent} from '../modals/promotion/promotion.modal';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {Store} from "@ngrx/store";
 import {IAppState} from "../reducers";
-import {CommitTurn, ResetBoard} from "../actions/get-board.actions";
+import {CommitTurn, ResetBoard, UndoBoard} from "../actions/get-board.actions";
 
 @Component({
     selector: 'app-chess-board',
@@ -99,5 +99,9 @@ export class ChessBoardComponent {
 
     reset() {
         this.store.dispatch(new ResetBoard());
+    }
+
+    undo() {
+        this.store.dispatch(new UndoBoard());
     }
 }

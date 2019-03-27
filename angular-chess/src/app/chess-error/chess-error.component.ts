@@ -1,5 +1,4 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {BoardApi} from '../api/board.api';
 import {Store} from "@ngrx/store";
 import {ResumeBoard} from "../actions/get-board.actions";
 import {IAppState} from "../reducers";
@@ -19,7 +18,7 @@ export class ChessErrorComponent implements OnInit {
     ngOnInit() {
     }
 
-    async resume() {
+    resume() {
 
         this.store.dispatch(new ResumeBoard());
 

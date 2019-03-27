@@ -46,6 +46,12 @@ export class BoardApi {
 
     }
 
+    public undo(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/undo`, {});
+
+    }
+
     public promote(type: PieceType): Observable<IBoardModel> {
 
         return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/promote/${type}`, {});
