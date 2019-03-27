@@ -179,11 +179,13 @@ class Server {
 		/**
 		 * Toggle turn validity / rule checker. 
 		 */
-		this.app.get('debug/validitychecker', (req: Request, res: Response) => {
+		this.app.get('/debug/validitychecker', (req: Request, res: Response) => {
 			BoardAPI.validityChecking = !BoardAPI.validityChecking;
+			let msg = `Validity checking ${ BoardAPI.validityChecking ? 'enabled' : 'disabled' }.`;
+			console.log(msg);
 			res.status(200);
 			res.json({
-				message: `Validity checking ${ BoardAPI.validityChecking ? 'enabled' : 'diabled' }.`
+				message: msg
 			});
 		});
 		this.app.post('/debug/set', (req: Request, res: Response) => {

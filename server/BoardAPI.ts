@@ -98,6 +98,10 @@ export default class BoardAPI {
 			BoardDriver.cycleColumn();
 
 
+			// Make sure pick ups are always read before putdowns
+			this._rawChangeQueue = this._rawChangeQueue.sort((a, b) => {
+				return (b.lift as unknown as number) - (a.lift as unknown as number);
+			});
 			// Process all queued changes
 			for (let change of this._rawChangeQueue) {
 				State.process(change, change.team === this._teamCurrent)
