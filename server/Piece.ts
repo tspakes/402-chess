@@ -201,7 +201,7 @@ export class Piece {
 						a++; // Move toward y destination/source
 						x++; // Move toward x destination/source
 					}
-				} else {// Invalid, xdiff and ydiff must be equal
+				} else { // Invalid, xdiff and ydiff must be equal
 					return false;
 				}
 				return true;

@@ -20,23 +20,23 @@ export class Board { // Single state of the board
   /**
    * Board is completely empty when constructed. 
    */
-	constructor() {
-		this.grid = [];
-		for (let y = 0; y < 8; y++) {
-			this.grid[y] = [];
+  constructor() {
+    this.grid = [];
+    for (let y = 0; y < 8; y++) {
+      this.grid[y] = [];
       for (let x = 0; x < 8; x++)
         this.grid[y].push(null);
-		}
-	}
-
-	public get pieces(): Piece[] {
-		let list = [];
-		for (let column of this.grid)
-			for (let piece of column)
-				list.push(piece);
-		return list;
+    }
   }
-  
+
+  public get pieces(): Piece[] {
+    let list = [];
+    for (let column of this.grid)
+      for (let piece of column)
+        list.push(piece);
+    return list;
+  }
+
   /**
    * Set up the board with all 32 pieces in their starting positions. 
    */
@@ -66,15 +66,15 @@ export class Board { // Single state of the board
     this.placePiece('rook', 'white', 7, 0);
   }
 
-	public placePiece(type: PieceType, team: Team, x: number, y: number): void {
+  public placePiece(type: PieceType, team: Team, x: number, y: number): void {
     let p = new Piece(type, team, x, y);
     this.grid[y][x] = p;
   }
-  
+
   public toString(): string {
     let str: string = Chalk.gray('  A B C D E F G H\n');
     for (let y = 7; y >= 0; y--) {
-      str += Chalk.gray(`${y+1} `); // Row demarkation
+      str += Chalk.gray(`${y + 1} `); // Row demarkation
       for (let x = 0; x < 8; x++) {
         // Piece '-' for empty, 'P' for pawn, notation for others; cyan for white, blue for black
         if (this.grid[y][x] === null) str += Chalk.gray('-');
@@ -86,12 +86,12 @@ export class Board { // Single state of the board
         }
         str += ' ';
       }
-      str = str.slice(0, str.length-1) + '\n';
+      str = str.slice(0, str.length - 1) + '\n';
     }
-    return str.slice(0, str.length-1);
+    return str.slice(0, str.length - 1);
   }
 
-	public applyTurn(turn: Turn): void {
+  public applyTurn(turn: Turn): void {
     if (turn.type === 'invalid') throw 'Could not apply invalid move to the board.';
 
     // Update board
@@ -110,7 +110,7 @@ export class Board { // Single state of the board
     if (turn.type === 'castle')
       turn.actor2.updatePosition(turn.x4, turn.y4);
     // Don't need to handle turn.actor2.hasMoved because it will never be involved w/ en passant
-    this.lastTurn = turn; 
+    this.lastTurn = turn;
   }
 
   public undoTurn(turn: Turn): void {
@@ -136,40 +136,269 @@ export class Board { // Single state of the board
       turn.actor2.updatePosition(turn.x3, turn.y3);
     // Note that this.lastTurn is updated in BoardAPI.postUndo()
   }
-  
+
   // Check which board spaces are threatened - this is for castling and king movement/check checking
   public getThreatenedSpaces(curTeam: Team, turnToApply: Turn = null): boolean[][] {
-    if (turnToApply == null) { // Pre-state
-      for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-          let piece = this.grid[y][x];
-          if (piece != null && piece.team == curTeam) { // Piece found
-            if (piece.type == 'king') {
-              
+    let threatenedSpaces: boolean[][];
+    for (let y = 0; y < 8; y++) { // Initialize return spaces to false
+      for (let x = 0; x < 8; x++) {
+        threatenedSpaces[y][x] = false;
+      }
+    }
 
-            } else if (piece.type == 'queen') {
-
-            } else if (piece.type == 'bishop') {
-
-            } else if (piece.type == 'knight') {
-
-            } else if (piece.type == 'rook') {
-
-            } else if (piece.type == 'pawn') {
-
-            } else { // Leftover piece type - shouldn't be reached
-
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        let piece = this.grid[y][x];
+        if (piece != null && piece.team == curTeam) { // Piece found
+          if (piece.type == 'king') { // Threatens the 8 spaces around it unless off the board
+            if (y == 0 && x == 0) { // Bottom left corner
+              threatenedSpaces[y][x + 1] = true;
+              threatenedSpaces[y + 1][x] = true;
+              threatenedSpaces[y + 1][x + 1] = true;
+            } else if (y == 0 && x == 7) { // Bottom right corner
+              threatenedSpaces[y][x - 1] = true;
+              threatenedSpaces[y + 1][x] = true;
+              threatenedSpaces[y + 1][x - 1] = true;
+            } else if (y == 7 && x == 0) { // Top left corner
+              threatenedSpaces[y][x + 1] = true;
+              threatenedSpaces[y - 1][x] = true;
+              threatenedSpaces[y - 1][x + 1] = true;
+            } else if (y == 7 && x == 7) { // Top right corner
+              threatenedSpaces[y][x - 1] = true;
+              threatenedSpaces[y - 1][x] = true;
+              threatenedSpaces[y - 1][x - 1] = true;
+            } else { // None of the corners
+              threatenedSpaces[y][x + 1] = true;
+              threatenedSpaces[y - 1][x] = true;
+              threatenedSpaces[y][x - 1] = true;
+              threatenedSpaces[y + 1][x] = true;
+              threatenedSpaces[y - 1][x + 1] = true;
+              threatenedSpaces[y - 1][x - 1] = true;
+              threatenedSpaces[y + 1][x - 1] = true;
+              threatenedSpaces[y + 1][x + 1] = true;
             }
-          } else { // No piece of desired team or no piece
-            
+          } else if (piece.type == 'queen') {
+            let b: number;
+            let a: number;
+
+            // Right
+            a = x + 1;
+            b = y;
+            while (a < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break; // Stop if piece found
+              a++;
+            }
+
+            // Down
+            a = x;
+            b = y - 1;
+            while (b > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              b--;
+            }
+
+            // Left
+            a = x - 1;
+            b = y;
+            while (a > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a--;
+            }
+
+            // Up
+            a = x;
+            b = y + 1;
+            while (b < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              b++;
+            }
+
+            // Down-right
+            a = x + 1;
+            b = y - 1;
+            while (b > -1 && a < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a++;
+              b--;
+            }
+
+            // Down-left
+            a = x - 1;
+            b = y - 1;
+            while (b > -1 && a > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a--;
+              b--;
+            }
+
+            // Up-left
+            a = x - 1;
+            b = y + 1;
+            while (b < 8 && a > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a--;
+              b++;
+            }
+
+            // Up-right
+            a = x + 1;
+            b = y + 1;
+            while (b < 8 && a < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a++;
+              b++;
+            }
+          } else if (piece.type == 'bishop') {
+            let b: number;
+            let a: number;
+
+            // Down-right
+            a = x + 1;
+            b = y - 1;
+            while (b > -1 && a < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a++;
+              b--;
+            }
+
+            // Down-left
+            a = x - 1;
+            b = y - 1;
+            while (b > -1 && a > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a--;
+              b--;
+            }
+
+            // Up-left
+            a = x - 1;
+            b = y + 1;
+            while (b < 8 && a > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a--;
+              b++;
+            }
+
+            // Up-right
+            a = x + 1;
+            b = y + 1;
+            while (b < 8 && a < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a++;
+              b++;
+            }
+          } else if (piece.type == 'knight') {
+            // Attempt to threaten all 8 possible moves
+            let b: number;
+            let a: number;
+
+            for (let c = 0; c < 8; c++) {
+              if (c == 0) {
+                a = x + 2;
+                b = y + 1;
+              } else if (c == 1) {
+                a = x + 2;
+                b = y - 1;
+              } else if (c == 2) {
+                a = x + 1;
+                b = y - 2;
+              } else if (c == 3) {
+                a = x - 1;
+                b = y - 2;
+              } else if (c == 4) {
+                a = x - 2;
+                b = y - 1;
+              } else if (c == 5) {
+                a = x - 2;
+                b = y + 1;
+              } else if (c == 6) {
+                a = x - 1;
+                b = y + 2;
+              } else {
+                a = x + 1;
+                b = y + 2;
+              }
+              // L determined, now threaten it if possible
+              if (a < 8 && a > -1 && b < 8 && b > -1) threatenedSpaces[b][a] = true;
+            }
+          } else if (piece.type == 'rook') {
+            let b: number;
+            let a: number;
+
+            // Right
+            a = x + 1;
+            b = y;
+            while (a < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break; // Stop if piece found
+              a++;
+            }
+
+            // Down
+            a = x;
+            b = y - 1;
+            while (b > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              b--;
+            }
+
+            // Left
+            a = x - 1;
+            b = y;
+            while (a > -1) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              a--;
+            }
+
+            // Up
+            a = x;
+            b = y + 1;
+            while (b < 8) {
+              threatenedSpaces[b][a] = true;
+              if (this.grid[b][a] != null) break;
+              b++;
+            }
+          } else if (piece.type == 'pawn') {
+            let b: number;
+            let a: number;
+
+            if (piece.team == 'white') {
+              b = y + 1; // Up for white
+            } else {
+              b = y - 1 // Down for black
+            }
+            a = x + 1; // Diagonal-right
+            if (a < 8 && b < 8 && b > -1) threatenedSpaces[b][a] = true;
+            a = x - 1; // Diagonal-left
+            if (a < 8 && b < 8 && b > -1) threatenedSpaces[b][a] = true;
+          } else { // Leftover piece type - shouldn't be reached
+            console.log('Unknown piece in threat mapping')
           }
         }
       }
+    }
+    if (turnToApply == null) { // Pre-state
+
     } else { // Post-state
 
     }
+    return threatenedSpaces;
   }
-  
+
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
    */
