@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Actions, Effect, ofType} from '@ngrx/effects';
-import {EMPTY} from 'rxjs';
+import {EMPTY, of} from 'rxjs';
 import {catchError, map, mergeMap} from 'rxjs/operators';
 import {BoardApi} from '../api/board.api';
 import {
@@ -78,11 +78,10 @@ export class BoardEffects {
     undoBoard = this.actions$
         .pipe(
             ofType(GetBoardActionTypes.UndoBoard),
-            mergeMap(() => this.boardService.undo()
-                .pipe(
-                    map(() => new UndoBoardSuccess()),
-                    catchError(() => EMPTY)
-                ))
+            mergeMap(() => this.boardService.cancel()
+                .pipe(mergeMap(() => this.boardService.undo()
+                    .pipe(map(() => new UndoBoardSuccess(), catchError(() => of(new UndoBoardSuccess()))))
+                ), catchError(() => of(new UndoBoardSuccess())))),
         );
 
     constructor(private actions$: Actions, private boardService: BoardApi) {
