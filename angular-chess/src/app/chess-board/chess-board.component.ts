@@ -113,7 +113,6 @@ export class ChessBoardComponent {
 
     historyFunction(index, history: IHistoryModel) {
 
-
         return history.actor.id;
 
     }
