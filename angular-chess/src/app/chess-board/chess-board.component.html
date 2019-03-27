@@ -21,7 +21,8 @@
                     <button type="button" class="commit-button  shadow-sm"
                             [ngClass]="{'commit-disabled': board.currentTeam != 'white' || board.message.length > 0}"
                             (click)="commit('white')">
-                        <span *ngIf="board.currentTeam === 'white' &&  board.message.length <= 0"><i class="fas fa-arrow-up"></i><br>Confirm</span>
+                        <span *ngIf="board.currentTeam === 'white' &&  board.message.length <= 0"><i
+                                class="fas fa-arrow-up"></i><br>Confirm</span>
                         <span *ngIf="board.currentTeam !== 'white'"></span>
                     </button>
 
@@ -125,15 +126,15 @@
                 </div>
                 <div class="card-body history-body" #history>
                     <div class="chess-move d-flex flex-row w-100"
-                         *ngFor="let move of board.history.reverse(); trackBy: historyFunction">
-                        <div class="d-flex flex-row justify-content-between  w-100"
+                         *ngFor="let move of board.history | reverse; trackBy: historyFunction">
+                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
                              *ngIf="move.type === 'move'">
                             <app-chess-piece styleClass="small-piece" [piece]="move.actor"
                                              style="position: relative; display: inline;"></app-chess-piece>
                             <p>moves to</p>
                             <strong>{{move.notation | uppercase}}</strong>
                         </div>
-                        <div class="d-flex flex-row justify-content-between w-100"
+                        <div class="d-flex flex-row justify-content-between w-100 animated fadeIn"
                              *ngIf="move.type === 'take'">
                             <app-chess-piece styleClass="small-piece" [piece]="move.actor"
                                              style="position: relative; display: inline;"></app-chess-piece>
