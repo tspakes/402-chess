@@ -422,6 +422,8 @@ export default class BoardAPI {
 	public static postUndo(): any {
 		if (this.sumDelta() > 0)
 			throw 'A turn is currently pending. Cancel the current turn before undoing the last turn.';
+		if (this._history.length <= 0)
+			throw 'No turns remain to be undone.';
 		this._board.undoTurn(this._history[this._history.length - 1]);
 		this._history.pop();
 		this._board.lastTurn = this._history[this._history.length - 1];
