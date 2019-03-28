@@ -141,6 +141,7 @@ export class Board { // Single state of the board
   public getThreatenedSpaces(curTeam: Team, turnToApply: Turn = null): boolean[][] {
     let threatenedSpaces: boolean[][];
     for (let y = 0; y < 8; y++) { // Initialize return spaces to false
+      threatenedSpaces[y] = [];
       for (let x = 0; x < 8; x++) {
         threatenedSpaces[y][x] = false;
       }

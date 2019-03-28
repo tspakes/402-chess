@@ -34,8 +34,8 @@ export default class BoardAPI {
 			this._rawChangeQueue = [];
 			this.zeroDelta();
 			State.reset();
-			this._boardRaw = this._board.minimize();
 			if (this._error !== 'PAWN_PROMOTION') { // Turn should not be canceled for promotion
+				this._boardRaw = this._board.minimize();
 				this._turnCommitQueued = false;
 				this._pendingTurn = null;
 			}
@@ -104,7 +104,7 @@ export default class BoardAPI {
 			});
 			// Process all queued changes
 			for (let change of this._rawChangeQueue) {
-				State.process(change, change.team === this._teamCurrent)
+				State.process(change, change.team === this._teamCurrent);
 				if ((State.state === 'move' || State.state === 'error') && this.sumDelta() === 1 && !change.lift) {
 					// Forget change if player put down a piece in the same cell it started in
 					State.reset();
