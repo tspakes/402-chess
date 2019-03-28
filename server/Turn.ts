@@ -79,8 +79,9 @@ export class Turn {
   }
 
 	public isValid(board: Board): boolean {
-    if (this.type == 'enpassant' && this.target != board.lastTurn.actor && board.lastTurn.meta.doublepawn != true)
-      return false; // Attempted invalid enpassant 
+    if (this.type == 'enpassant' && board.lastTurn != null && this.target != board.lastTurn.actor && board.lastTurn.meta.doublepawn != true) {
+      return false; // Attempted invalid enpassant
+    } 
     // TODO This should handle castling while Piece.isTurnValid() just checks that each piece moved in a valid way
     //      For castling, check that both king and rook castled to the same side
     // TODO Need to check that this.actor2.isTurnValid() as well, but it'll need to use a different x and y, so maybe pass in the x and y instead?

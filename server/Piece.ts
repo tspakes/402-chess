@@ -156,7 +156,7 @@ export class Piece {
 							a = turn.x1 - 1; // Left
 						}
 
-						if (turn.actor.hasMoved == true || turn.actor2.hasMoved == true) return false; // King or rook has moved, cannot castle
+						if (turn.actor.hasMoved == true || turn.actor2 == null || turn.actor2.hasMoved == true) return false; // King or rook has moved or rook didn't move, cannot castle
 						else if (threats[turn.y1][turn.x1] == true) return false; // King is in check, cannot castle
 						else if (threats[turn.y1][turn.x2] == true) return false; // King's destination is threatened, cannot castle
 						else if (threats[turn.y1][a] == true) return false; // King's transition space is threatened, cannot castle
@@ -303,21 +303,8 @@ export class Piece {
 			case 'pawn':
 				let pawnMovement = turn.y2 - turn.y1;
 				if (xdiff == 1 && ydiff == 1) { // Pawn diagonal attack
-					let dest = board.grid[turn.y2][turn.x2];
-					let offset: number;
-					if (turn.actor.team == 'white') offset = -1; // Behind white pawn
-					else offset = 1; // Behind black pawn
-					let behindPawn = board.grid[turn.y2 + offset][turn.x2]
-					if (dest == null && behindPawn == null) {
-						return false; // Not an enpassant and no enemy piece to take at pawn destination
-					} else { // Piece present at pawn attack destination or behind that destination
-						if (dest != null) { // Normal pawn attack
-							return true; // Enemy piece at destination
-						} else { // A piece is behind the pawn attack destination
-							if (behindPawn.type != 'pawn' || behindPawn.team == turn.actor.team) return false;
-							else return true; // Valid enpassant
-						}
-					}
+					if (turn.type === 'enpassant' || turn.type === 'take') return true;
+					else return false;
 				} else if (ydiff == 1 && xdiff == 0) { // Pawn single move
 					if (turn.actor.team == 'white' && (pawnMovement < 1) || turn.actor.team == 'black' && (pawnMovement > -1)) {
 						return false; // Pawn moving backwards
