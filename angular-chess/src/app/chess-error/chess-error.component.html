@@ -1,5 +1,24 @@
-<div *ngIf="board?.message.length > 0" class="error">
-    <span>{{board?.description}}</span>
+<div class="row justify-content-center mb-5" *ngIf="board?.message.length > 0">
+    <div class="col-auto flex-fill">
+        <div class="card shadow-sm">
 
-    <button (click)="resume()" class="resume-game">Resume Game</button>
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i>
+
+                Waiting on you....
+
+            </div>
+            <div class="card-body">
+
+                <span class="text-danger">{{board?.description}}</span>
+
+
+            </div>
+
+            <div class="card-footer">
+                <button (click)="resume()" class="btn btn-success float-right">Resume Game</button>
+
+            </div>
+        </div>
+    </div>
 </div>

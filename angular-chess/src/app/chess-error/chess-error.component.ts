@@ -1,5 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {BoardApi} from '../api/board.api';
+import {Store} from "@ngrx/store";
+import {ResumeBoard} from "../actions/get-board.actions";
+import {IAppState} from "../reducers";
 
 @Component({
     selector: 'app-chess-error',
@@ -10,15 +12,15 @@ export class ChessErrorComponent implements OnInit {
 
     @Input() board: any = null;
 
-    constructor(private boardApi: BoardApi) {
+    constructor(public store: Store<IAppState>) {
     }
 
     ngOnInit() {
     }
 
-    async resume() {
+    resume() {
 
-        await this.boardApi.resume();
+        this.store.dispatch(new ResumeBoard());
+
     }
-
 }

@@ -16,7 +16,11 @@ export class RemoveEmptyPipe implements PipeTransform {
             }
         });
 
-        return flattenedArray.filter(piece => piece !== null && piece !== undefined);
+        return flattenedArray.filter(piece => piece !== null && piece !== undefined).sort((a: any, b: any) => {
+
+            return a.id - b.id;
+
+        });
 
     }
 

@@ -398,7 +398,7 @@ export class Board { // Single state of the board
     }
     return threatenedSpaces;
   }
-
+  
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
    */

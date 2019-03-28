@@ -19,6 +19,7 @@ td {
 tr {
   padding: 0;
   margin: 0;
+
 }
 
 tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
@@ -41,5 +42,46 @@ tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd) {
   align-items: center;
   height: 100vh;
   width: 100vw;
-  background: #e9d6aa;
+  background: #e2e6ea;
+}
+
+
+.commit-button {
+
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ff3019+0,cf0404+100;Red+3D */
+  background: rgb(143,196,0); /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, rgba(143,196,0,1) 0%, rgba(143,196,0,1) 100%); /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(143,196,0,1) 0%,rgba(143,196,0,1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, rgba(143,196,0,1) 0%,rgba(143,196,0,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8fc400', endColorstr='#8fc400',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3019', endColorstr='#cf0404', GradientType=1); /* IE6-9 fallback on horizontal gradient */
+  border-radius: 50%;
+  height: 80px;
+  width: 80px;
+  padding: 0px;
+  color: white;
+  border: solid 10px dimgrey;
+  outline: none;
+
+  transition: all 1.0s;
+
+}
+
+.commit-disabled {
+  background: rgb(125, 126, 125); /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, rgba(125, 126, 125, 1) 0%, rgba(14, 14, 14, 1) 100%); /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(125, 126, 125, 1) 0%, rgba(14, 14, 14, 1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, rgba(125, 126, 125, 1) 0%, rgba(14, 14, 14, 1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#7d7e7d', endColorstr='#0e0e0e', GradientType=1); /* IE6-9 fallback on horizontal gradient */
+}
+
+.small-piece {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.history-body {
+
+  height: 400px;
+  overflow-y: scroll;
 }

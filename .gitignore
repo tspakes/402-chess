@@ -8,3 +8,4 @@
 !/www/**/*.js
 
 /angular-chess/node_modules
+.idea
