@@ -37,6 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.board$.subscribe((board: IBoardState) => {
 
             this.board = board.board;
+
             this.checkMessages();
         });
 

@@ -52,9 +52,20 @@ export class BoardApi {
 
     }
 
+    public cancel(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/cancel`, {});
+
+    }
+
     public promote(type: PieceType): Observable<IBoardModel> {
 
         return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/promote/${type}`, {});
+    }
+
+    public history(): Observable<IBoardModel> {
+
+        return this.httpClient.get<IBoardModel>(`${this.endpoint}/board/history`);
     }
 }
 

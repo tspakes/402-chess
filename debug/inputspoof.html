@@ -40,6 +40,7 @@
 			}
 
 			function reset() {
+				clearInterval(intval);
 				xhttp = new XMLHttpRequest();
 				xhttp.open('POST', `board/reset`, false);
 				xhttp.send();
@@ -88,12 +89,13 @@
 				document.getElementById('histEncLabel').innerText = 'Copied to clipboard.';
 			}
 
+			let intval;
 			function readHistoryFromUrl() {
 				let iQ = window.location.href.indexOf('script=');
 				if (iQ < 0) return;
 				let actions = window.location.href.substr(iQ+7).split(',');
 				let a = 0;
-				let intval = setInterval(() => {
+				intval = setInterval(() => {
 					try {
 						if (actions[a] === '')
 							endTurn();

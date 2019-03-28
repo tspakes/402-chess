@@ -1,19 +1,23 @@
 <div class="row justify-content-center mb-5" *ngIf="board?.message.length > 0">
     <div class="col-auto flex-fill">
         <div class="card shadow-sm">
+
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i>
+
+                Waiting on you....
+
+            </div>
             <div class="card-body">
 
-                <div class="row justify-content-between align-items-center">
+                <span class="text-danger">{{board?.description}}</span>
 
-                    <div class="col-auto">
 
-                        <span class="text-danger">{{board?.description}}</span>
+            </div>
 
-                    </div>
-                    <div class="col-auto">
-                        <button (click)="resume()" class="btn btn-success">Resume Game</button>
-                    </div>
-                </div>
+            <div class="card-footer">
+                <button (click)="resume()" class="btn btn-success float-right">Resume Game</button>
+
             </div>
         </div>
     </div>

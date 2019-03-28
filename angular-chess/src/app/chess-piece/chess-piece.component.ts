@@ -10,6 +10,7 @@ export class ChessPieceComponent implements OnInit, DoCheck {
 
 
     @Input() piece: IPieceModel;
+    @Input() styleClass: string;
 
 
     constructor(public elementRef: ElementRef) {

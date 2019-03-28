@@ -98,6 +98,10 @@ export default class BoardAPI {
 			BoardDriver.cycleColumn();
 
 
+			// Make sure pick ups are always read before putdowns
+			this._rawChangeQueue = this._rawChangeQueue.sort((a, b) => {
+				return (b.lift as unknown as number) - (a.lift as unknown as number);
+			});
 			// Process all queued changes
 			for (let change of this._rawChangeQueue) {
 				State.process(change, change.team === this._teamCurrent)
@@ -123,7 +127,9 @@ export default class BoardAPI {
 					this._pendingTurn = this.postProcess(turntype);
 					if (this._pendingTurn.type === 'invalid') {
 						this.error = 'INVALID_TURN';
-						this._errorDesc = 'Post processing failed.';
+						if (this._errorDesc === '')
+							this._errorDesc = 'Post processing failed.';
+						console.log(Chalk.redBright(this._errorDesc));
 						console.log(Chalk.redBright('Invalid move processed. Waiting for /board/resume request.'));
 						return;
 					}
@@ -192,7 +198,7 @@ export default class BoardAPI {
 		}
 		if (turn.actor === null) {
 			// The player probably moved the wrong team's piece
-			console.log(Chalk.redBright(`Actor for turn of type ${type} not detected. It is likely the wrong player moved. The current player is ${this._teamCurrent}.`));
+			this._errorDesc = `Actor for turn of type ${type} not detected. It is likely the wrong player moved. The current player is ${this._teamCurrent}.`;
 			if (!DEBUG) this.printBoardState();
 			turn.type = 'invalid';
 			return turn;
@@ -268,6 +274,13 @@ export default class BoardAPI {
 						break actor2Detection;
 					}
 				}
+			}
+			if (turn.actor2 === null) {
+				// The player probably moved the wrong team's piece
+				this._errorDesc = `Rook not detected. It is likely ${this._teamCurrent} tried to take their own piece.`;
+				if (!DEBUG) this.printBoardState();
+				turn.type = 'invalid';
+				return turn;
 			}
 			console.log(Chalk.greenBright(`actor2=${turn.actor2.toString()}`));
 
@@ -417,17 +430,21 @@ export default class BoardAPI {
 	public static postCancel(): void {
 		console.log(`Cancelling turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
 		this.error = 'CANCEL_TURN';
+		this._errorDesc = 'Move pieces back to their locations at the start of the current turn.';
 	}
 	
 	public static postUndo(): any {
 		if (this.sumDelta() > 0)
 			throw 'A turn is currently pending. Cancel the current turn before undoing the last turn.';
+		if (this._history.length <= 0)
+			throw 'No turns remain to be undone.';
 		this._board.undoTurn(this._history[this._history.length - 1]);
 		this._history.pop();
 		this._board.lastTurn = this._history[this._history.length - 1];
 		this.switchTeam();
 		console.log(`Undoing last turn... Board state should be returned to \n${this._board.toString()}\nWaiting for /board/resume.`);
 		this.error = 'UNDO_TURN';
+		this._errorDesc = 'Move pieces to their locations at the start of the previous turn.';
 	}
 
 	public static postPromote(type: PieceType): void {

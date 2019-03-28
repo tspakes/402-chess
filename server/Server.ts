@@ -163,12 +163,11 @@ class Server {
 		 * Enable hardware spoofing, enable piece detection, and return the control panel. 
 		 */
 		this.app.get('/debug', (req: Request, res: Response) => {
+			BoardAPI.init();
+			BoardDriver.debug = false;
+			BoardDriver.debug = true;
 			BoardAPI.postResume();
-			if (!BoardDriver.debug) {
-				BoardDriver.debug = false;
-				BoardDriver.debug = true;
-				console.log('BoardDriver set to debug state and will remain in this state until the web server is restarted.');
-			}
+			console.log('BoardDriver set to debug state and will remain in this state until the web server is restarted.');
 			res.sendFile(Path.join(__dirname, '../debug/inputspoof.html'));
 		});
 		/**
@@ -180,19 +179,21 @@ class Server {
 		/**
 		 * Toggle turn validity / rule checker. 
 		 */
-		this.app.get('debug/validitychecker', (req: Request, res: Response) => {
+		this.app.get('/debug/validitychecker', (req: Request, res: Response) => {
 			BoardAPI.validityChecking = !BoardAPI.validityChecking;
+			let msg = `Validity checking ${ BoardAPI.validityChecking ? 'enabled' : 'disabled' }.`;
+			console.log(msg);
 			res.status(200);
 			res.json({
-				message: `Validity checking ${ BoardAPI.validityChecking ? 'enabled' : 'diabled' }.`
+				message: msg
 			});
 		});
 		this.app.post('/debug/set', (req: Request, res: Response) => {
+			BoardDriver.debug_setCell(8 - req.query.x, req.query.y - 1, req.query.lift !== 'true');
 			res.status(200);
 			res.json({
 				message: 'Updated board state.'
 			});
-			BoardDriver.debug_setCell(8 - req.query.x, req.query.y - 1, req.query.lift !== 'true');
 		});
 		/**
 		 * Reset the spoofed hardware state. 

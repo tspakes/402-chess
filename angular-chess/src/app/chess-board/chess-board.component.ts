@@ -1,10 +1,12 @@
-import {Component, ElementRef, Input} from '@angular/core';
+import {Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {IPieceModel} from '../models/IPieceModel';
 import {PromotionModalComponent} from '../modals/promotion/promotion.modal';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {Store} from "@ngrx/store";
 import {IAppState} from "../reducers";
 import {CommitTurn, ResetBoard, UndoBoard} from "../actions/get-board.actions";
+import {IBoardModel} from "../models/IBoardModel";
+import {IHistoryModel} from "../models/IHistoryModel";
 
 @Component({
     selector: 'app-chess-board',
@@ -13,9 +15,11 @@ import {CommitTurn, ResetBoard, UndoBoard} from "../actions/get-board.actions";
 })
 export class ChessBoardComponent {
 
-    @Input() board: any = null;
+    @Input() board: IBoardModel = null;
     public pieces: IPieceModel[] = [];
-    private grid = [];
+    private grid: IPieceModel[] = [];
+
+    @ViewChild('history') historyRef: ElementRef;
 
     modalRef: BsModalRef;
 
@@ -56,7 +60,7 @@ export class ChessBoardComponent {
             let row_index = 8;
             let column_index = 1;
 
-            this.grid.forEach((row: Array<any>) => {
+            this.grid.forEach((row: any) => {
 
                 row.forEach((piece: IPieceModel) => {
 
@@ -93,8 +97,10 @@ export class ChessBoardComponent {
         }
     }
 
-    commit() {
-        this.store.dispatch(new CommitTurn());
+    commit(team) {
+        if (this.board.currentTeam === team) {
+            this.store.dispatch(new CommitTurn());
+        }
     }
 
     reset() {
@@ -103,5 +109,11 @@ export class ChessBoardComponent {
 
     undo() {
         this.store.dispatch(new UndoBoard());
+    }
+
+    historyFunction(index, history: IHistoryModel) {
+
+        return history.actor.id;
+
     }
 }
