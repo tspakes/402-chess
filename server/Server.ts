@@ -208,12 +208,20 @@ class Server {
 			console.log('Reset spoofed board state.');
 		});
 
+		/**
+		 * Return log file. 
+		 */
+		this.app.get('/log', (req: Request, res: Response) => {
+			res.sendFile(Path.join(__dirname, '../log.txt'));
+		});
+
 		// Website file serving
 		this.app.use(Express.static(Path.join(__dirname, '../www')));
 
 		this.router.use((req: Request, res: Response, next: Function) => {
-			// Run this on every incoming request
-			console.log(Chalk.blueBright(req.url));
+			// Run this on every incoming request (except /board)
+			if (req.url !== '/board')
+				console.log(Chalk.blueBright(req.url));
 			next();
 		});
 	}
