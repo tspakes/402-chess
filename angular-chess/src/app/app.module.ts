@@ -18,6 +18,7 @@ import {PromotionModalComponent} from './modals/promotion/promotion.modal';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { InteractComponent } from './interact/interact.component';
 import { MainComponent } from './main/main.component';
+import { ReversePipe } from './pipes/reverse.pipe';
 
 @NgModule({
     declarations: [
@@ -28,7 +29,8 @@ import { MainComponent } from './main/main.component';
         RemoveEmptyPipe,
         PromotionModalComponent,
         InteractComponent,
-        MainComponent
+        MainComponent,
+        ReversePipe
 
     ],
     imports: [

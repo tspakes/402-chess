@@ -37,6 +37,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.board$.subscribe((board: IBoardState) => {
 
             this.board = board.board;
+
+            console.log(this.board);
+
             this.checkMessages();
         });
 
@@ -54,8 +57,10 @@ export class AppComponent implements OnInit, OnDestroy {
     private checkMessages() {
 
         if (this.board !== null) {
-            if (this.board.message === 'PAWN_PROMOTION' && this.modalRef === null) {
-                this.modalRef = this.modalService.show(PromotionModalComponent);
+            if (this.board.message === 'PAWN_PROMOTION') {
+                if (this.modalRef === null) {
+                    this.modalRef = this.modalService.show(PromotionModalComponent);
+                }
             } else if (this.modalRef !== null) {
                 this.modalRef.hide();
                 this.modalRef = null;

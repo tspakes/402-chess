@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Actions, Effect, ofType} from '@ngrx/effects';
-import {EMPTY} from 'rxjs';
+import {EMPTY, of} from 'rxjs';
 import {catchError, map, mergeMap} from 'rxjs/operators';
 import {BoardApi} from '../api/board.api';
 import {
@@ -8,7 +8,10 @@ import {
     GetBoardActionTypes,
     LoadGetBoardsSuccess,
     PromotePiece,
-    PromotePieceSuccess, ResetBoardSuccess
+    PromotePieceSuccess,
+    ResetBoardSuccess,
+    ResumeBoardSuccess,
+    UndoBoardSuccess
 } from '../actions/get-board.actions';
 import {IBoardModel} from '../models/IBoardModel';
 
@@ -43,7 +46,7 @@ export class BoardEffects {
             ofType(GetBoardActionTypes.CommitBoard),
             mergeMap(() => this.boardService.commit()
                 .pipe(
-                    map(() =>  new CommitTurnSuccess()),
+                    map(() => new CommitTurnSuccess()),
                     catchError(() => EMPTY)
                 ))
         );
@@ -54,11 +57,34 @@ export class BoardEffects {
             ofType(GetBoardActionTypes.ResetBoard),
             mergeMap(() => this.boardService.reset()
                 .pipe(
-                    map(() =>  new ResetBoardSuccess()),
+                    map(() => new ResetBoardSuccess()),
                     catchError(() => EMPTY)
                 ))
+        );
+
+
+    @Effect()
+    resumeBoard = this.actions$
+        .pipe(
+            ofType(GetBoardActionTypes.ResumeBoard),
+            mergeMap(() => this.boardService.resume()
+                .pipe(
+                    map(() => new ResumeBoardSuccess()),
+                    catchError(() => EMPTY)
+                ))
+        );
+
+    @Effect()
+    undoBoard = this.actions$
+        .pipe(
+            ofType(GetBoardActionTypes.UndoBoard),
+            mergeMap(() => this.boardService.cancel()
+                .pipe(mergeMap(() => this.boardService.undo()
+                    .pipe(map(() => new UndoBoardSuccess(), catchError(() => of(new UndoBoardSuccess()))))
+                ), catchError(() => of(new UndoBoardSuccess())))),
         );
 
     constructor(private actions$: Actions, private boardService: BoardApi) {
     }
 }
+

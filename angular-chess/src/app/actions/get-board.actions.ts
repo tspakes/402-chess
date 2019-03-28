@@ -5,12 +5,21 @@ import {PieceType} from '../models/IPieceModel';
 export enum GetBoardActionTypes {
     LoadGetBoards = '[GetBoard] Load GetBoards',
     LoadGetBoardsSuccess = '[GetBoard] Load GetBoards Success',
+
     PromotePiece = '[PromotePiece] PromotePiece',
     PromotePieceSuccess = '[PromotePiece] PromotePiece Success',
+
     ResetBoard = '[Board] Board Reset',
     ResetBoardSuccess = '[Board] Board Reset Success',
+
     CommitBoard = '[Board] CommitBoard',
     CommitBoardSuccess = '[Board] CommitBoard Success',
+
+    ResumeBoard = '[Board] ResumeBoard',
+    ResumeBoardSuccess = '[Board] ResumeBoard Success',
+
+    UndoBoard = '[Board] UndoBoard',
+    UndoBoardSuccess = '[Board] UndoBoardSuccess Success',
 
 }
 
@@ -93,6 +102,49 @@ export class CommitTurnSuccess implements Action {
 
 }
 
+export class ResumeBoard implements Action {
+
+    readonly type = GetBoardActionTypes.ResumeBoard;
+
+    constructor() {
+
+    }
+
+}
+
+export class ResumeBoardSuccess implements Action {
+
+    readonly type = GetBoardActionTypes.ResumeBoardSuccess;
+
+    constructor() {
+
+    }
+
+}
+
+export class UndoBoard implements Action {
+
+    readonly type = GetBoardActionTypes.UndoBoard;
+
+    constructor() {
+
+    }
+
+}
+
+export class UndoBoardSuccess implements Action {
+
+    readonly type = GetBoardActionTypes.UndoBoardSuccess;
+
+    constructor() {
+
+    }
+
+}
+
+
+
+
 export type GetBoardActions =
     LoadGetBoards
     | LoadGetBoardsSuccess
@@ -101,4 +153,8 @@ export type GetBoardActions =
     | ResetBoard
     | ResetBoardSuccess
     | CommitTurn
-    | CommitTurnSuccess;
+    | CommitTurnSuccess
+    | ResumeBoard
+    | ResumeBoardSuccess
+    | UndoBoard
+    | UndoBoardSuccess;

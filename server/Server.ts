@@ -110,6 +110,27 @@ class Server {
 			});
 		});
 		/**
+		 * Undo the last committed turn. (no turn may be currently pending)
+		 */
+		this.app.post('/board/undo', (req: Request, res: Response) => {
+			try {
+				BoardAPI.postUndo();
+				res.status(200);
+				res.json({
+					message: 'Last turn undone. Call /board/resume when the pieces have been moved to their locations at the start of the last turn.'
+				});
+			} catch (ex) {
+				console.log(Chalk.red(ex));
+				res.status(400);
+				res.json({
+					message: ex
+				});
+				if (typeof ex !== 'string') {
+					throw ex;
+				}
+			}
+		});
+		/**
 		 * Choose type of piece for pawn promotion. 
 		 */
 		this.app.post('/board/promote/:type', (req: Request, res: Response) => {
@@ -142,20 +163,37 @@ class Server {
 		 * Enable hardware spoofing, enable piece detection, and return the control panel. 
 		 */
 		this.app.get('/debug', (req: Request, res: Response) => {
+			BoardAPI.init();
+			BoardDriver.debug = false;
+			BoardDriver.debug = true;
 			BoardAPI.postResume();
-			if (!BoardDriver.debug) {
-				BoardDriver.debug = false;
-				BoardDriver.debug = true;
-				console.log('BoardDriver set to debug state and will remain in this state until the web server is restarted.');
-			}
+			console.log('BoardDriver set to debug state and will remain in this state until the web server is restarted.');
 			res.sendFile(Path.join(__dirname, '../debug/inputspoof.html'));
 		});
+		/**
+		 * Return request spoofing panel. Does not enable debug mode. 
+		 */
+		this.app.get('/debug/requests', (req: Request, res: Response) => {
+			res.sendFile(Path.join(__dirname, '../debug/requestspoof.html'));
+		});
+		/**
+		 * Toggle turn validity / rule checker. 
+		 */
+		this.app.get('/debug/validitychecker', (req: Request, res: Response) => {
+			BoardAPI.validityChecking = !BoardAPI.validityChecking;
+			let msg = `Validity checking ${ BoardAPI.validityChecking ? 'enabled' : 'disabled' }.`;
+			console.log(msg);
+			res.status(200);
+			res.json({
+				message: msg
+			});
+		});
 		this.app.post('/debug/set', (req: Request, res: Response) => {
+			BoardDriver.debug_setCell(8 - req.query.x, req.query.y - 1, req.query.lift !== 'true');
 			res.status(200);
 			res.json({
 				message: 'Updated board state.'
 			});
-			BoardDriver.debug_setCell(8 - req.query.x, req.query.y - 1, req.query.lift !== 'true');
 		});
 		/**
 		 * Reset the spoofed hardware state. 

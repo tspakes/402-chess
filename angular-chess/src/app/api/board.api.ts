@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import {IBoardModel} from "../models/IBoardModel";
 import {PieceType} from "../models/IPieceModel";
+import {environment} from "../../environments/environment";
 
 @Injectable({
     providedIn: 'root'
@@ -10,9 +11,16 @@ import {PieceType} from "../models/IPieceModel";
 export class BoardApi {
 
 
-    private endpoint = 'http://chesspi.nomads.utk.edu';
+    private readonly endpoint;
 
     constructor(private httpClient: HttpClient) {
+
+        if (environment.production === true) {
+            this.endpoint = window.location.href.substr(0, window.location.href.lastIndexOf('/'));
+        } else {
+            this.endpoint = "http://localhost"
+
+        }
 
     }
 
@@ -21,9 +29,9 @@ export class BoardApi {
         return this.httpClient.get<IBoardModel>(`${this.endpoint}/board`);
     }
 
-    public resume(): Promise<any> {
+    public resume(): Observable<IBoardModel> {
 
-        return this.httpClient.post(`${this.endpoint}/board/resume`, {}).toPromise();
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/resume`, {});
     }
 
     public commit(): Observable<IBoardModel> {
@@ -38,9 +46,26 @@ export class BoardApi {
 
     }
 
+    public undo(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/undo`, {});
+
+    }
+
+    public cancel(): Observable<IBoardModel> {
+
+        return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/cancel`, {});
+
+    }
+
     public promote(type: PieceType): Observable<IBoardModel> {
 
         return this.httpClient.post<IBoardModel>(`${this.endpoint}/board/promote/${type}`, {});
+    }
+
+    public history(): Observable<IBoardModel> {
+
+        return this.httpClient.get<IBoardModel>(`${this.endpoint}/board/history`);
     }
 }
 

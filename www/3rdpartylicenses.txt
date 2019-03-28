@@ -294,6 +294,18 @@ Apache-2.0
 @angular/core
 MIT
 
+@angular/common
+MIT
+
+@angular/platform-browser
+MIT
+
+@angular/router
+MIT
+
+@ngrx/store
+MIT
+
 ngx-bootstrap
 MIT
 The MIT License (MIT)
@@ -321,15 +333,6 @@ SOFTWARE.
 
 
 
-@angular/common
-MIT
-
-@angular/platform-browser
-MIT
-
-@angular/router
-MIT
-
 ngx-bootstrap/utils
 
 ngx-bootstrap/component-loader
@@ -337,9 +340,6 @@ ngx-bootstrap/component-loader
 ngx-bootstrap/positioning
 
 ngx-bootstrap/modal
-
-@ngrx/store
-MIT
 
 ngx-bootstrap/dropdown
 
