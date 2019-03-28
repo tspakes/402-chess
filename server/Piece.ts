@@ -133,22 +133,30 @@ export class Piece {
 			/* QUEEN QUEEN QUEEN QUEEN QUEEN QUEEN */
 			case 'queen':
 				if (xdiff == ydiff) { // Diagonal move
+					let xminus: boolean;
+					let yminus: boolean;
 					if (turn.y1 < turn.y2) {
+						yminus = false;
 						a = turn.y1 + 1;
-						b = turn.y2;
 					} else {
-						a = turn.y2 + 1;
-						b = turn.y1;
+						yminus = true;
+						a = turn.y1 - 1;
 					}
 					if (turn.x1 < turn.x2) {
+						xminus = false;
 						x = turn.x1 + 1;
 					} else {
-						x = turn.x2 + 1;
+						xminus = true;
+						x = turn.x1 - 1;
 					}
-					while (a < b) { // Check spaces between source and destination
+					b = turn.y2;
+					while (a != b) { // Check spaces between source and destination
 						if (board.grid[a][x] != null) return false; // Piece in the way
-						a++; // Move toward y destination/source
-						x++; // Move toward x destination/source
+						// Move toward y and x destination
+						if (yminus) a--;
+						else a++;
+						if (xminus) x--;
+						else x++;
 					}
 				} else if (xdiff == 0) { // y-axis move
 					if (turn.y1 < turn.y2) {
@@ -184,22 +192,31 @@ export class Piece {
 			/* BISHOP BISHOP BISHOP BISHOP BISHOP BISHOP */
 			case 'bishop':
 				if (xdiff == ydiff) {
+					let xminus: boolean;
+					let yminus: boolean;
 					if (turn.y1 < turn.y2) {
+						yminus = false;
 						a = turn.y1 + 1;
-						b = turn.y2;
 					} else {
-						a = turn.y2 + 1;
-						b = turn.y1;
+						yminus = true;
+						a = turn.y1 - 1;
 					}
 					if (turn.x1 < turn.x2) {
+						xminus = false;
 						x = turn.x1 + 1;
 					} else {
-						x = turn.x2 + 1;
+						xminus = true;
+						x = turn.x1 - 1;
 					}
-					while (a < b) { // Check spaces between source and destination
+					b = turn.y2;
+					while (a != b) { // Check spaces between source and destination
 						if (board.grid[a][x] != null) return false; // Piece in the way
-						a++; // Move toward y destination/source
-						x++; // Move toward x destination/source
+						// Move toward y and x destination
+						if (yminus) a--;
+						else a++;
+						if (xminus) x--;
+						else x++;
+						console.log('test');
 					}
 				} else {// Invalid, xdiff and ydiff must be equal
 					return false;

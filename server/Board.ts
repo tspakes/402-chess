@@ -137,6 +137,7 @@ export class Board { // Single state of the board
     // Note that this.lastTurn is updated in BoardAPI.postUndo()
   }
   
+
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
    */
