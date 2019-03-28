@@ -147,7 +147,7 @@ export class Board { // Single state of the board
     }
 
     if (turnToApply != null) { // Temporarily apply turn to the board
-      // apply turn
+      this.applyTurn(turnToApply);
     }
 
     for (let y = 0; y < 8; y++) {
@@ -421,7 +421,7 @@ export class Board { // Single state of the board
     }
 
     if (turnToApply != null) { // Undo temporarily applied turn
-      // undo turn
+      this.undoTurn(turnToApply);
     }
     return threatenedSpaces;
   }

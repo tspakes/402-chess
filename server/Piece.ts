@@ -112,9 +112,22 @@ export class Piece {
 
 		if (board.grid[turn.y2][turn.x2] != null && board.grid[turn.y2][turn.x2].team == turn.actor.team) return false; // Friendly piece in the way at destination
 
+		let t = this._team;
+		if (t == 'white') t = 'black'; // Find the which is the enemy team
+		else t = 'white';
+
+		let threats = board.getThreatenedSpaces(t, turn); // Find which spaces the enemy team will threaten after the turn is applied
+		for (let y = 0; y < 8; y++) { // Find the current team's king and check for check
+			for (let x = 0; x < 8; x++) {
+				if (board.grid[y][x].type == 'king' && board.grid[y][x].team == this._team && threats[y][x] == true) {
+					return false; // Current team's king put in check due to this move, therefore invalid
+				}
+			}
+		}
+
 		let xdiff = Math.abs(turn.x2 - turn.x1);
 		let ydiff = Math.abs(turn.y2 - turn.y1);
-		let a: number, b: number, x: number, y: number; // <- Just added temporarily to fix build errors
+		let a: number, b: number, x: number, y: number;
 		switch (turn.actor.type) {
 			/* KING KING KING KING KING KING */
 			case 'king':
@@ -129,7 +142,18 @@ export class Piece {
 						//   3. The King or Rook to castle with has moved
 						//   4. A piece, enemy or friendly, is obstructing the castling path
 
-						return true;
+						let a: number; 
+						if (turn.x1 < turn.x2) { // Determining which way the king is moving to check king transition space
+							a = turn.x1 + 1; // Right
+						} else {
+							a = turn.x1 - 1; // Left
+						}
+
+						threats = board.getThreatenedSpaces(t);
+						if (threats[turn.y1][turn.x1] == true) return false; // King is in check, cannot castle
+						else if (threats[turn.y1][turn.x2] == true) return false; // King's destination is threatened, cannot castle
+						else if (threats[turn.y1][a] == true) return false; // King's transition space is threatened, cannot castle
+						else return true;
 					}
 				} else { // Should be normal move, can't have pieces in the way, as this is a one-square move
 					return true;
