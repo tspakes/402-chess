@@ -452,6 +452,7 @@ export default class BoardAPI {
 		if (this.error !== 'PAWN_PROMOTION')
 			throw 'No pawns are being promoted.';
 		this._pendingTurn.actor.promote(type);
+		this._pendingTurn.promotion = type;
 		console.log(`Promoted ${this._pendingTurn.actor.toString()} to type ${type}. Waiting for /board/resume request.`);
 	}
 
