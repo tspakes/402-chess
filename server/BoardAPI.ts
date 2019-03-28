@@ -150,6 +150,14 @@ export default class BoardAPI {
 
 				this._board.applyTurn(this._pendingTurn);
 				
+				/*
+				// Determining Check, Checkmate, or Stalemate
+				let enemyTeam: Team;
+				if (this._teamCurrent == 'white') enemyTeam = 'black'; // Discover enemy team
+				else enemyTeam = 'white';
+				let threats = this._board.getThreatenedSpaces(enemyTeam);
+				*/
+
 				console.log('Committed turn.');
 				this._turnCommitQueued = false;
 				this.zeroDelta();

@@ -138,9 +138,11 @@ export class Board { // Single state of the board
   }
 
   // Check which board spaces are threatened - this is for castling and king movement/check checking
-  public getThreatenedSpaces(curTeam: Team, turnToApply: Turn = null): boolean[][] {
+  public getThreatenedSpaces(threatTeam: Team, turnToApply: Turn = null): boolean[][] {
     let threatenedSpaces: boolean[][];
+    threatenedSpaces = [];
     for (let y = 0; y < 8; y++) { // Initialize return spaces to false
+      threatenedSpaces[y] = [];
       for (let x = 0; x < 8; x++) {
         threatenedSpaces[y][x] = false;
       }
@@ -153,7 +155,7 @@ export class Board { // Single state of the board
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
         let piece = this.grid[y][x];
-        if (piece != null && piece.team == curTeam) { // Piece found
+        if (piece != null && piece.team == threatTeam) { // Piece found
           if (piece.type == 'king') { // Threatens the 8 spaces around it unless off the board
             if (y == 0 && x == 0) { // Bottom left corner
               threatenedSpaces[y][x + 1] = true;
@@ -412,7 +414,7 @@ export class Board { // Single state of the board
             a = x + 1; // Diagonal-right
             if (a < 8 && b < 8 && b > -1) threatenedSpaces[b][a] = true;
             a = x - 1; // Diagonal-left
-            if (a < 8 && b < 8 && b > -1) threatenedSpaces[b][a] = true;
+            if (a > -1 && b < 8 && b > -1) threatenedSpaces[b][a] = true;
           } else { // Leftover piece type - shouldn't be reached
             console.log('Unknown piece in threat mapping')
           }
@@ -423,6 +425,22 @@ export class Board { // Single state of the board
     if (turnToApply != null) { // Undo temporarily applied turn
       this.undoTurn(turnToApply);
     }
+
+    /* FOR PRINTING OUR A THREAT REPRESENTATION OF THE BOARD
+    let s: string;
+    let square: string;
+    for (let j = 7; j > -1; j--) {
+      s = '';
+      for (let i = 0; i < 8; i++) {
+        if (threatenedSpaces[j][i] == true) {
+          square = 'T';
+        } else {
+          square = 'x';
+        }
+        s = s + square;
+      }
+      console.log(s);
+    } */
     return threatenedSpaces;
   }
 

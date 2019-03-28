@@ -116,14 +116,18 @@ export class Piece {
 		if (t == 'white') t = 'black'; // Find the which is the enemy team
 		else t = 'white';
 
-		let threats = board.getThreatenedSpaces(t, turn); // Find which spaces the enemy team will threaten after the turn is applied
+		board.applyTurn(turn); // Temporarily applying the turn
+		let threats = board.getThreatenedSpaces(t); // Find which spaces the enemy team will threaten after the turn is applied
 		for (let y = 0; y < 8; y++) { // Find the current team's king and check for check
 			for (let x = 0; x < 8; x++) {
-				if (board.grid[y][x].type == 'king' && board.grid[y][x].team == this._team && threats[y][x] == true) {
+				if (board.grid[y][x] != null && board.grid[y][x].type == 'king' && board.grid[y][x].team == turn.actor.team && threats[y][x] == true) {
+					console.log('King put into Check.')
+					board.undoTurn(turn); // Undo the turn before erroring
 					return false; // Current team's king put in check due to this move, therefore invalid
 				}
 			}
 		}
+		board.undoTurn(turn); // Undo the temporary turn
 
 		let xdiff = Math.abs(turn.x2 - turn.x1);
 		let ydiff = Math.abs(turn.y2 - turn.y1);
@@ -131,7 +135,6 @@ export class Piece {
 		switch (turn.actor.type) {
 			/* KING KING KING KING KING KING */
 			case 'king':
-				// Have to consider moves not being able to be made due to check threat
 				if (xdiff > 1 || ydiff > 1) { // Might be a castle, but not a normal king move
 					if (ydiff != 0 || xdiff != 2) { // Not a castle, so invalid
 						return false;
@@ -149,8 +152,8 @@ export class Piece {
 							a = turn.x1 - 1; // Left
 						}
 
-						threats = board.getThreatenedSpaces(t);
-						if (threats[turn.y1][turn.x1] == true) return false; // King is in check, cannot castle
+						if (turn.actor.hasMoved == true || turn.actor2.hasMoved == true) return false; // King or rook has moved, cannot castle
+						else if (threats[turn.y1][turn.x1] == true) return false; // King is in check, cannot castle
 						else if (threats[turn.y1][turn.x2] == true) return false; // King's destination is threatened, cannot castle
 						else if (threats[turn.y1][a] == true) return false; // King's transition space is threatened, cannot castle
 						else return true;
