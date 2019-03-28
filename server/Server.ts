@@ -220,7 +220,7 @@ class Server {
 
 		this.router.use((req: Request, res: Response, next: Function) => {
 			// Run this on every incoming request (except /board)
-			if (req.url !== '/board')
+			if (req.url !== '/board' && req.url !== '/log')
 				console.log(Chalk.blueBright(req.url));
 			next();
 		});
