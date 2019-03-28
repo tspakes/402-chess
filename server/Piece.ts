@@ -88,6 +88,10 @@ export class Piece {
 		this._y = y;
 	}
 
+	public demote(): void {
+		this._type = 'pawn';
+	}
+
 	public promote(type: PieceType): void {
 		if (this._type !== 'pawn')
 			throw 'Only pawns may be promoted.';

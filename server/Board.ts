@@ -130,6 +130,8 @@ export class Board { // Single state of the board
 
     // Update piece
     turn.actor.updatePosition(turn.x1, turn.y1);
+    if (turn.type === 'pawnpromotion')
+      turn.actor.demote();
     if (turn.meta.firstMove)
       turn.actor.hasMoved = false;
     if (turn.type === 'castle')
@@ -139,8 +141,7 @@ export class Board { // Single state of the board
 
   // Check which board spaces are threatened - this is for castling and king movement/check checking
   public getThreatenedSpaces(threatTeam: Team, turnToApply: Turn = null): boolean[][] {
-    let threatenedSpaces: boolean[][];
-    threatenedSpaces = [];
+    let threatenedSpaces: boolean[][] = [];
     for (let y = 0; y < 8; y++) { // Initialize return spaces to false
       threatenedSpaces[y] = [];
       for (let x = 0; x < 8; x++) {

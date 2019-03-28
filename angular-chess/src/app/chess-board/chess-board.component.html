@@ -11,8 +11,8 @@
                     <button type="button" class="commit-button shadow-sm"
                             [ngClass]="{'commit-disabled': board.currentTeam != 'black' || board.message.length > 0}"
                             (click)="commit('black')">
-                        <span *ngIf="board.currentTeam === 'black' &&  board.message.length <= 0">Confirm<br><i
-                                class="fas fa-arrow-down"></i></span>
+                        <span *ngIf="board.currentTeam === 'black' &&  board.message.length <= 0"><br><i
+                                class="fas fa-2x fa-arrow-down"></i></span>
                         <span *ngIf="board.currentTeam !== 'black'"></span>
                     </button>
 
@@ -22,7 +22,7 @@
                             [ngClass]="{'commit-disabled': board.currentTeam != 'white' || board.message.length > 0}"
                             (click)="commit('white')">
                         <span *ngIf="board.currentTeam === 'white' &&  board.message.length <= 0"><i
-                                class="fas fa-arrow-up"></i><br>Confirm</span>
+                                class="fas fa-2x fa-arrow-up"></i><br></span>
                         <span *ngIf="board.currentTeam !== 'white'"></span>
                     </button>
 
@@ -141,6 +141,15 @@
                             <p>takes </p>
                             <app-chess-piece style="position: relative; display: inline;" styleClass="small-piece"
                                              [piece]="move.target"></app-chess-piece>
+                        </div>
+
+                        <div class="d-flex flex-row justify-content-between w-100 animated fadeIn"
+                             *ngIf="move.type === 'pawnpromotion'">
+                            <app-chess-piece styleClass="small-piece" [piece]="move.actor"
+                                             style="position: relative; display: inline;"></app-chess-piece>
+
+                            <p>Promotion</p>
+
                         </div>
                     </div>
 
