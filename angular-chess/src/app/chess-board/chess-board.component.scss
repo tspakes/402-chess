@@ -85,3 +85,8 @@ tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd) {
   height: 400px;
   overflow-y: scroll;
 }
+
+.rotate {
+
+  transform: rotateY(180deg) rotateX(180deg);
+}
