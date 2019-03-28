@@ -146,6 +146,10 @@ export class Board { // Single state of the board
       }
     }
 
+    if (turnToApply != null) { // Temporarily apply turn to the board
+      // apply turn
+    }
+
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
         let piece = this.grid[y][x];
@@ -167,7 +171,31 @@ export class Board { // Single state of the board
               threatenedSpaces[y][x - 1] = true;
               threatenedSpaces[y - 1][x] = true;
               threatenedSpaces[y - 1][x - 1] = true;
-            } else { // None of the corners
+            } else if (y == 7) { // Top row
+              threatenedSpaces[y][x + 1] = true;
+              threatenedSpaces[y - 1][x] = true;
+              threatenedSpaces[y][x - 1] = true;
+              threatenedSpaces[y - 1][x + 1] = true;
+              threatenedSpaces[y - 1][x - 1] = true;
+            } else if (y == 0) { // Bottom row
+              threatenedSpaces[y][x + 1] = true;
+              threatenedSpaces[y][x - 1] = true;
+              threatenedSpaces[y + 1][x] = true;
+              threatenedSpaces[y + 1][x - 1] = true;
+              threatenedSpaces[y + 1][x + 1] = true;
+            } else if (x == 0) { // Left column
+              threatenedSpaces[y][x + 1] = true;
+              threatenedSpaces[y - 1][x] = true;
+              threatenedSpaces[y + 1][x] = true;
+              threatenedSpaces[y - 1][x + 1] = true;
+              threatenedSpaces[y + 1][x + 1] = true;
+            } else if (x == 7) { // Right column
+              threatenedSpaces[y - 1][x] = true;
+              threatenedSpaces[y][x - 1] = true;
+              threatenedSpaces[y + 1][x] = true;
+              threatenedSpaces[y - 1][x - 1] = true;
+              threatenedSpaces[y + 1][x - 1] = true;
+            } else { // None of the edges
               threatenedSpaces[y][x + 1] = true;
               threatenedSpaces[y - 1][x] = true;
               threatenedSpaces[y][x - 1] = true;
@@ -391,14 +419,13 @@ export class Board { // Single state of the board
         }
       }
     }
-    if (turnToApply == null) { // Pre-state
 
-    } else { // Post-state
-
+    if (turnToApply != null) { // Undo temporarily applied turn
+      // undo turn
     }
     return threatenedSpaces;
   }
-  
+
   /**
    * Remove the board's functions, getters, and setters in preparation for stringification. 
    */
