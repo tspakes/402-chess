@@ -119,7 +119,7 @@ export class Piece {
 		let threats = board.getThreatenedSpaces(t, turn); // Find which spaces the enemy team will threaten after the turn is applied
 		for (let y = 0; y < 8; y++) { // Find the current team's king and check for check
 			for (let x = 0; x < 8; x++) {
-				if (board.grid[y][x].type == 'king' && board.grid[y][x].team == this._team && threats[y][x] == true) {
+				if (board.grid[y][x] != null && board.grid[y][x].type == 'king' && board.grid[y][x].team == this._team && threats[y][x] == true) {
 					return false; // Current team's king put in check due to this move, therefore invalid
 				}
 			}
