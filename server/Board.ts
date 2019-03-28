@@ -130,6 +130,8 @@ export class Board { // Single state of the board
 
     // Update piece
     turn.actor.updatePosition(turn.x1, turn.y1);
+    if (turn.type === 'pawnpromotion')
+      turn.actor.demote();
     if (turn.meta.firstMove)
       turn.actor.hasMoved = false;
     if (turn.type === 'castle')
