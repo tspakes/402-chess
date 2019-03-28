@@ -109,6 +109,7 @@ export default class BoardAPI {
 					// Forget change if player put down a piece in the same cell it started in
 					State.reset();
 					this.zeroDelta();
+					this._boardRaw[change.y][change.x] = this._board.grid[change.y][change.x].minimize();
 				}
 				if (DEBUG) console.log(`state=${State.state}`);
 			}
