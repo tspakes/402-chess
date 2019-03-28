@@ -221,7 +221,6 @@ export class Piece {
 						else a++;
 						if (xminus) x--;
 						else x++;
-						console.log('testtest');
 					}
 				} else { // Invalid, xdiff and ydiff must be equal
 					return false;
