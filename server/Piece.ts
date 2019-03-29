@@ -1,5 +1,6 @@
 import { Board } from "./Board";
 import { Turn } from "./Turn";
+import BoardAPI from "./BoardAPI";
 
 export type PieceType = 'king'|'queen'|'bishop'|'knight'|'rook'|'pawn'|'unknown';
 export type Team = 'black'|'white'|'unknown';
@@ -359,6 +360,145 @@ export class Piece {
 		board.undoTurn(turn); // Undo the temporary turn
 
 		return true;
+	}
+
+	/**
+	 * Get all valid moves that the piece could make. 
+	 */
+	public getPossibleTurns(board: Board): Turn[] {
+		let turns: Turn[] = [];
+
+		/* Thoughts on moves explicity not covered: 
+		 * En passant will happen even when not possible, but fine since validity is checked later.
+		 * Pawn promotion will never affect the current turn, just the next turn. 
+		 * Cannot castle out of check
+		 * Can always move instead of castling
+		 */
+
+		// Calculate all theoretically possible moves
+		switch (this.type) {
+			case 'king': // Any direction, 1 cell
+				for (let y = Math.max(this.y-1, 0); y < Math.min(this.y+1, 8); y++)
+					for (let x = Math.max(this.x-1, 0); x < Math.min(this.x+1, 8); x++)
+						turns.push(Turn.newAndInit(this, x, y, board));
+				break;
+			case 'queen': // Any direction, 7 cells, stop at first occupied
+				// Right
+				for (let x = this.x+1; x <= 7; x++) {
+					turns.push(Turn.newAndInit(this, x, this.y, board));
+					if (board.grid[this.y][x] !== null)
+						break;
+				}
+				// Left
+				for (let x = this.x-1; x >= 0; x--) {
+					turns.push(Turn.newAndInit(this, x, this.y, board));
+					if (board.grid[this.y][x] !== null)
+						break;
+				}
+				// Up
+				for (let y = this.y+1; y <= 7; y++) {
+					turns.push(Turn.newAndInit(this, this.x, y, board));
+					if (board.grid[y][this.x] !== null)
+						break;
+				}
+				// Down
+				for (let y = this.y-1; y >= 0; y--) {
+					turns.push(Turn.newAndInit(this, this.x, y, board));
+					if (board.grid[y][this.x] !== null)
+						break;
+				}
+			case 'bishop': // Diagonal, 7 cells, stop at first occupied
+				// Up-right
+				for (let d = 1; d < 8; d++) {
+					if (this.x + d > 7 || this.y + d > 7)
+						break;
+					turns.push(Turn.newAndInit(this, this.x + d, this.y + d, board));
+					if (board.grid[this.y + d][this.x + d] !== null)
+						break;
+				}
+				// Down-right
+				for (let d = 1; d < 8; d++) {
+					if (this.x + d > 7 || this.y - d < 0)
+						break;
+					turns.push(Turn.newAndInit(this, this.x + d, this.y - d, board));
+					if (board.grid[this.y - d][this.x + d] !== null)
+						break;
+				}
+				// Up-left
+				for (let d = 1; d < 8; d++) {
+					if (this.x - d < 0 || this.y + d > 7)
+						break;
+					turns.push(Turn.newAndInit(this, this.x - d, this.y + d, board));
+					if (board.grid[this.y + d][this.x - d] !== null)
+						break;
+				}
+				// Down-left
+				for (let d = 1; d < 8; d++) {
+					if (this.x - d < 0 || this.y - d < 0)
+						break;
+					turns.push(Turn.newAndInit(this, this.x - d, this.y - d, board));
+					if (board.grid[this.y - d][this.x - d] !== null)
+						break;
+				}
+				break;
+			case 'rook': // Straight, 7 cells, stop at first occupied
+				// Right
+				for (let x = this.x+1; x <= 7; x++) {
+					turns.push(Turn.newAndInit(this, x, this.y, board));
+					if (board.grid[this.y][x] !== null)
+						break;
+				}
+				// Left
+				for (let x = this.x-1; x >= 0; x--) {
+					turns.push(Turn.newAndInit(this, x, this.y, board));
+					if (board.grid[this.y][x] !== null)
+						break;
+				}
+				// Up
+				for (let y = this.y+1; y <= 7; y++) {
+					turns.push(Turn.newAndInit(this, this.x, y, board));
+					if (board.grid[y][this.x] !== null)
+						break;
+				}
+				// Down
+				for (let y = this.y-1; y >= 0; y--) {
+					turns.push(Turn.newAndInit(this, this.x, y, board));
+					if (board.grid[y][this.x] !== null)
+						break;
+				}
+				break;
+			case 'knight': // L-shape
+				turns.push(Turn.newAndInit(this, this.x + 1, this.y + 2, board));
+				turns.push(Turn.newAndInit(this, this.x + 2, this.y + 1, board));
+				turns.push(Turn.newAndInit(this, this.x - 1, this.y + 2, board));
+				turns.push(Turn.newAndInit(this, this.x - 2, this.y + 1, board));
+				turns.push(Turn.newAndInit(this, this.x - 1, this.y - 2, board));
+				turns.push(Turn.newAndInit(this, this.x - 2, this.y - 1, board));
+				turns.push(Turn.newAndInit(this, this.x + 1, this.y - 2, board));
+				turns.push(Turn.newAndInit(this, this.x + 2, this.y - 1, board));
+				break;
+			case 'pawn': // Forward or diagonal, 1 cell
+				if (this.team === 'white') {
+					turns.push(Turn.newAndInit(this, this.x, this.y + 1, board));
+					turns.push(Turn.newAndInit(this, this.x, this.y + 2, board));
+					turns.push(Turn.newAndInit(this, this.x - 1, this.y + 1, board));
+					turns.push(Turn.newAndInit(this, this.x + 1, this.y + 1, board));
+				}
+				else if (this.team === 'black') {
+					turns.push(Turn.newAndInit(this, this.x, this.y - 1, board));
+					turns.push(Turn.newAndInit(this, this.x, this.y - 2, board));
+					turns.push(Turn.newAndInit(this, this.x - 1, this.y - 1, board));
+					turns.push(Turn.newAndInit(this, this.x + 1, this.y - 1, board));
+				}
+				break;
+		}
+
+		// Remove moves onto friendly pieces
+		for (let t = 0; t < turns.length; t++)
+			if (turns[t] === null || (turns[t].type === 'take' && turns[t].target.team === this.team) || !turns[t].isValid(board))
+				turns.splice(t--, 1);
+
+		return turns;
 	}
 
 	/**
