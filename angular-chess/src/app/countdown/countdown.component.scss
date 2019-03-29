@@ -1,0 +1,30 @@
+
+.counter-inline {
+
+  display: inline-block;
+}
+
+.countdown {
+
+  margin: 0 auto;
+  max-width: 300px;
+  color: lightgray;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  font-size: 20px;
+
+}
+
+.amount {
+
+  display: inline-block;
+}
+
+.classifier {
+}
+
+.time-left {
+  display: inline-block;
+}
+

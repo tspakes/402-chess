@@ -6,6 +6,7 @@
 *.js
 *.js.map
 !/www/**/*.js
+/log.txt
 
 /angular-chess/node_modules
 /.idea
