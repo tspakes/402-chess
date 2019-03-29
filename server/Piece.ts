@@ -353,118 +353,130 @@ export class Piece {
 		// Calculate all theoretically possible moves
 		switch (this.type) {
 			case 'king': // Any direction, 1 cell
-				for (let dy = -1; dy <= 1; dy++)
-					for (let dx = -1; dx <= 1; dx++)
-						moves.push({ x: dx, y: dy });
+				for (let y = Math.max(this.y-1, 0); y < Math.min(this.y+1, 8); y++)
+					for (let x = Math.max(this.x-1, 0); x < Math.min(this.x+1, 8); x++)
+						moves.push({ x: x, y: y });
 				break;
 			case 'queen': // Any direction, 7 cells, stop at first occupied
-				// Exact same check as rook
 				// Right
-				for (let dx = 1; dx < 8; dx++) {
-					moves.push({ x: dx, y: 0});
-					if (board.grid[this.y][this.x + dx] !== null)
+				for (let x = this.x+1; x <= 7; x++) {
+					moves.push({ x: x, y: this.y });
+					if (board.grid[this.y][x] !== null)
 						break;
 				}
 				// Left
-				for (let dx = 1; dx < 8; dx++) {
-					moves.push({ x: -dx, y: 0});
-					if (board.grid[this.y][this.x - dx] !== null)
+				for (let x = this.x-1; x >= 0; x--) {
+					moves.push({ x: x, y: this.y });
+					if (board.grid[this.y][x] !== null)
 						break;
 				}
 				// Up
-				for (let dy = 1; dy < 8; dy++) {
-					moves.push({ x: 0, y: dy});
-					if (board.grid[this.y + dy][this.x] !== null)
+				for (let y = this.y+1; y <= 7; y++) {
+					moves.push({ x: this.x, y: y });
+					if (board.grid[y][this.x] !== null)
 						break;
 				}
 				// Down
-				for (let dy = 1; dy < 8; dy++) {
-					moves.push({ x: 0, y: -dy});
-					if (board.grid[this.y - dy][this.x] !== null)
+				for (let y = this.y-1; y >= 0; y--) {
+					moves.push({ x: this.x, y: y });
+					if (board.grid[y][this.x] !== null)
 						break;
 				}
 			case 'bishop': // Diagonal, 7 cells, stop at first occupied
 				// Up-right
 				for (let d = 1; d < 8; d++) {
-					moves.push({ x: d, y: d});
+					if (this.x + d > 7 || this.y + d > 7)
+						break;
+					moves.push({ x: this.x + d, y: this.y + d});
 					if (board.grid[this.y + d][this.x + d] !== null)
 						break;
 				}
 				// Down-right
 				for (let d = 1; d < 8; d++) {
-					moves.push({ x: d, y: -d});
+					if (this.x + d > 7 || this.y - d < 0)
+						break;
+					moves.push({ x: this.x + d, y: this.y - d});
 					if (board.grid[this.y - d][this.x + d] !== null)
 						break;
 				}
 				// Up-left
 				for (let d = 1; d < 8; d++) {
-					moves.push({ x: -d, y: d});
+					if (this.x - d < 0 || this.y + d > 7)
+						break;
+					moves.push({ x: this.x - d, y: this.y + d});
 					if (board.grid[this.y + d][this.x - d] !== null)
 						break;
 				}
 				// Down-left
 				for (let d = 1; d < 8; d++) {
-					moves.push({ x: -d, y: -d});
+					if (this.x - d < 0 || this.y - d < 0)
+						break;
+					moves.push({ x: this.x - d, y: this.y - d});
 					if (board.grid[this.y - d][this.x - d] !== null)
 						break;
 				}
 				break;
 			case 'rook': // Straight, 7 cells, stop at first occupied
 				// Right
-				for (let dx = 1; dx < 8; dx++) {
-					moves.push({ x: dx, y: 0});
-					if (board.grid[this.y][this.x + dx] !== null)
+				for (let x = this.x+1; x <= 7; x++) {
+					moves.push({ x: x, y: this.y });
+					if (board.grid[this.y][x] !== null)
 						break;
 				}
 				// Left
-				for (let dx = 1; dx < 8; dx++) {
-					moves.push({ x: -dx, y: 0});
-					if (board.grid[this.y][this.x - dx] !== null)
+				for (let x = this.x-1; x >= 0; x--) {
+					moves.push({ x: x, y: this.y });
+					if (board.grid[this.y][x] !== null)
 						break;
 				}
 				// Up
-				for (let dy = 1; dy < 8; dy++) {
-					moves.push({ x: 0, y: dy});
-					if (board.grid[this.y + dy][this.x] !== null)
+				for (let y = this.y+1; y <= 7; y++) {
+					moves.push({ x: this.x, y: y });
+					if (board.grid[y][this.x] !== null)
 						break;
 				}
 				// Down
-				for (let dy = 1; dy < 8; dy++) {
-					moves.push({ x: 0, y: -dy});
-					if (board.grid[this.y - dy][this.x] !== null)
+				for (let y = this.y-1; y >= 0; y--) {
+					moves.push({ x: this.x, y: y });
+					if (board.grid[y][this.x] !== null)
 						break;
 				}
 				break;
 			case 'knight': // L-shape
-				moves.push({ x: 1, y: 2 });
-				moves.push({ x: 2, y: 1 });
-				moves.push({ x: -1, y: 2 });
-				moves.push({ x: -2, y: 1 });
-				moves.push({ x: -1, y: -2 });
-				moves.push({ x: -2, y: -1 });
-				moves.push({ x: 1, y: -2 });
-				moves.push({ x: 2, y: -1 });
+				moves.push({ x: this.x + 1, y: this.y + 2 });
+				moves.push({ x: this.x + 2, y: this.y + 1 });
+				moves.push({ x: this.x - 1, y: this.y + 2 });
+				moves.push({ x: this.x - 2, y: this.y + 1 });
+				moves.push({ x: this.x - 1, y: this.y - 2 });
+				moves.push({ x: this.x - 2, y: this.y - 1 });
+				moves.push({ x: this.x + 1, y: this.y - 2 });
+				moves.push({ x: this.x + 2, y: this.y - 1 });
 				break;
-			case 'pawn': // Forward, 1 cell (NOTE different from threat)
-				if (this.team === 'white')
-					moves.push({ x: 0, y: 1 });
-				else if (this.team === 'black')
-					moves.push({ x: 0, y: -1 });
+			case 'pawn': // Forward or diagonal, 1 cell
+				if (this.team === 'white') {
+					moves.push({ x: this.x, y: this.y + 1 });
+					if (board.grid[this.y+1][this.x-1] !== null)
+						moves.push({ x: this.x - 1, y: this.y + 1 });
+					if (board.grid[this.y+1][this.x+1] !== null)
+						moves.push({ x: this.x + 1, y: this.y + 1 });
+				}
+				else if (this.team === 'black') {
+					moves.push({ x: this.x, y: this.y - 1 });
+					if (board.grid[this.y-1][this.x-1] !== null)
+						moves.push({ x: this.x - 1, y: this.y - 1 });
+					if (board.grid[this.y-1][this.x+1] !== null)
+						moves.push({ x: this.x + 1, y: this.y - 1 });
+				}
 				break;
 		}
 
-		for (let m = 0; m < moves.length; m++) {
-			// Change deltas to actual locations
-			moves[m].x += this.x;
-			moves[m].y += this.y;
-
-			// Remove out-of-bounds moves and moves onto friendly pieces
+		// Remove moves onto friendly pieces
+		for (let m = 0; m < moves.length; m++)
 			if (moves[m].x < 0 || moves[m].y < 0
-					|| moves[m].x > 7 || moves[m].y > 7
-					|| (board.grid[moves[m].y][moves[m].x] !== null
-						&& board.grid[moves[m].y][moves[m].x].team === this.team))
+				|| moves[m].x > 7 || moves[m].y > 7
+				|| (board.grid[moves[m].y][moves[m].x] !== null
+					&& board.grid[moves[m].y][moves[m].x].team === this.team))
 				moves.splice(m--, 1);
-		}
 
 		return moves;
 	}
