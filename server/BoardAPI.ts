@@ -349,20 +349,32 @@ export default class BoardAPI {
 
 	private static isCheck(): CheckType {
 		let check: CheckType = '';
+		let movePossible: boolean = false;
+		let checkEscapePossible: boolean = false;
 
 		// Check
 		let king = this._board.getMatchingPieces(this._teamCurrent, [ 'king' ])[0];
 		console.log(king);
 		if (this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent))[king.y][king.x])
 			check = 'check';
+		else
+			checkEscapePossible = true; // Bc wasn't even in check
 
-		// Checkmate
-		// For every piece, check every possible turn, check threatened with possible turn?
+		// Checkmate and stalemate detection (very slow)
+		possibleMoveLoop:
 		for (let p of this._board.getMatchingPieces(this._teamCurrent))
-			for (let m of p.getPossibleMoves(this._board))
-				console.log(m);
+			for (let t of p.getPossibleTurns(this._board)) {
+				movePossible = true;
+				if (check !== 'check' || !this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent), t)[king.y][king.x])
+					checkEscapePossible = true;
+				if (checkEscapePossible)
+					break possibleMoveLoop;
+			}
 
-		// Stalemate
+		// Classify checkmate and stalemate
+		// Stalemate will never occur. Bad logic somewhere. 
+		if (!checkEscapePossible) check = 'checkmate';
+		else if (!movePossible) check = 'stalemate';
 
 		return check;
 	}

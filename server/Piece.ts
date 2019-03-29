@@ -345,7 +345,7 @@ export class Piece {
 		}
 	}
 
-	public getPossibleMoves(board: Board): Move[] {
+	public getPossibleTurns(board: Board): Turn[] {
 		let moves: Move[] = [];
 
 		// TODO Castling, en passant, pawn promotion (don't have to pick piece type)
