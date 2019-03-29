@@ -117,6 +117,8 @@ export class Board { // Single state of the board
 
     // Update piece
     turn.actor.updatePosition(turn.x2, turn.y2);
+    if (!turn.actor.hasMoved)
+      turn.meta.firstMove = true;
     turn.actor.hasMoved = true;
     if (turn.type === 'castle')
       turn.actor2.updatePosition(turn.x4, turn.y4);

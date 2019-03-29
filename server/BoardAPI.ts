@@ -354,8 +354,10 @@ export default class BoardAPI {
 
 		// Check
 		let king = this._board.getMatchingPieces(this._teamCurrent, [ 'king' ])[0];
-		console.log(king);
-		BoardAPI.printGrid(this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent)));
+		if (DEBUG) {
+			console.log(Chalk.gray('  ==[') + Chalk.white(' Threat ') + Chalk.gray(']==='));
+			BoardAPI.printGrid(this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent)));
+		}
 		if (this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent))[king.y][king.x])
 			check = 'check';
 		else
@@ -417,8 +419,9 @@ export default class BoardAPI {
 
 	private static printGrid(grid: boolean[][]): void {
 		let line: string;
+		console.log(Chalk.gray('  A B C D E F G H'));
 		for (let r = 7; r >= 0; r--) {
-			line = '';
+			line = Chalk.gray(`${r + 1} `);
 			for (let c = 0; c < 8; c++)
 				line += grid[r][c] ? Chalk.white('1 ') : Chalk.gray('0 ');
 			console.log(line);
