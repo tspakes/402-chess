@@ -18,7 +18,7 @@ export class PlayComponent implements OnInit {
 
     public board: IBoardModel;
 
-    public date = moment().add('30', 'seconds');
+    public date = moment();
 
     constructor(public store: Store<IAppState>) {
     }
@@ -27,7 +27,7 @@ export class PlayComponent implements OnInit {
 
     public updateTeam(team) {
         this.currentTeam = team;
-        this.date = moment().add('31', 'seconds');
+        this.date = moment();
     }
 
     ngOnInit() {

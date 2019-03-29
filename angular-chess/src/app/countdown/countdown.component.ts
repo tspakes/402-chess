@@ -18,6 +18,7 @@ export class CountdownComponent implements OnInit, OnDestroy {
     @Output() expired = new EventEmitter<any>();
     @Input() startingDate: any;
     @Input() endingDate: any = null;
+    @Input() countUp: any = null;
     isExpired = false;
 
     constructor() {
@@ -37,22 +38,18 @@ export class CountdownComponent implements OnInit, OnDestroy {
             }
 
             // Find the distance between now and the count down date
-            const distance = moment.duration(moment.utc(this.startingDate).diff(now));
+            const distance = moment.duration(now.diff(moment.utc(this.startingDate)));
 
             // Time calculations for days, hours, minutes and seconds
-            this.days = distance.days();
-            this.hours = distance.hours();
-            this.minutes = distance.minutes();
-            this.seconds = distance.seconds();
+            this.days = Math.abs(distance.days());
+            this.hours =  Math.abs(distance.hours());
+            this.minutes =  Math.abs(distance.minutes());
+            this.seconds =  Math.abs(distance.seconds());
 
 
-            if (distance.asMilliseconds() < 0) {
-                this.isExpired = true;
-                clearInterval(this.countdownInterval);
-                this.expired.emit();
-            }
 
-        }, 0);
+
+        }, 1000);
 
     }
 
