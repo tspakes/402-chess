@@ -1,0 +1,24 @@
+<div>
+
+    <ng-template [ngIf]="!isExpired">
+        <ng-template [ngIf]="days > 0" class="amount">
+            <h3 class="time-left">{{days}}d.</h3>
+            &nbsp;
+        </ng-template>
+        <ng-template [ngIf]="hours > 0 || days > 0" class="amount">
+            <h3 class="time-left">{{hours}}h.</h3>
+            &nbsp;
+        </ng-template>
+        <ng-template [ngIf]="minutes > 0 || hours > 0" class="amount">
+            <h3 class="time-left">{{minutes}}m.</h3>
+        </ng-template>
+        <ng-template [ngIf]="true" class="amount">
+            <h3 class="time-left">{{seconds}}s</h3>
+        </ng-template>
+    </ng-template>
+
+    <h3 *ngIf="isExpired">
+
+    </h3>
+
+</div>

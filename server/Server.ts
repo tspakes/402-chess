@@ -224,6 +224,11 @@ class Server {
 				console.log(Chalk.blueBright(req.url));
 			next();
 		});
+
+		this.app.get('*', function(req, res, next) {
+			//Path to your main file
+			res.status(200).sendFile(Path.join(__dirname, '../www/index.html'));
+		});
 	}
 }
 
