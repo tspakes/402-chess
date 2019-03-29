@@ -103,8 +103,8 @@ export class Piece {
 
 	public isTurnValid(turn: Turn, board: Board): boolean {
 		// Pawns are the x-axis
-
-		// TODO Make this abstract and have each piece implement this function
+		
+		// Make this abstract and have each piece implement this function
 		// For example, rook's would check that either xi==xf or yi==yf, then check that all spaces along that axis of movement are unoccupied
 		// OR, a big, ugly switch statement
 		// Three main checks:
@@ -120,22 +120,10 @@ export class Piece {
 		if (t == 'white') t = 'black'; // Find the which is the enemy team
 		else t = 'white';
 
-		board.applyTurn(turn); // Temporarily applying the turn
-		let threats = board.getThreatenedSpaces(t); // Find which spaces the enemy team will threaten after the turn is applied
-		for (let y = 0; y < 8; y++) { // Find the current team's king and check for check
-			for (let x = 0; x < 8; x++) {
-				if (board.grid[y][x] != null && board.grid[y][x].type == 'king' && board.grid[y][x].team == turn.actor.team && threats[y][x] == true) {
-					
-					board.undoTurn(turn); // Undo the turn before erroring
-					return false; // Current team's king put in check due to this move, therefore invalid
-				}
-			}
-		}
-		board.undoTurn(turn); // Undo the temporary turn
-
 		let xdiff = Math.abs(turn.x2 - turn.x1);
 		let ydiff = Math.abs(turn.y2 - turn.y1);
 		let a: number, b: number, x: number, y: number;
+		let threats: boolean[][] = []; // For finding threatened spaces later
 		switch (turn.actor.type) {
 			/* KING KING KING KING KING KING */
 			case 'king':
@@ -155,6 +143,8 @@ export class Piece {
 						} else {
 							a = turn.x1 - 1; // Left
 						}
+
+						threats = board.getThreatenedSpaces(t); // Find which spaces the enemy team will threaten after the turn is applied
 
 						if (turn.actor.hasMoved == true || turn.actor2 == null || turn.actor2.hasMoved == true || turn.actor2.type != 'rook' || turn.type != 'castle') return false; // King or rook has moved or rook didn't move, cannot castle
 						else if (threats[turn.y1][turn.x1] == true) return false; // King is in check, cannot castle
@@ -184,10 +174,10 @@ export class Piece {
 						} else { // Rook must move either 2 or 3 during a castling move
 							return false;
 						}
-						return true;
+						break;
 					}
 				} else { // Should be normal move, can't have pieces in the way, as this is a one-square move
-					return true;
+					break;
 				}
 			/* END KING */
 			/* QUEEN QUEEN QUEEN QUEEN QUEEN QUEEN */
@@ -247,7 +237,7 @@ export class Piece {
 				} else { // Invalid, xdiff and ydiff must equal or one must be 0
 					return false;
 				}
-				return true;
+				break;
 			/* END QUEEN */
 			/* BISHOP BISHOP BISHOP BISHOP BISHOP BISHOP */
 			case 'bishop':
@@ -280,12 +270,12 @@ export class Piece {
 				} else { // Invalid, xdiff and ydiff must be equal
 					return false;
 				}
-				return true;
+				break;
 			/* END BISHOP */
 			/* KNIGHT KNIGHT KNIGHT KNIGHT KNIGHT KNIGHT */
 			case 'knight':
 				if (xdiff == 2 && ydiff == 1 || xdiff == 1 && ydiff == 2) { // L move
-					return true;
+					break;
 				} else { // Not an L move
 					return false;
 				}
@@ -321,20 +311,20 @@ export class Piece {
 				} else { // Invalid, either xdiff or ydiff must be 0
 					return false;
 				}
-				return true;
+				break;
 			/* END ROOK */
 			/* PAWN PAWN PAWN PAWN PAWN PAWN */
 			case 'pawn':
 				let pawnMovement = turn.y2 - turn.y1;
 				if (xdiff == 1 && ydiff == 1) { // Pawn diagonal attack
-					if (turn.type === 'enpassant' || turn.type === 'take') return true;
+					if (turn.type === 'enpassant' || turn.type === 'take') break;
 					else return false;
 				} else if (ydiff == 1 && xdiff == 0) { // Pawn single move
 					if (turn.actor.team == 'white' && (pawnMovement < 1) || turn.actor.team == 'black' && (pawnMovement > -1)) {
 						return false; // Pawn moving backwards
 					} else if (board.grid[turn.y2][turn.x2] != null) {
 						return false; // Piece in the way at pawn destination
-					} else return true; // Valid single move
+					} else break; // Valid single move
 				} else if (ydiff == 2 && xdiff == 0 && this.hasMoved == false) { // Pawn double move allowed if it hasn't moved
 					if (board.grid[turn.y2][turn.x2] != null) return false; // Piece in the way at pawn destination
 					if (turn.actor.team == 'white') {
@@ -343,7 +333,7 @@ export class Piece {
 						y = turn.y1 - 1; // Black team pawn double move transition space
 					}
 					if (board.grid[y][turn.x2] != null) return false; // Obstruction check for pawn double move transition space
-					else return true; // Valid double move
+					else break; // Valid double move
 				} else {
 					return false;
 				}
@@ -353,6 +343,22 @@ export class Piece {
 			default:
 				return false;
 		}
+
+		board.applyTurn(turn); // Temporarily applying the turn
+		if (threats.length == 0) {
+			threats = board.getThreatenedSpaces(t); // Find which spaces the enemy team will threaten after the turn is applied
+		}
+		for (let y = 0; y < 8; y++) { // Find the current team's king and check for check
+			for (let x = 0; x < 8; x++) {
+				if (board.grid[y][x] != null && board.grid[y][x].type == 'king' && board.grid[y][x].team == turn.actor.team && threats[y][x] == true) {
+					board.undoTurn(turn); // Undo the turn before erroring
+					return false; // Current team's king put in check due to this move, therefore invalid
+				}
+			}
+		}
+		board.undoTurn(turn); // Undo the temporary turn
+
+		return true;
 	}
 
 	/**
