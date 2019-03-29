@@ -37,6 +37,17 @@ export class Board { // Single state of the board
     return list;
   }
 
+  public getMatchingPieces(team: Team, types: PieceType[] = []): Piece[] {
+    let ret: Piece[] = [];
+    for (let p of this.pieces) {
+      if (p === null) continue;
+      if (types.length === 0) ret.push(p);
+      else for (let t of types)
+        if (p.type === t) ret.push(p);
+    }
+    return ret;
+  }
+
   /**
    * Set up the board with all 32 pieces in their starting positions. 
    */

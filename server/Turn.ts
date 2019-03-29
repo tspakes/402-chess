@@ -2,6 +2,7 @@ import { Piece, PieceType, PieceSerialized } from "./Piece";
 import { Board } from "./Board";
 
 export type TurnType = 'move'|'take'|'castle'|'enpassant'|'pawnpromotion'|'invalid';
+export type CheckType = ''|'check'|'checkmate'|'stalemate';
 
 export class Turn {
   public type: TurnType;
@@ -20,7 +21,7 @@ export class Turn {
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
 
   public promotion: PieceType;
-  public check: ''|'check'|'checkmate' = '';
+  public check: CheckType = '';
   public meta: any = {}; // Pawn double move, castle side
 
   // All of this is to maintain the positions apart from the references as the pieces will change over time
@@ -108,6 +109,7 @@ export class Turn {
       y2: this.y2,
       actor: this.actor.serialize(),
       target: this.target ? this.target.serialize() : null,
+      check: this.check,
       promotion: this.promotion,
       notation: this.notation,
       meta: this.meta
@@ -123,6 +125,7 @@ export interface TurnSerialized {
   y2: number;
   actor: PieceSerialized;
   target: PieceSerialized;
+  check: CheckType;
   promotion: string;
   notation: string;
   meta: {};

@@ -1,5 +1,6 @@
 import { Board } from "./Board";
 import { Turn } from "./Turn";
+import BoardAPI from "./BoardAPI";
 
 export type PieceType = 'king'|'queen'|'bishop'|'knight'|'rook'|'pawn'|'unknown';
 export type Team = 'black'|'white'|'unknown';
@@ -125,7 +126,7 @@ export class Piece {
 		for (let y = 0; y < 8; y++) { // Find the current team's king and check for check
 			for (let x = 0; x < 8; x++) {
 				if (board.grid[y][x] != null && board.grid[y][x].type == 'king' && board.grid[y][x].team == turn.actor.team && threats[y][x] == true) {
-					console.log('King put into Check.')
+					BoardAPI.errorDesc = 'Cannot move king into check.';
 					board.undoTurn(turn); // Undo the turn before erroring
 					return false; // Current team's king put in check due to this move, therefore invalid
 				}
@@ -344,6 +345,130 @@ export class Piece {
 		}
 	}
 
+	public getPossibleMoves(board: Board): Move[] {
+		let moves: Move[] = [];
+
+		// TODO Castling, en passant, pawn promotion (don't have to pick piece type)
+
+		// Calculate all theoretically possible moves
+		switch (this.type) {
+			case 'king': // Any direction, 1 cell
+				for (let dy = -1; dy <= 1; dy++)
+					for (let dx = -1; dx <= 1; dx++)
+						moves.push({ x: dx, y: dy });
+				break;
+			case 'queen': // Any direction, 7 cells, stop at first occupied
+				// Exact same check as rook
+				// Right
+				for (let dx = 1; dx < 8; dx++) {
+					moves.push({ x: dx, y: 0});
+					if (board.grid[this.y][this.x + dx] !== null)
+						break;
+				}
+				// Left
+				for (let dx = 1; dx < 8; dx++) {
+					moves.push({ x: -dx, y: 0});
+					if (board.grid[this.y][this.x - dx] !== null)
+						break;
+				}
+				// Up
+				for (let dy = 1; dy < 8; dy++) {
+					moves.push({ x: 0, y: dy});
+					if (board.grid[this.y + dy][this.x] !== null)
+						break;
+				}
+				// Down
+				for (let dy = 1; dy < 8; dy++) {
+					moves.push({ x: 0, y: -dy});
+					if (board.grid[this.y - dy][this.x] !== null)
+						break;
+				}
+			case 'bishop': // Diagonal, 7 cells, stop at first occupied
+				// Up-right
+				for (let d = 1; d < 8; d++) {
+					moves.push({ x: d, y: d});
+					if (board.grid[this.y + d][this.x + d] !== null)
+						break;
+				}
+				// Down-right
+				for (let d = 1; d < 8; d++) {
+					moves.push({ x: d, y: -d});
+					if (board.grid[this.y - d][this.x + d] !== null)
+						break;
+				}
+				// Up-left
+				for (let d = 1; d < 8; d++) {
+					moves.push({ x: -d, y: d});
+					if (board.grid[this.y + d][this.x - d] !== null)
+						break;
+				}
+				// Down-left
+				for (let d = 1; d < 8; d++) {
+					moves.push({ x: -d, y: -d});
+					if (board.grid[this.y - d][this.x - d] !== null)
+						break;
+				}
+				break;
+			case 'rook': // Straight, 7 cells, stop at first occupied
+				// Right
+				for (let dx = 1; dx < 8; dx++) {
+					moves.push({ x: dx, y: 0});
+					if (board.grid[this.y][this.x + dx] !== null)
+						break;
+				}
+				// Left
+				for (let dx = 1; dx < 8; dx++) {
+					moves.push({ x: -dx, y: 0});
+					if (board.grid[this.y][this.x - dx] !== null)
+						break;
+				}
+				// Up
+				for (let dy = 1; dy < 8; dy++) {
+					moves.push({ x: 0, y: dy});
+					if (board.grid[this.y + dy][this.x] !== null)
+						break;
+				}
+				// Down
+				for (let dy = 1; dy < 8; dy++) {
+					moves.push({ x: 0, y: -dy});
+					if (board.grid[this.y - dy][this.x] !== null)
+						break;
+				}
+				break;
+			case 'knight': // L-shape
+				moves.push({ x: 1, y: 2 });
+				moves.push({ x: 2, y: 1 });
+				moves.push({ x: -1, y: 2 });
+				moves.push({ x: -2, y: 1 });
+				moves.push({ x: -1, y: -2 });
+				moves.push({ x: -2, y: -1 });
+				moves.push({ x: 1, y: -2 });
+				moves.push({ x: 2, y: -1 });
+				break;
+			case 'pawn': // Forward, 1 cell (NOTE different from threat)
+				if (this.team === 'white')
+					moves.push({ x: 0, y: 1 });
+				else if (this.team === 'black')
+					moves.push({ x: 0, y: -1 });
+				break;
+		}
+
+		for (let m = 0; m < moves.length; m++) {
+			// Change deltas to actual locations
+			moves[m].x += this.x;
+			moves[m].y += this.y;
+
+			// Remove out-of-bounds moves and moves onto friendly pieces
+			if (moves[m].x < 0 || moves[m].y < 0
+					|| moves[m].x > 7 || moves[m].y > 7
+					|| (board.grid[moves[m].y][moves[m].x] !== null
+						&& board.grid[moves[m].y][moves[m].x].team === this.team))
+				moves.splice(m--, 1);
+		}
+
+		return moves;
+	}
+
 	/**
 	 * Remove the piece's functions, getters, and setters in preparation for stringification.
 	 */
@@ -366,6 +491,11 @@ export class Piece {
 			team: this.team
 		};
 	}
+}
+
+interface Move {
+	x: number;
+	y: number;
 }
 
 export interface PieceSerialized {
