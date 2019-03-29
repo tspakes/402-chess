@@ -93,7 +93,7 @@ export class Turn {
     valid = this.actor.isTurnValid(this, board);
     if (this.type === 'pawnpromotion')
       this.actor.promote(this.promotion);
-
+      
     return valid;
 	}
   

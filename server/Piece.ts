@@ -125,7 +125,7 @@ export class Piece {
 		for (let y = 0; y < 8; y++) { // Find the current team's king and check for check
 			for (let x = 0; x < 8; x++) {
 				if (board.grid[y][x] != null && board.grid[y][x].type == 'king' && board.grid[y][x].team == turn.actor.team && threats[y][x] == true) {
-					console.log('King put into Check.')
+					
 					board.undoTurn(turn); // Undo the turn before erroring
 					return false; // Current team's king put in check due to this move, therefore invalid
 				}
@@ -156,11 +156,35 @@ export class Piece {
 							a = turn.x1 - 1; // Left
 						}
 
-						if (turn.actor.hasMoved == true || turn.actor2 == null || turn.actor2.hasMoved == true) return false; // King or rook has moved or rook didn't move, cannot castle
+						if (turn.actor.hasMoved == true || turn.actor2 == null || turn.actor2.hasMoved == true || turn.actor2.type != 'rook' || turn.type != 'castle') return false; // King or rook has moved or rook didn't move, cannot castle
 						else if (threats[turn.y1][turn.x1] == true) return false; // King is in check, cannot castle
 						else if (threats[turn.y1][turn.x2] == true) return false; // King's destination is threatened, cannot castle
 						else if (threats[turn.y1][a] == true) return false; // King's transition space is threatened, cannot castle
-						else return true;
+
+						let xdiff2 = Math.abs(turn.x4 - turn.x3);
+						let ydiff2 = Math.abs(turn.y4 - turn.y3);
+						if (xdiff2 == 2) { // King-side castle
+							if (turn.x3 != 7) return false; // Rook not in position for King-side castle
+							a = turn.x3 - 1;
+							b = turn.x4;
+							let y = turn.y3;
+							while (a > b) { // Check spaces between source and destination
+								if (board.grid[y][a] != null) return false; // Piece in the way
+								a--; // Move toward destination/source
+							}
+						} else if (xdiff2 == 3) { // Queen-side castle
+							if (turn.x3 != 0) return false; // Rook not in position for Queen-side castle
+							a = turn.x3 + 1;
+							b = turn.x4;
+							let y = turn.y3;
+							while (a < b) { // Check spaces between source and destination
+								if (board.grid[y][a] != null) return false; // Piece in the way
+								a++; // Move toward destination/source
+							}
+						} else { // Rook must move either 2 or 3 during a castling move
+							return false;
+						}
+						return true;
 					}
 				} else { // Should be normal move, can't have pieces in the way, as this is a one-square move
 					return true;
