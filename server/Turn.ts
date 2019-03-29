@@ -79,9 +79,28 @@ export class Turn {
     return not;
   }
 
+  /**
+   * Create and partially initialize a turn object. Does not fully qualify or validate the turn.
+   * @returns Partially initialized Turn object
+   */
+  public static newAndInit(actor: Piece, x2: number, y2: number, board: Board): Turn {
+    if (x2 < 0 || x2 > 7 || y2 < 0 || y2 > 7)
+      return null;
+    let t = new Turn();
+    t.actor = actor;
+    t.x2 = x2;
+    t.y2 = y2;
+    t.type = 'move';
+    if (board.grid[y2][x2] !== null) {
+      t.target = board.grid[y2][x2];
+      t.type = 'take';
+    }
+    return t;
+  }
+
 	public isValid(board: Board): boolean {
     if (this.type == 'enpassant' && this.target != board.lastTurn.actor && board.lastTurn.meta.doublepawn != true)
-      return false; // Attempted invalid enpassant 
+      return false; // Attempted invalid enpassant
     // TODO This should handle castling while Piece.isTurnValid() just checks that each piece moved in a valid way
     //      For castling, check that both king and rook castled to the same side
     // TODO Need to check that this.actor2.isTurnValid() as well, but it'll need to use a different x and y, so maybe pass in the x and y instead?

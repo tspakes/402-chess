@@ -349,12 +349,13 @@ export default class BoardAPI {
 
 	private static isCheck(): CheckType {
 		let check: CheckType = '';
-		let movePossible: boolean = false;
+		let movesPossible: boolean = false;
 		let checkEscapePossible: boolean = false;
 
 		// Check
 		let king = this._board.getMatchingPieces(this._teamCurrent, [ 'king' ])[0];
 		console.log(king);
+		BoardAPI.printGrid(this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent)));
 		if (this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent))[king.y][king.x])
 			check = 'check';
 		else
@@ -364,17 +365,19 @@ export default class BoardAPI {
 		possibleMoveLoop:
 		for (let p of this._board.getMatchingPieces(this._teamCurrent))
 			for (let t of p.getPossibleTurns(this._board)) {
-				movePossible = true;
-				if (check !== 'check' || !this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent), t)[king.y][king.x])
+				movesPossible = true;
+				if (!checkEscapePossible || !this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent), t)[king.y][king.x])
 					checkEscapePossible = true;
 				if (checkEscapePossible)
 					break possibleMoveLoop;
 			}
 
 		// Classify checkmate and stalemate
-		// Stalemate will never occur. Bad logic somewhere. 
 		if (!checkEscapePossible) check = 'checkmate';
-		else if (!movePossible) check = 'stalemate';
+		else if (!movesPossible) check = 'stalemate';
+
+		if (check !== '')
+			console.log(`${check.substr(0, 1).toUpperCase()}${check.substr(1)} detected.`);
 
 		return check;
 	}
@@ -409,6 +412,16 @@ export default class BoardAPI {
             lines[l] += Chalk.gray('0 ');
 			}
 			console.log(lines[l]);
+		}
+	}
+
+	private static printGrid(grid: boolean[][]): void {
+		let line: string;
+		for (let r = 7; r >= 0; r--) {
+			line = '';
+			for (let c = 0; c < 8; c++)
+				line += grid[r][c] ? Chalk.white('1 ') : Chalk.gray('0 ');
+			console.log(line);
 		}
 	}
 
