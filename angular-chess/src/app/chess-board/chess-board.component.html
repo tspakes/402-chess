@@ -120,10 +120,10 @@
         </div>
         <div class="col-auto">
 
-            <div class="card shadow-sm h-500">
+            <div class="card shadow-sm h-500" [ngClass]="{'rotate': flip}">
                 <div class="card-header text-center">
 
-                    <h5>Move History</h5>
+                    <h5 (click)="flip = !flip">Move History</h5>
 
                 </div>
                 <div class="card-body history-body" #history>

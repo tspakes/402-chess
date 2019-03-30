@@ -19,6 +19,8 @@ export class ChessBoardComponent {
     public pieces: IPieceModel[] = [];
     private grid: IPieceModel[] = [];
 
+    public flip = false;
+    
     @ViewChild('history') historyRef: ElementRef;
 
     modalRef: BsModalRef;
