@@ -16,6 +16,8 @@ export class Turn {
   public x4: number = -1; // Actor2 final
   public y4: number = -1;
 
+  private _notation: string = '';
+
   private _actor: Piece = null; // Piece moving
   private _actor2: Piece = null; // Only used for castling
   public target: Piece = null; // Used in take, enpassant, and pawnpromotion
@@ -47,7 +49,48 @@ export class Turn {
    * @see https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
 	 */
 	public get notation(): string {
+    return this._notation;
+  }
+
+  public generateNotation(board: Board): void {
     let not: string = '';
+
+    // TODO Actor disambiguation
+
+    // Get all pieces of matching type to current piece
+    // For each of those pieces, get all possible moves - will give turn objects
+    // If any of those turns have identical x2, y2 s, add to an array
+    // Break the inner loop to go to the next piece
+    // Outside of the loops, look at the pieces in that array and find the distinct movement vector (x or y)
+    //  differing col, two bishops: B3e5
+
+    // Actor disambiguation
+    let piecesOfSameType = board.getMatchingPieces(this.actor.team, [this.actor.type])
+
+    let turns: Turn[] = [];
+    let conflictTurn: Turn;
+    conflictCheck:
+    for (let a = 0; a < piecesOfSameType.length; a++) {
+      turns = piecesOfSameType[a].getPossibleTurns(board);
+      for (let b = 0; b < turns.length; b++) {
+        if (this.x2 == turns[b].x2 && this.y2 == turns[b].y2)
+          conflictTurn = turns[b];
+          break conflictCheck;
+      }
+    }
+
+    if (conflictTurn !== undefined) {
+      let rowOrCol: string;
+      if (this.x1 == conflictTurn.x1) { // Same column
+        rowOrCol = String(this.y1 + 1);
+      } else { // Same row
+        rowOrCol = Piece.colToLetter(this.x1);
+      }
+      not = this.actor.notation + rowOrCol;
+    } else {
+      not = this.actor.notation;
+    }
+
 
     // Base notation
     switch (this.type) {
@@ -55,18 +98,17 @@ export class Turn {
         not = this.meta.kingside ? 'O-O' : 'O-O-O';
         break;
       case 'take': // Include type, source, x, and destination
-        not = 'x' + Piece.colToLetter(this.x2) + (this.y2 + 1);
+        not = not + 'x' + Piece.colToLetter(this.x2) + (this.y2 + 1);
+        break;
       case 'enpassant': // Include file of departure
-        not = Piece.colToLetter(this.x1) + not;
+        not = Piece.colToLetter(this.x1) + 'x' + Piece.colToLetter(this.x2) + (this.y2 + 1) + 'e.p.';
         break;
       case 'pawnpromotion':
-        not += Piece.colToLetter(this.x2) + (this.y2 + 1) + '=' + Piece.notationFromType(this.promotion);
+        not = not + Piece.colToLetter(this.x2) + (this.y2 + 1) + '=' + Piece.notationFromType(this.promotion);
         break;
       default:
-        not = Piece.colToLetter(this.x2) + (this.y2 + 1);
+        not = not + Piece.colToLetter(this.x2) + (this.y2 + 1);
     }
-
-    // TODO Actor disambiguation
 
     // Prefixes
     if (this.type === 'take' || this.type === 'enpassant') not = this.actor.notation + not;
@@ -76,7 +118,7 @@ export class Turn {
     if (this.check === 'check') not += '+';
     if (this.check === 'checkmate') not += '++';
 
-    return not;
+    this._notation = not;
   }
 
   /**

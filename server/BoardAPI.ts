@@ -161,7 +161,7 @@ export default class BoardAPI {
 		this._board.applyTurn(this._pendingTurn);
 		this.switchTeam();
 
-		console.log('Committed turn.');
+		console.log(`Committed ${this._pendingTurn.notation}.`);
 		this._turnCommitQueued = false;
 		this.zeroDelta();
 		this._history.push(this._pendingTurn);
@@ -344,6 +344,7 @@ export default class BoardAPI {
 		if (!turn.actor.hasMoved)
 			turn.meta.firstMove = true;
 		
+		turn.generateNotation(this._board);
 		return turn;
 	}
 
