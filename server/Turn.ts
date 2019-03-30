@@ -52,7 +52,7 @@ export class Turn {
     return this._notation;
   }
 
-  public generateNotation(board: Board): void {
+  public generateNotation(board: Board): string {
     let not: string = '';
 
     // Get all pieces of matching type to current piece
@@ -109,12 +109,18 @@ export class Turn {
         not = not + Piece.colToLetter(this.x2) + (this.y2 + 1);
     }
 
-    // Suffixes
-    if (this.check === 'check') not += '+';
-    if (this.check === 'checkmate') not += '++';
-    if (this.check === 'stalemate') not += '+++';
-
     this._notation = not;
+    return not;
+  }
+
+  /**
+   * Add check, checkmate, and stalemate suffixes. 
+   */
+  public updateNotation(): void {
+    if (this._notation.indexOf('+') !== -1) return;
+    if (this.check === 'check') this._notation += '+';
+    if (this.check === 'checkmate') this._notation += '++';
+    if (this.check === 'stalemate') this._notation += '+++';
   }
 
   /**

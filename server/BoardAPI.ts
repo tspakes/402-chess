@@ -161,12 +161,13 @@ export default class BoardAPI {
 		this._board.applyTurn(this._pendingTurn);
 		this.switchTeam();
 
-		console.log(`Committed ${this._pendingTurn.notation}.`);
 		this._turnCommitQueued = false;
 		this.zeroDelta();
 		this._history.push(this._pendingTurn);
 		this._boardRaw = this._board.minimize();
 		this._pendingTurn.check = this.isCheck();
+		this._pendingTurn.updateNotation();
+		console.log(`Committed ${this._pendingTurn.notation}.`);
 		this._pendingTurn = null;
 	}
 

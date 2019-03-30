@@ -378,8 +378,8 @@ export class Piece {
 		// Calculate all theoretically possible moves
 		switch (this.type) {
 			case 'king': // Any direction, 1 cell
-				for (let y = Math.max(this.y-1, 0); y < Math.min(this.y+1, 8); y++)
-					for (let x = Math.max(this.x-1, 0); x < Math.min(this.x+1, 8); x++)
+				for (let y = Math.max(this.y-1, 0); y <= Math.min(this.y+1, 7); y++)
+					for (let x = Math.max(this.x-1, 0); x <= Math.min(this.x+1, 7); x++)
 						turns.push(Turn.newAndInit(this, x, y, board));
 				break;
 			case 'queen': // Any direction, 7 cells, stop at first occupied
