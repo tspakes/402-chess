@@ -55,34 +55,33 @@ export class Turn {
   public generateNotation(board: Board): void {
     let not: string = '';
 
-    // TODO Actor disambiguation
-
     // Get all pieces of matching type to current piece
     // For each of those pieces, get all possible moves - will give turn objects
     // If any of those turns have identical x2, y2 s, add to an array
     // Break the inner loop to go to the next piece
     // Outside of the loops, look at the pieces in that array and find the distinct movement vector (x or y)
-    //  differing col, two bishops: B3e5
+    //   differing col, two bishops: B3e5
 
     // Actor disambiguation
     let piecesOfSameType = board.getMatchingPieces(this.actor.team, [this.actor.type])
 
     let turns: Turn[] = [];
-    let conflictTurn: Turn;
+    let conflictTurn: Turn = null;
     conflictCheck:
     for (let a = 0; a < piecesOfSameType.length; a++) {
       turns = piecesOfSameType[a].getPossibleTurns(board);
       for (let b = 0; b < turns.length; b++) {
-        if (this.x2 == turns[b].x2 && this.y2 == turns[b].y2)
+        if (this != turns[b] && this.x2 == turns[b].x2 && this.y2 == turns[b].y2) {
           conflictTurn = turns[b];
           break conflictCheck;
+        }
       }
     }
 
-    if (conflictTurn !== undefined) {
+    if (conflictTurn !== null) {
       let rowOrCol: string;
       if (this.x1 == conflictTurn.x1) { // Same column
-        rowOrCol = String(this.y1 + 1);
+        rowOrCol = (this.y1 + 1).toString();
       } else { // Same row
         rowOrCol = Piece.colToLetter(this.x1);
       }
@@ -110,13 +109,10 @@ export class Turn {
         not = not + Piece.colToLetter(this.x2) + (this.y2 + 1);
     }
 
-    // Prefixes
-    if (this.type === 'take' || this.type === 'enpassant') not = this.actor.notation + not;
-
     // Suffixes
-    if (this.type === 'enpassant') not += '(ep)';
     if (this.check === 'check') not += '+';
     if (this.check === 'checkmate') not += '++';
+    if (this.check === 'stalemate') not += '+++';
 
     this._notation = not;
   }
