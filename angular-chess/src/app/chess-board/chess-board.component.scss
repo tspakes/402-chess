@@ -23,13 +23,14 @@ tr {
 }
 
 tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
-  background-image: url("/assets/squares/light.png");
+  background-image: url("/assets/squares/dark.png");
+
   background-size: contain;
 
 }
 
 tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd) {
-  background-image: url("/assets/squares/dark.png");
+  background-image: url("/assets/squares/light.png");
   background-size: contain;
 
 }
