@@ -326,9 +326,9 @@ export default class BoardAPI {
 			}
 			
 			// Sub-classify castle turn type depending on king's final location
-			turn.meta.kingside = boardFinal[turn.actor.y][6] !== null
-				&& boardFinal[turn.actor.y][6].type === 'king'
-				&& boardFinal[turn.actor.y][6].team === this._teamCurrent;
+			turn.meta.kingside = boardFinal[turn.actor.y][7] !== null
+				&& boardFinal[turn.actor.y][7].type === 'king'
+				&& boardFinal[turn.actor.y][7].team === this._teamCurrent;
 			if (DEBUG) console.log(Chalk.gray(`turn.meta.kingside=${turn.meta.kingside}`));
 		}
 
