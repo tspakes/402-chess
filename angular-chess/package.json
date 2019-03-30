@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --host 0.0.0.0",
     "prod": "ng build --prod",
     "build": "ng build",
     "test": "ng test",
@@ -26,6 +26,7 @@
     "@ngrx/store-devtools": "^7.3.0",
     "bootstrap": "^4.3.1",
     "core-js": "^2.5.4",
+    "moment": "^2.24.0",
     "ng-redux": "^4.1.0",
     "ngx-bootstrap": "^3.2.0",
     "redux": "^4.0.1",

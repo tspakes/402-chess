@@ -2,6 +2,8 @@
 	<head>
 		<title>Input Spoofing | 402Chess</title>
 		<script type="text/javascript">
+			const SCRIPT_INTERVAL = 250;
+
 			// Generate HTML
 			let firstinit = true;
 			function init() {
@@ -110,7 +112,7 @@
 					a++;
 					if (a >= actions.length)
 						clearInterval(intval);
-				}, 100);
+				}, SCRIPT_INTERVAL);
 			}
 		</script>
 		<style>

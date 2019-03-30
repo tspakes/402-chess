@@ -19,6 +19,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { InteractComponent } from './interact/interact.component';
 import { MainComponent } from './main/main.component';
 import { ReversePipe } from './pipes/reverse.pipe';
+import { PlayComponent } from './play/play.component';
+import {CountdownComponent} from './countdown/countdown.component';
 
 @NgModule({
     declarations: [
@@ -30,7 +32,9 @@ import { ReversePipe } from './pipes/reverse.pipe';
         PromotionModalComponent,
         InteractComponent,
         MainComponent,
-        ReversePipe
+        ReversePipe,
+        PlayComponent,
+        CountdownComponent
 
     ],
     imports: [

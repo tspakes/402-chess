@@ -13,6 +13,7 @@ export interface IHistoryModel {
     notation?: string;
     type?: string;
     target?: IActorModel;
+    check: string;
 }
 
 interface IActorModel {

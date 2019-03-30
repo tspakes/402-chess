@@ -23,7 +23,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     board$: Observable<IBoardState> = this.store.select(state => state.board);
 
-    modalRef: BsModalRef = null;
+    pawnPromotionModalRef: BsModalRef = null;
 
     modalDescription: Subscription = null;
 
@@ -50,7 +50,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     private setupModalSubscription() {
         this.modalDescription = this.modalService.onHide.subscribe(() => {
-            this.modalRef = null;
+            this.pawnPromotionModalRef = null;
         });
     }
 
@@ -58,13 +58,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
         if (this.board !== null) {
             if (this.board.message === 'PAWN_PROMOTION') {
-                if (this.modalRef === null) {
-                    this.modalRef = this.modalService.show(PromotionModalComponent);
+                if (this.pawnPromotionModalRef === null) {
+                    this.pawnPromotionModalRef = this.modalService.show(PromotionModalComponent);
                 }
-            } else if (this.modalRef !== null) {
-                this.modalRef.hide();
-                this.modalRef = null;
+            } else if (this.pawnPromotionModalRef !== null) {
+                this.pawnPromotionModalRef.hide();
+                this.pawnPromotionModalRef = null;
             }
+
         }
     }
 

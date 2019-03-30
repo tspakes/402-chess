@@ -11,21 +11,21 @@
                 <div class="card-body d-flex flex-column justify-content-between align-items-center">
 
                     <button type="button" class="commit-button shadow-sm"
-                            [ngClass]="{'commit-disabled': board.currentTeam != 'black' || board.message.length > 0}"
+                            [ngClass]="{'commit-disabled': board?.currentTeam != 'black' || board?.message.length > 0}"
                             (click)="commit('black')">
-                        <span *ngIf="board.currentTeam === 'black' &&  board.message.length <= 0"><i
+                        <span *ngIf="board?.currentTeam === 'black' &&  board?.message.length <= 0"><i
                                 class="fas fa-2x fa-arrow-down"></i></span>
-                        <span *ngIf="board.currentTeam !== 'black'"></span>
+                        <span *ngIf="board?.currentTeam !== 'black'"></span>
                     </button>
 
                     <i class="fas fa-undo" (click)="undo()"></i>
 
                     <button type="button" class="commit-button  shadow-sm"
-                            [ngClass]="{'commit-disabled': board.currentTeam != 'white' || board.message.length > 0}"
+                            [ngClass]="{'commit-disabled': board?.currentTeam != 'white' || board?.message.length > 0}"
                             (click)="commit('white')">
-                        <span *ngIf="board.currentTeam === 'white' &&  board.message.length <= 0"><i
+                        <span *ngIf="board?.currentTeam === 'white' &&  board?.message.length <= 0"><i
                                 class="fas fa-2x fa-arrow-up"></i></span>
-                        <span *ngIf="board.currentTeam !== 'white'"></span>
+                        <span *ngIf="board?.currentTeam !== 'white'"></span>
                     </button>
 
 
@@ -122,40 +122,49 @@
 
             <div class="card shadow-sm h-500">
                 <div class="card-header text-center">
+
                     <h5>Move History</h5>
-                    <strong>({{board.history.length}})</strong>
 
                 </div>
                 <div class="card-body history-body" #history>
                     <div class="chess-move d-flex flex-row w-100"
-                         *ngFor="let move of board.history | reverse; trackBy: historyFunction">
+                         *ngFor="let move of board?.history | reverse; trackBy: historyFunction; let i = index;">
+
                         <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
-                             *ngIf="move.type === 'move'">
-                            <app-chess-piece styleClass="small-piece" [piece]="move.actor"
-                                             style="position: relative; display: inline;"></app-chess-piece>
-                            <p>moves to</p>
-                            <strong>{{move.notation | uppercase}}</strong>
-                        </div>
-                        <div class="d-flex flex-row justify-content-between w-100 animated fadeIn"
-                             *ngIf="move.type === 'take'">
-                            <app-chess-piece styleClass="small-piece" [piece]="move.actor"
-                                             style="position: relative; display: inline;"></app-chess-piece>
-                            <p>takes </p>
-                            <app-chess-piece style="position: relative; display: inline;" styleClass="small-piece"
-                                             [piece]="move.target"></app-chess-piece>
+                             *ngIf="move.type === 'move'"
+                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                            <p>{{board?.history.length - i}}.</p>
+                            <strong>{{move.notation}}</strong>
                         </div>
 
-                        <div class="d-flex flex-row justify-content-between w-100 animated fadeIn"
-                             *ngIf="move.type === 'pawnpromotion'">
-                            <app-chess-piece styleClass="small-piece" [piece]="move.actor"
-                                             style="position: relative; display: inline;"></app-chess-piece>
+                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                             *ngIf="move.type === 'take'"
+                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                            <p>{{board?.history.length - i}}.</p>
+                            <strong>{{move.notation}}</strong>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                             *ngIf="move.type === 'pawnpromotion'"
+                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                            <p>{{board?.history.length - i}}.</p>
+                            <strong>{{move.notation}}</strong>
+                        </div>
 
-                            <p>Promotion</p>
-
+                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                             *ngIf="move.type === 'castle'"
+                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                            <p>{{board?.history.length - i}}.</p>
+                            <strong>{{move.notation}}</strong>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                             *ngIf="move.type === 'enpassant'"
+                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                            <p>{{board?.history.length - i}}.</p>
+                            <strong>{{move.notation}}</strong>
                         </div>
                     </div>
 
-                    <div *ngIf="board.history.length === 0"
+                    <div *ngIf="board?.history.length === 0"
                          class="d-flex flex-column justify-content-center align-items-center h-100 animated fadeIn">
                         <i class="fas fa-2x fa-history mb-2"></i>
 
