@@ -18,7 +18,7 @@ export class BoardApi {
         if (environment.production === true) {
             this.endpoint = window.location.href.substr(0, window.location.href.lastIndexOf('/'));
         } else {
-            this.endpoint = "http://192.168.1.169"
+            this.endpoint = "http://localhost"
 
         }
 
