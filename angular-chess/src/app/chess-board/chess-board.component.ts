@@ -20,7 +20,9 @@ export class ChessBoardComponent {
     private grid: IPieceModel[] = [];
 
     public flip = false;
-    
+
+    public rotate = "";
+
     @ViewChild('history') historyRef: ElementRef;
 
     modalRef: BsModalRef;
@@ -56,6 +58,8 @@ export class ChessBoardComponent {
     public get getGrid() {
 
         if (this.board !== null) {
+
+            this.rotate = this.board.currentTeam === 'black' ? 'rotate' : 'unrotate';
 
             this.grid = this.board.pieces;
 

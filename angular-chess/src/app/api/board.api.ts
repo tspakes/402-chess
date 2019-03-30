@@ -18,7 +18,7 @@ export class BoardApi {
         if (environment.production === true) {
             this.endpoint = window.location.href.substr(0, window.location.href.lastIndexOf('/'));
         } else {
-            this.endpoint = "http://localhost"
+            this.endpoint = "http://chesspi.nomads.utk.edu"
 
         }
 

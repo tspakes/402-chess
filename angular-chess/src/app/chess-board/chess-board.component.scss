@@ -89,5 +89,15 @@ tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd) {
 
 .rotate {
 
-  transform: rotateY(180deg) rotateX(180deg);
+  transition: all 1.0s;
+  transform:  rotateZ(180deg);
+
 }
+
+.unrotate {
+
+  transition: all 1.0s;
+  transform: rotateZ(0deg);
+
+}
+

@@ -19,3 +19,18 @@
 .h-500 {
   height: 500px !important;
 }
+
+.rotate {
+
+  transition: all 1.0s;
+  transform:  rotateZ(180deg);
+
+}
+
+.unrotate {
+
+  transition: all 1.0s;
+  transform: rotateZ(0deg);
+
+}
+

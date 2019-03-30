@@ -35,7 +35,7 @@
         <div class="col-auto d-flex align-items-center">
             <table (dragover)="dragOver($event)" (drop)="onDrop($event)" border="0" cellpadding="0" cellspacing="0">
                 <app-chess-piece *ngFor="let piece of getGrid | removeEmpty; trackBy: trackElement" [piece]="piece"
-                                 (dblclick)="promote(piece)" styleClass="animated fadeIn"></app-chess-piece>
+                                 (dblclick)="promote(piece)" [styleClass]="'animated '+ 'fadeIn ' + rotate"></app-chess-piece>
                 <tr>
                     <td x="1" y="1"></td>
                     <td x="2" y="1"></td>
@@ -119,48 +119,106 @@
             </table>
         </div>
         <div class="col-auto">
-
-            <div class="card shadow-sm h-500" [ngClass]="{'rotate': flip}">
+            <div class="card shadow-sm h-100 overflow-hidden" [ngClass]="rotate">
                 <div class="card-header text-center">
-
                     <h5 (click)="flip = !flip">Move History</h5>
-
                 </div>
                 <div class="card-body history-body" #history>
-                    <div class="chess-move d-flex flex-row w-100"
-                         *ngFor="let move of board?.history | reverse; trackBy: historyFunction; let i = index;">
 
-                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
-                             *ngIf="move.type === 'move'"
-                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
-                            <p>{{board?.history.length - i}}.</p>
-                            <strong>{{move.notation}}</strong>
-                        </div>
+                    <div class="row text-center">
+                        <div class="col-auto text-center">
 
-                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
-                             *ngIf="move.type === 'take'"
-                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
-                            <p>{{board?.history.length - i}}.</p>
-                            <strong>{{move.notation}}</strong>
                         </div>
-                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
-                             *ngIf="move.type === 'pawnpromotion'"
-                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
-                            <p>{{board?.history.length - i}}.</p>
-                            <strong>{{move.notation}}</strong>
+                        <div class="col-auto text-center">
+                            White
                         </div>
+                        <div class="col-auto text-center">
+                            Black
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-auto">
+                            <div class="chess-move d-flex flex-row w-100"
+                                 *ngFor="let move of board?.history | reverse; trackBy: historyFunction; let i = index;">
+                                <p>{{board?.history.length - i}}.</p>
+                            </div>
+                        </div>
+                        <!--White-->
+                        <div class="col-auto">
+                            <p *ngIf="board?.currentTeam == 'white'"></p>
 
-                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
-                             *ngIf="move.type === 'castle'"
-                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
-                            <p>{{board?.history.length - i}}.</p>
-                            <strong>{{move.notation}}</strong>
+                            <div class="chess-move d-flex flex-row w-100"
+                                 *ngFor="let move of board?.history | reverse; trackBy: historyFunction;">
+                                <div *ngIf="move.actor.team === 'white'">
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'move'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'take'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'pawnpromotion'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'castle'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+
+                                        <p>{{move.notation}}</p>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'enpassant'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
-                        <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
-                             *ngIf="move.type === 'enpassant'"
-                             [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
-                            <p>{{board?.history.length - i}}.</p>
-                            <strong>{{move.notation}}</strong>
+                        <!--Black-->
+                        <div class="col-auto">
+                            <p *ngIf="board?.currentTeam == 'black'"></p>
+
+                            <div class="chess-move d-flex flex-row w-100"
+                                 *ngFor="let move of board?.history | reverse; trackBy: historyFunction;">
+                                <div *ngIf="move.actor.team === 'black'">
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'move'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'take'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'pawnpromotion'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'castle'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between  w-100 animated fadeIn"
+                                         *ngIf="move.type === 'enpassant'"
+                                         [ngClass]="{'text-danger': move.check === 'checkmate' || move.check === 'stalemate' || move.check === 'check'}">
+                                        <p>{{move.notation}}</p>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
