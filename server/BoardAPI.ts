@@ -326,9 +326,9 @@ export default class BoardAPI {
 			}
 			
 			// Sub-classify castle turn type depending on king's final location
-			turn.meta.kingside = boardFinal[turn.actor.y][6] !== null
-				&& boardFinal[turn.actor.y][6].type === 'king'
-				&& boardFinal[turn.actor.y][6].team === this._teamCurrent;
+			turn.meta.kingside = boardFinal[turn.actor.y][7] !== null
+				&& boardFinal[turn.actor.y][7].type === 'king'
+				&& boardFinal[turn.actor.y][7].team === this._teamCurrent;
 			if (DEBUG) console.log(Chalk.gray(`turn.meta.kingside=${turn.meta.kingside}`));
 		}
 
@@ -355,10 +355,10 @@ export default class BoardAPI {
 
 		// Check
 		let king = this._board.getMatchingPieces(this._teamCurrent, [ 'king' ])[0];
-		if (DEBUG) {
-			console.log(Chalk.gray('  ==[') + Chalk.white(' Threat ') + Chalk.gray(']==='));
-			BoardAPI.printGrid(this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent)));
-		}
+		// if (DEBUG) {
+		// 	console.log(Chalk.gray('  ==[') + Chalk.white(' Threat ') + Chalk.gray(']==='));
+		// 	BoardAPI.printGrid(this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent)));
+		// }
 		if (this._board.getThreatenedSpaces(this.getOppTeam(this._teamCurrent))[king.y][king.x])
 			check = 'check';
 		else
@@ -374,6 +374,7 @@ export default class BoardAPI {
 				if (checkEscapePossible)
 					break possibleMoveLoop;
 			}
+		this.errorDesc = '';
 
 		// Classify checkmate and stalemate
 		if (!checkEscapePossible) check = 'checkmate';
